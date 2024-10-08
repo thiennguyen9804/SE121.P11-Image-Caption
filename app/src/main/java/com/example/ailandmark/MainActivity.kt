@@ -2,14 +2,29 @@ package com.example.ailandmark
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,11 +32,14 @@ import com.example.ailandmark.presentation.camera_screen.CameraScreen
 import com.example.ailandmark.presentation.description_screen.DescriptionScreen
 import com.example.ailandmark.ui.theme.AILandmarkTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var navController: NavHostController
+    private lateinit var viewModel: SharedViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
-//        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         if(!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(
@@ -37,20 +55,25 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-                val navController = rememberNavController()
+
+                navController = rememberNavController()
+                viewModel = hiltViewModel<SharedViewModel>()
+
                 NavHost(
                     navController = navController,
                     startDestination = "camera_screen"
                 ) {
                     composable("camera_screen") {
                         CameraScreen(
-                            navController = navController,
                             controller = controller,
-                        )
+                        ) {
+                            takePhoto(controller)
+                        }
                     }
 
                     composable("description_screen") {
-                        DescriptionScreen()
+                        val bitmap by viewModel.bitmap.collectAsState()
+                        DescriptionScreen(bitmap)
                     }
                 }
             }
@@ -66,11 +89,72 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    companion object {
-        private val CAMERAX_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
+    private fun takePhoto(
+        controller: LifecycleCameraController
+    ) {
+        if(!hasRequiredPermissions()) {
+            return
+        }
+
+        val metadata = ImageCapture.Metadata().apply {
+            isReversedHorizontal = (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA)
+        }
+
+        val outputOptions = ImageCapture.OutputFileOptions
+            .Builder(
+                File(filesDir, "${System.currentTimeMillis()}.jpg")
+            )
+            .setMetadata(metadata)
+            .build()
+
+        controller.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(applicationContext),
+            object: ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    val bitmap = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        outputFileResults.savedUri?.let {
+                            ImageDecoder.createSource(applicationContext.contentResolver,
+                                it
+                            )
+                        }?.let { ImageDecoder.decodeBitmap(it) }
+                    } else {
+                        MediaStore.Images.Media.getBitmap(
+                            applicationContext.contentResolver,
+                            outputFileResults.savedUri
+                        )
+                    }
+
+                    viewModel.updateBitmap(bitmap)
+                    navController.navigate("description_screen")
+                    println("image uri ${outputFileResults.savedUri.toString()}")
+
+                    Toast.makeText(
+                        applicationContext,
+                        "Succeed!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Something went wrong!!!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    Timber.tag("Capture Error").e(exception)
+                }
+
+            }
         )
     }
 
+    companion object {
+        private val CAMERAX_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+        )
+    }
 }
