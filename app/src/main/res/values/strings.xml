@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">AILandmark</string>
+    <string name="app_name">ImageAI</string>
+    <string name="login_text">Đăng nhập</string>
+    <string name="dont_have_account_text">Chưa có tài khoản?</string>
+    <string name="sign_up_now_text">Đăng ký ngay!</string>
+    <string name="sign_in_name_text">Tên đăng nhập</string>
+    <string name="password_text">Mật khẩu</string>
+    <string name="remember_me_text">Nhớ mật khẩu</string>
+    <string name="or_sign_in_with_text">Hoặc đăng nhập với</string>
 </resources>

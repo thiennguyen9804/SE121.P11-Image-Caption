@@ -127,5 +127,4 @@ dependencies {
 
 kapt {
     correctErrorTypes = true
-    generateStubs = true
 }

@@ -2,6 +2,7 @@ package com.example.ailandmark.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val PrimaryPurple = Color(0xFF9A00F7)
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

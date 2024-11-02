@@ -2,16 +2,13 @@ package com.example.ailandmark
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -23,13 +20,14 @@ import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.ailandmark.core.presentation.utils.Screen
 import com.example.ailandmark.presentation.camera_screen.CameraScreen
 import com.example.ailandmark.presentation.description_screen.DescriptionScreen
+import com.example.ailandmark.presentation.login_screen.LoginScreen
 import com.example.ailandmark.ui.theme.AILandmarkTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -61,9 +59,9 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "camera_screen"
+                    startDestination = Screen.LoginScreen.route
                 ) {
-                    composable("camera_screen") {
+                    composable(Screen.CameraScreen.route) {
                         CameraScreen(
                             controller = controller,
                         ) {
@@ -71,9 +69,16 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    composable("description_screen") {
+                    composable(Screen.DescriptionScreen.route) {
                         val bitmap by viewModel.bitmap.collectAsState()
                         DescriptionScreen(bitmap)
+                    }
+
+                    composable(Screen.LoginScreen.route) {
+                        LoginScreen(
+                            navigateToSignUp = {},
+                            signIn = {}
+                        )
                     }
                 }
             }
