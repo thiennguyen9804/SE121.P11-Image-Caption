@@ -23,11 +23,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.ailandmark.core.presentation.utils.Screen
 import com.example.ailandmark.presentation.camera_screen.CameraScreen
+import com.example.ailandmark.presentation.dashboard_screen.DashboardScreen
 import com.example.ailandmark.presentation.description_screen.DescriptionScreen
 import com.example.ailandmark.presentation.login_screen.LoginScreen
+import com.example.ailandmark.presentation.sign_up_screen.SignUpScreen
 import com.example.ailandmark.ui.theme.AILandmarkTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -59,27 +62,59 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.LoginScreen.route
+                    startDestination = Screen.AuthNav.route
                 ) {
-                    composable(Screen.CameraScreen.route) {
-                        CameraScreen(
-                            controller = controller,
-                        ) {
-                            takePhoto(controller)
+                    navigation(
+                        startDestination = Screen.AuthNav.LoginScreen.route,
+                        route = Screen.AuthNav.route
+                    ) {
+                        composable(Screen.AuthNav.LoginScreen.route) {
+                            LoginScreen(
+                                navigateToSignUp = {
+                                    navController.navigate(Screen.AuthNav.SignUpScreen.route)
+                                },
+                                signIn = {}
+                            )
+                        }
+
+                        composable(Screen.AuthNav.SignUpScreen.route) {
+                            SignUpScreen(
+                                navigateToLogin = {
+                                    navController.navigate(Screen.AuthNav.LoginScreen.route)
+                                },
+                                signUp = {}
+                            )
                         }
                     }
 
-                    composable(Screen.DescriptionScreen.route) {
-                        val bitmap by viewModel.bitmap.collectAsState()
-                        DescriptionScreen(bitmap)
+                    navigation(
+                        route = Screen.CameraNav.route,
+                        startDestination = Screen.DashboardNav.DashboardScreen.route
+                    ) {
+                        composable(Screen.CameraNav.CameraScreen.route) {
+                            CameraScreen(
+                                controller = controller,
+                            ) {
+                                takePhoto(controller)
+                            }
+                        }
+
+                        composable(Screen.CameraNav.DescriptionScreen.route) {
+                            val bitmap by viewModel.bitmap.collectAsState()
+                            DescriptionScreen(bitmap)
+                        }
                     }
 
-                    composable(Screen.LoginScreen.route) {
-                        LoginScreen(
-                            navigateToSignUp = {},
-                            signIn = {}
-                        )
+                    navigation(
+                        startDestination = Screen.DashboardNav.DashboardScreen.route,
+                        route = Screen.DashboardNav.route
+                    ) {
+                        composable(Screen.DashboardNav.DashboardScreen.route) {
+                            DashboardScreen()
+                        }
                     }
+
+
                 }
             }
         }

@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
 import com.example.ailandmark.R
 
+// chọn màu nền dựa trên icon
 fun iconToColor(@DrawableRes resId: Int): Color {
     val color = when(resId) {
         R.drawable.ic_facebook -> Color(0xff4F43D3)

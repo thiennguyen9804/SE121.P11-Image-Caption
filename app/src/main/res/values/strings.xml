@@ -7,4 +7,7 @@
     <string name="password_text">Mật khẩu</string>
     <string name="remember_me_text">Nhớ mật khẩu</string>
     <string name="or_sign_in_with_text">Hoặc đăng nhập với</string>
+    <string name="had_account_already_text">Đã có tài khoản?</string>
+    <string name="password_confirm_text">Nhập lại mật khẩu</string>
+    <string name="sign_up_text">Đăng ký</string>
 </resources>
