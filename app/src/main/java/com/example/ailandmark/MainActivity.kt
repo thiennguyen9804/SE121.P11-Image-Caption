@@ -14,6 +14,7 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -91,6 +92,7 @@ class MainActivity : ComponentActivity() {
                         route = Screen.CameraNav.route,
                         startDestination = Screen.DashboardNav.DashboardScreen.route
                     ) {
+
                         composable(Screen.CameraNav.CameraScreen.route) {
                             CameraScreen(
                                 controller = controller,

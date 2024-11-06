@@ -101,8 +101,7 @@ fun SignUpScreen(
                     topEnd = 25.dp,
                 ))
                 .background(Color.White)
-                .padding(horizontal = 20.dp, vertical = 30.dp)
-                ,
+                .padding(horizontal = 20.dp, vertical = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(

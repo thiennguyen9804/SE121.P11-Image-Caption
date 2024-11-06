@@ -10,4 +10,7 @@
     <string name="had_account_already_text">Đã có tài khoản?</string>
     <string name="password_confirm_text">Nhập lại mật khẩu</string>
     <string name="sign_up_text">Đăng ký</string>
+    <string name="captured_image_text">Hình đã chụp</string>
+    <string name="more_text">xem thêm</string>
+    <string name="saved_vocabulary_text">Từ vựng đã lưu</string>
 </resources>
