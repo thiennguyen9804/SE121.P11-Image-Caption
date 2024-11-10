@@ -50,6 +50,7 @@ fun SE121P11NewTheme(
         else -> LightColorScheme
     }
 
+
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

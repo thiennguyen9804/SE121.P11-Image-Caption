@@ -9,15 +9,11 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,15 +24,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.se121p11new.core.presentation.utils.Screen
+import com.example.se121p11new.core.presentation.utils.CameraScreen
+import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreen
+import com.example.se121p11new.core.presentation.utils.DashboardScreen
+import com.example.se121p11new.core.presentation.utils.LoginScreen
+import com.example.se121p11new.core.presentation.utils.SignUpScreen
 import com.example.se121p11new.presentation.camera_screen.CameraScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
-import com.example.se121p11new.presentation.description_screen.DescriptionScreen
+import com.example.se121p11new.presentation.captured_image_preview_screen.CapturedImagePreviewScreen
 import com.example.se121p11new.presentation.login_screen.LoginScreen
+import com.example.se121p11new.presentation.shared_view_model.SharedViewModel
 import com.example.se121p11new.presentation.sign_up_screen.SignUpScreen
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,29 +70,28 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.CameraNav.CameraScreen.route
+                    startDestination = CameraScreen
                 ) {
 
-                    composable(Screen.AuthNav.LoginScreen.route) {
+                    composable<LoginScreen> {
                         LoginScreen(
                             navigateToSignUp = {
-                                navController.navigate(Screen.AuthNav.SignUpScreen.route)
+                                navController.navigate(SignUpScreen)
                             },
                             signIn = {}
                         )
                     }
 
-                    composable(Screen.AuthNav.SignUpScreen.route) {
+                    composable<SignUpScreen> {
                         SignUpScreen(
                             navigateToLogin = {
-                                navController.navigate(Screen.AuthNav.LoginScreen.route)
+                                navController.navigate(LoginScreen)
                             },
                             signUp = {}
                         )
                     }
 
-
-                    composable(Screen.CameraNav.CameraScreen.route) {
+                    composable<CameraScreen> {
                         CameraScreen(
                             controller = controller,
                         ) {
@@ -98,18 +99,15 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    composable(Screen.CameraNav.DescriptionScreen.route) {
-                        val bitmap by viewModel.bitmap.collectAsState()
-                        DescriptionScreen(bitmap)
+                    composable<CapturedImagePreviewScreen> {
+                        val bitmap by viewModel.bitmap.collectAsStateWithLifecycle()
+                        val imageName by viewModel.imageName.collectAsStateWithLifecycle()
+                        CapturedImagePreviewScreen(bitmap, imageName)
                     }
 
-
-
-                    composable(Screen.DashboardNav.DashboardScreen.route) {
+                    composable<DashboardScreen> {
                         DashboardScreen()
                     }
-
-
                 }
             }
         }
@@ -136,9 +134,13 @@ class MainActivity : ComponentActivity() {
                 (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA)
         }
 
+        viewModel.setImageName("${System.currentTimeMillis()}.jpg")
+//        viewModel.normalImageName = "${System.currentTimeMillis()}.jpg"
+        println("image name ${viewModel.normalImageName}")
+
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(
-                File(filesDir, "${System.currentTimeMillis()}.jpg")
+                File(filesDir, viewModel.imageName.value)
             )
             .setMetadata(metadata)
             .build()
@@ -163,7 +165,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     viewModel.updateBitmap(bitmap)
-                    navController.navigate("description_screen")
+                    navController.navigate(CapturedImagePreviewScreen)
                     println("image uri ${outputFileResults.savedUri.toString()}")
 
                     Toast.makeText(
@@ -179,9 +181,7 @@ class MainActivity : ComponentActivity() {
                         "Something went wrong!!!",
                         Toast.LENGTH_SHORT
                     ).show()
-
                 }
-
             }
         )
     }
@@ -192,21 +192,5 @@ class MainActivity : ComponentActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
         )
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SE121P11NewTheme {
-        Greeting("Android")
     }
 }

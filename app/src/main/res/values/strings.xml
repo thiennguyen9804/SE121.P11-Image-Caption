@@ -13,4 +13,5 @@
     <string name="captured_image_text">Hình đã chụp</string>
     <string name="more_text">xem thêm</string>
     <string name="saved_vocabulary_text">Từ vựng đã lưu</string>
+    <string name="analyze_text">Phân tích</string>
 </resources>
