@@ -1,0 +1,135 @@
+package com.example.se121p11new.presentation.image_captioning_screen
+
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.se121p11new.R
+import com.example.se121p11new.presentation.image_captioning_screen.components.ClickableWords
+import com.example.se121p11new.ui.theme.SE121P11NewTheme
+
+@Composable
+fun ImageCaptioningScreen(
+    bitmap: ImageBitmap
+) {
+    var selectedWord by remember { mutableStateOf<String?>(null) }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)) {
+        Column(
+            modifier = Modifier
+                .padding(35.dp)
+                .fillMaxSize()
+                .clip(RoundedCornerShape(15.dp))
+                .background(Color(0xffD9D9D9))
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                bitmap = bitmap,
+                contentDescription = null,
+                modifier = Modifier
+                    .width(180.dp)
+                    .aspectRatio(9.0f / 16.0f)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentScale = ContentScale.FillHeight
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.description_text),
+                modifier = Modifier.align(Alignment.Start),
+                fontSize = 17.sp
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .padding(10.dp)
+            ) {
+                ClickableWords(
+                    text = "Kiana and Captain is sleeping together",
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                ) {
+                    selectedWord = it
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .padding(10.dp)
+            ) {
+                ClickableWords(
+                    text = "Kiana và Captain đang ngủ cùng nhau",
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                ) {
+                    selectedWord = it
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.vocabulary_text),
+                modifier = Modifier.align(Alignment.Start),
+                fontSize = 17.sp
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .padding(10.dp)
+            ) {
+                Text(
+                    text = "sleeping: ngủ",
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ImageCaptioningScreenPreview() {
+    SE121P11NewTheme {
+        ImageCaptioningScreen(
+            bitmap = ImageBitmap.imageResource(R.drawable.kiana_and_captain),
+        )
+    }
+}

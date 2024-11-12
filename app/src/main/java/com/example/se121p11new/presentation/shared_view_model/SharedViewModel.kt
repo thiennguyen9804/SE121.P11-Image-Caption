@@ -1,10 +1,14 @@
 package com.example.se121p11new.presentation.shared_view_model
 
+import android.content.res.Resources
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +29,13 @@ class SharedViewModel @Inject constructor() : ViewModel() {
 
     fun updateBitmap(newBitmap: Bitmap?) {
         _bitmap.value = newBitmap
+    }
+
+    fun onSubmit() {
+        viewModelScope.launch {
+            delay(timeMillis = 3000L)
+
+        }
     }
 
 

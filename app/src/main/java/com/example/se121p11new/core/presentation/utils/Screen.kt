@@ -37,6 +37,8 @@ object SignUpScreen
 @Serializable
 object CapturedImagePreviewScreen
 
+@Serializable
+object ImageCaptioningScreen
 
 @Serializable
 object DashboardScreen

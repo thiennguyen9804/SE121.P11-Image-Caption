@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.se121p11new.core.presentation.utils.CameraScreen
 import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreen
 import com.example.se121p11new.core.presentation.utils.DashboardScreen
+import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreen
 import com.example.se121p11new.core.presentation.utils.LoginScreen
 import com.example.se121p11new.core.presentation.utils.SignUpScreen
 import com.example.se121p11new.presentation.camera_screen.CameraScreen
@@ -102,7 +103,13 @@ class MainActivity : ComponentActivity() {
                     composable<CapturedImagePreviewScreen> {
                         val bitmap by viewModel.bitmap.collectAsStateWithLifecycle()
                         val imageName by viewModel.imageName.collectAsStateWithLifecycle()
-                        CapturedImagePreviewScreen(bitmap, imageName)
+                        CapturedImagePreviewScreen(bitmap, imageName) {
+//                            viewModel.
+                        }
+                    }
+
+                    composable<ImageCaptioningScreen> {
+
                     }
 
                     composable<DashboardScreen> {

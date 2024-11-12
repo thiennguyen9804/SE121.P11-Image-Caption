@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -27,13 +29,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.se121p11new.presentation.camera_screen.components.CameraPreview
+import com.example.se121p11new.presentation.captured_image_preview_screen.components.SubmitButton
 import java.io.File
 
 
 @Composable
 fun CapturedImagePreviewScreen(
     bitmap: Bitmap?,
-    imageName: String = ""
+    imageName: String = "",
+    onSubmit: () -> Unit
 ) {
     // TODO chuyển launch effect ra ngoài sub graph
     val context = LocalContext.current as ComponentActivity
@@ -86,7 +90,13 @@ fun CapturedImagePreviewScreen(
                 .padding(horizontal = 6.dp),
             horizontalArrangement = Arrangement.End,
         ) {
+            SubmitButton(
+                modifier = Modifier
+                    .size(90.dp)
+                    .height(35.dp)
+            ) {
 
+            }
         }
 
     }

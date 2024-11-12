@@ -2,18 +2,16 @@ package com.example.se121p11new.presentation.captured_image_preview_screen.compo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,13 +35,16 @@ fun SubmitButton(
         modifier = modifier
             .border(1.dp, Color.Black, RoundedCornerShape(35.dp))
             .clip(RoundedCornerShape(35.dp))
-            .background(Color.White),
+            .background(Color.White)
+            .clickable(onClick = onClick)
+            .padding(end = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
             contentDescription = null,
+            tint = Color.White,
             modifier = Modifier
                 .clip(CircleShape)
                 .background(Color(0xff9A00F7))

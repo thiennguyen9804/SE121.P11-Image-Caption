@@ -14,4 +14,6 @@
     <string name="more_text">xem thêm</string>
     <string name="saved_vocabulary_text">Từ vựng đã lưu</string>
     <string name="analyze_text">Phân tích</string>
+    <string name="description_text">"Mô tả"</string>
+    <string name="vocabulary_text">Từ vựng</string>
 </resources>

@@ -87,6 +87,9 @@ dependencies {
 
 //    Kotlin Serialization
     implementation(libs.kotlinx.serialization.json)
+
+//    Retrofit
+    implementation(libs.retrofit)
 }
 
 kapt {
