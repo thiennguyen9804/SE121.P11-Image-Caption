@@ -22,6 +22,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +47,11 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
+import com.example.se121p11new.core.presentation.components.AuthScreenImage
 import com.example.se121p11new.core.presentation.components.OutlinedText
 import com.example.se121p11new.core.presentation.components.SignInWithButton
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -65,36 +68,7 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .scale(1.0f)
-        ) {
-            Image(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                painter = painterResource(R.drawable.img),
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth
-            )
-            OutlinedText(
-                text = "Image AI".toUpperCase(Locale.current),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = (70).dp),
-                fontSize = 80.sp,
-                fontWeight = FontWeight.Bold,
-                outlineColor = Color.White,
-                style = TextStyle(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xff651A93),
-                            Color(0xffEA80FC),
-                        )
-                    )
-                )
-            )
-        }
+        AuthScreenImage()
         Column(
             modifier = Modifier
                 .height(490.dp)
@@ -155,7 +129,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(0.dp)
             ) {
-                CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
                     Checkbox(
                         checked = checked,
                         onCheckedChange = {
@@ -179,7 +153,8 @@ fun LoginScreen(
                 Text(
                     text = stringResource(R.string.login_text).toUpperCase(Locale.current),
                     fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))

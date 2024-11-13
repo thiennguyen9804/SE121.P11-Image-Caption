@@ -16,4 +16,5 @@
     <string name="analyze_text">Phân tích</string>
     <string name="description_text">"Mô tả"</string>
     <string name="vocabulary_text">Từ vựng</string>
+    <string name="recaptioning_text">Tạo lại mô tả</string>
 </resources>

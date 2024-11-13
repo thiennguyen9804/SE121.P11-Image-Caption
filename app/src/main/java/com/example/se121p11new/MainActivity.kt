@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
             )
         }
         setContent {
+            this.enableEdgeToEdge()
             SE121P11NewTheme {
                 val controller = remember {
                     LifecycleCameraController(applicationContext).apply {
