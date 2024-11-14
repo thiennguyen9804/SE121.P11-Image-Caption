@@ -17,4 +17,11 @@
     <string name="description_text">"Mô tả"</string>
     <string name="vocabulary_text">Từ vựng</string>
     <string name="recaptioning_text">Tạo lại mô tả</string>
+    <string name="forget_password_text">Quên mật khẩu</string>
+    <string name="email_text">Email</string>
+    <string name="send_code_text">Gửi mã</string>
+    <string name="confirm_text">Xác nhận</string>
+    <string name="enter_otp_text">Nhập mã xác thực</string>
+    <string name="code_havent_sent_yet_text">Chưa nhận được mã?</string>
+    <string name="resend_text">Gửi lại mã!</string>
 </resources>

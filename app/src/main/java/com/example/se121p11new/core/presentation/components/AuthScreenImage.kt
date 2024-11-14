@@ -25,7 +25,6 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun AuthScreenImage(modifier: Modifier = Modifier) {
-
     Box(
         modifier = Modifier
             .fillMaxWidth()

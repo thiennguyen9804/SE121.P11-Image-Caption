@@ -2,9 +2,9 @@
 
 package com.example.se121p11new.presentation.login_screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,15 +13,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -34,13 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.intl.Locale
@@ -52,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.AuthScreenImage
-import com.example.se121p11new.core.presentation.components.OutlinedText
 import com.example.se121p11new.core.presentation.components.SignInWithButton
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
@@ -79,7 +73,8 @@ fun LoginScreen(
                     topEnd = 25.dp,
                 ))
                 .background(Color.White)
-                .padding(horizontal = 20.dp, vertical = 30.dp),
+                .padding(horizontal = 20.dp, vertical = 30.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -109,6 +104,11 @@ fun LoginScreen(
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
+//            Text(
+//                text = stringResource(R.string.sign_in_name_text) + ":",
+//                modifier = Modifier.align(Alignment.Start),
+//                fontWeight = FontWeight.Bold
+//            )
             OutlinedTextField(
                 value = loginName,
                 onValueChange = { loginName = it },
@@ -116,6 +116,11 @@ fun LoginScreen(
                 label = {Text(stringResource(R.string.sign_in_name_text))},
             )
             Spacer(modifier = Modifier.height(20.dp))
+//            Text(
+//                text = stringResource(R.string.password_text) + ":",
+//                modifier = Modifier.align(Alignment.Start),
+//                fontWeight = FontWeight.Bold
+//            )
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -154,7 +159,8 @@ fun LoginScreen(
                     text = stringResource(R.string.login_text).toUpperCase(Locale.current),
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 30.dp)
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))

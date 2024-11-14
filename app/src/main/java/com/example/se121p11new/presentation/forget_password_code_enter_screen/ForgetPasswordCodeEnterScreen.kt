@@ -1,5 +1,6 @@
-package com.example.se121p11new.presentation.sign_up_screen
+package com.example.se121p11new.presentation.forget_password_code_enter_screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,10 +11,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,94 +48,97 @@ import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.AuthScreenImage
 import com.example.se121p11new.core.presentation.components.SignInWithButton
+import com.example.se121p11new.presentation.forget_password_code_enter_screen.components.OTPTextField
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
-fun SignUpScreen(
-    navigateToLogin: () -> Unit,
-    signUp: () -> Unit
-) {
-    var loginName by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordConfirm by remember { mutableStateOf("") }
-    var checked by remember { mutableStateOf(false) }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+fun ForgetPasswordCodeEnter(modifier: Modifier = Modifier) {
+    var otpValue by remember {
+        mutableStateOf("")
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
         AuthScreenImage()
         Column(
             modifier = Modifier
-                .height(520.dp)
+                .height(490.dp)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .clip(RoundedCornerShape(
-                    topStart = 25.dp,
-                    topEnd = 25.dp,
-                ))
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 25.dp,
+                        topEnd = 25.dp,
+                    )
+                )
                 .background(Color.White)
-                .padding(horizontal = 20.dp, vertical = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(horizontal = 20.dp, vertical = 30.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(
+                    modifier = Modifier
+                        .offset(0.dp, 0.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xffd9d9d9)),
+                    onClick = { }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
+                        contentDescription = null,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = stringResource(R.string.sign_up_text),
+                text = stringResource(R.string.enter_otp_text),
                 color = Color(0xff651A93),
                 fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
+                fontSize = 35.sp,
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Left
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(5.dp))
+            OTPTextField(
+                otpValue = otpValue
+            ) {
+                if(otpValue.length <= 6) {
+                    otpValue = it
+                }
+            }
+            Spacer(modifier = Modifier.height(5.dp))
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(R.string.had_account_already_text),
+                    text = stringResource(R.string.code_havent_sent_yet_text),
                     color = Color.Black,
                 )
                 Text(
-                    text = " " + stringResource(R.string.login_text) + "!",
+                    text = " " + stringResource(R.string.resend_text),
                     color = Color(0xffEA1616),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .clickable {
-                            navigateToLogin()
+
                         }
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
-                value = loginName,
-                onValueChange = { loginName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = {Text(stringResource(R.string.sign_in_name_text))},
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = {Text(stringResource(R.string.password_text))},
-                visualTransformation = PasswordVisualTransformation()
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
-                value = passwordConfirm,
-                onValueChange = { passwordConfirm = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = {Text(stringResource(R.string.password_confirm_text))},
-                visualTransformation = PasswordVisualTransformation()
-            )
-            Spacer(modifier = Modifier.height(15.dp))
+
             Spacer(modifier = Modifier.height(15.dp))
             Button(
-                onClick = { signUp() },
+                onClick = {  },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xff616AE5)
-                )
+                ),
+//                modifier = Modifier.padding(horizontal = 50.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.sign_up_text).toUpperCase(Locale.current),
+                    text = stringResource(R.string.confirm_text).toUpperCase(Locale.current),
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -158,20 +172,35 @@ fun SignUpScreen(
                     resId = R.drawable.ic_guest
                 )
             }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.dont_have_account_text),
+                modifier = Modifier
+                    .clickable { }
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = {  },
+                border = BorderStroke(1.dp, color = Color(0xff616AE5)),
+                modifier = Modifier.padding(horizontal = 30.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_up_text).toUpperCase(Locale.current),
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xff616AE5),
+                    modifier = Modifier.padding(horizontal = 30.dp)
+                )
+            }
+
         }
     }
-
-
 }
 
 @Preview
-@Preview
 @Composable
-private fun SignUpScreenPreview() {
+private fun ForgetPasswordCodeEnterPreview() {
     SE121P11NewTheme {
-        SignUpScreen(
-            navigateToLogin = { },
-            signUp = { },
-        )
+        ForgetPasswordCodeEnter()
     }
 }
