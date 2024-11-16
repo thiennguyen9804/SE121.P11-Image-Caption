@@ -5,8 +5,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,11 +36,11 @@ fun SubmitButton(
 ) {
     Row(
         modifier = modifier
-            .border(1.dp, Color.Black, RoundedCornerShape(35.dp))
+//            .border(1.dp, Color.Black, RoundedCornerShape(35.dp))
             .clip(RoundedCornerShape(35.dp))
             .background(Color.White)
-            .clickable(onClick = onClick)
-            .padding(end = 3.dp),
+            .clickable(onClick = onClick),
+//            .padding(end = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -61,8 +64,9 @@ private fun SubmitButtonPreview() {
         SubmitButton(
             modifier = Modifier
                 .width(90.dp)
-                .height(35.dp),
-            onClick = {}
-        )
+                .height(35.dp)
+        ) {
+//                onSubmit()
+        }
     }
 }

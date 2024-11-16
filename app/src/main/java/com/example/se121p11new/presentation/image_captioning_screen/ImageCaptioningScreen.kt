@@ -1,5 +1,6 @@
 package com.example.se121p11new.presentation.image_captioning_screen
 
+import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBackIos
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.rounded.ArrowBackIos
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -38,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
@@ -48,12 +52,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
+import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.presentation.image_captioning_screen.components.ClickableWords
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun ImageCaptioningScreen(
-    bitmap: ImageBitmap
+    bitmap: Bitmap,
+    englishText: Resource<String> = Resource.Loading(),
+    vietnameseText: Resource<String> = Resource.Loading()
 ) {
     var selectedWord by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current as ComponentActivity
@@ -85,7 +92,7 @@ fun ImageCaptioningScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                bitmap = bitmap,
+                bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
                     .width(180.dp)
@@ -106,13 +113,22 @@ fun ImageCaptioningScreen(
                 .background(Color.White)
                 .padding(10.dp)
             ) {
-                ClickableWords(
-                    text = "Kiana and Captain is sleeping together",
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                ) {
-                    selectedWord = it
+                when(englishText) {
+                    is Resource.Loading ->
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    is Resource.Error -> TODO()
+                    is Resource.Success ->
+                        ClickableWords(
+                            text = englishText.data ?: "",
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        ) {
+                            selectedWord = it
+                        }
                 }
+
             }
             Spacer(modifier = Modifier.height(20.dp))
             Box(modifier = Modifier
@@ -121,12 +137,20 @@ fun ImageCaptioningScreen(
                 .background(Color.White)
                 .padding(10.dp)
             ) {
-                ClickableWords(
-                    text = "Kiana và Captain đang ngủ cùng nhau",
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                ) {
-                    selectedWord = it
+                when(vietnameseText) {
+                    is Resource.Loading ->
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    is Resource.Error -> TODO()
+                    is Resource.Success ->
+                        ClickableWords(
+                            text = vietnameseText.data ?: "",
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        ) {
+                            selectedWord = it
+                        }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -175,7 +199,8 @@ fun ImageCaptioningScreen(
 private fun ImageCaptioningScreenPreview() {
     SE121P11NewTheme {
         ImageCaptioningScreen(
-            bitmap = ImageBitmap.imageResource(R.drawable.kiana_and_captain),
+            bitmap = ImageBitmap.imageResource(R.drawable.kiana_and_captain).asAndroidBitmap(),
+            englishText = Resource.Loading()
         )
     }
 }

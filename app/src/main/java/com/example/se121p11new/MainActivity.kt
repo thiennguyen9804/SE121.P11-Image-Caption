@@ -15,13 +15,8 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,6 +34,8 @@ import com.example.se121p11new.core.presentation.utils.SignUpScreen
 import com.example.se121p11new.presentation.camera_screen.CameraScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
 import com.example.se121p11new.presentation.captured_image_preview_screen.CapturedImagePreviewScreen
+import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
+import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
 import com.example.se121p11new.presentation.login_screen.LoginScreen
 import com.example.se121p11new.presentation.shared_view_model.SharedViewModel
 import com.example.se121p11new.presentation.sign_up_screen.SignUpScreen
@@ -49,7 +46,7 @@ import java.io.File
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
-    private lateinit var viewModel: SharedViewModel
+    private lateinit var sharedViewModel: SharedViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!hasRequiredPermissions()) {
@@ -69,7 +66,8 @@ class MainActivity : ComponentActivity() {
                 }
 
                 navController = rememberNavController()
-                viewModel = hiltViewModel<SharedViewModel>()
+                sharedViewModel = hiltViewModel<SharedViewModel>()
+                val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
 
                 NavHost(
                     navController = navController,
@@ -103,15 +101,23 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<CapturedImagePreviewScreen> {
-                        val bitmap by viewModel.bitmap.collectAsStateWithLifecycle()
-                        val imageName by viewModel.imageName.collectAsStateWithLifecycle()
+                        val bitmap by sharedViewModel.bitmap.collectAsStateWithLifecycle()
+                        val imageName by sharedViewModel.imageName.collectAsStateWithLifecycle()
                         CapturedImagePreviewScreen(bitmap, imageName) {
-//                            viewModel.
+                            imageCaptioningViewModel.setBitmap(bitmap!!)
+                            navController.navigate(ImageCaptioningScreen)
                         }
                     }
 
                     composable<ImageCaptioningScreen> {
+                        val englishText by imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle()
+                        val vietnameseText by imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle()
+                        ImageCaptioningScreen(
+                            bitmap = imageCaptioningViewModel.bitmap!!,
+                            englishText = englishText,
+                            vietnameseText = vietnameseText
 
+                        )
                     }
 
                     composable<DashboardScreen> {
@@ -143,13 +149,13 @@ class MainActivity : ComponentActivity() {
                 (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA)
         }
 
-        viewModel.setImageName("${System.currentTimeMillis()}.jpg")
+        sharedViewModel.setImageName("${System.currentTimeMillis()}.jpg")
 //        viewModel.normalImageName = "${System.currentTimeMillis()}.jpg"
-        println("image name ${viewModel.normalImageName}")
+        println("image name ${sharedViewModel.normalImageName}")
 
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(
-                File(filesDir, viewModel.imageName.value)
+                File(filesDir, sharedViewModel.imageName.value)
             )
             .setMetadata(metadata)
             .build()
@@ -173,7 +179,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    viewModel.updateBitmap(bitmap)
+                    sharedViewModel.updateBitmap(bitmap)
                     navController.navigate(CapturedImagePreviewScreen)
                     println("image uri ${outputFileResults.savedUri.toString()}")
 
