@@ -13,6 +13,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttp
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -32,8 +34,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRemoteImageDataSource(
-        generativeModel: GenerativeModel
-    ): RemoteImageDataSource = RemoteImageDataSource(generativeModel)
+        generativeModel: GenerativeModel,
+        api: GcpApi
+    ): RemoteImageDataSource = RemoteImageDataSource(generativeModel, api)
 
     @Provides
     @Singleton
@@ -43,11 +46,26 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGcpApi(): GcpApi {
+    fun provideClient(): OkHttpClient {
+        return OkHttpClient.Builder().addInterceptor({
+            val newRequest = it.request().newBuilder()
+                .addHeader("Authorization", "Bearer ${AppConstants.TOKEN}")
+                .addHeader("x-goog-user-project", AppConstants.PROJECT_ID)
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
+                .build()
+            it.proceed(newRequest)
+        }).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGcpApi(client: OkHttpClient): GcpApi {
         return Retrofit.Builder()
             .baseUrl(AppConstants.TRANSLATE_URL)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GcpApi::class.java)
     }
+
 }

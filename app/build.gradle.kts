@@ -98,6 +98,9 @@ dependencies {
 //    Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.vertexai)
+
+//    ML Kit Transalation
+    implementation(libs.translate)
 }
 
 kapt {

@@ -1,6 +1,7 @@
 package com.example.se121p11new.presentation.image_captioning_screen
 
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -118,7 +119,9 @@ fun ImageCaptioningScreen(
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
                         )
-                    is Resource.Error -> TODO()
+                    is Resource.Error ->
+                        Toast.makeText(context, vietnameseText.message, Toast.LENGTH_SHORT).show()
+
                     is Resource.Success ->
                         ClickableWords(
                             text = englishText.data ?: "",
@@ -142,7 +145,8 @@ fun ImageCaptioningScreen(
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
                         )
-                    is Resource.Error -> TODO()
+                    is Resource.Error ->
+                        Toast.makeText(context, vietnameseText.message, Toast.LENGTH_SHORT).show()
                     is Resource.Success ->
                         ClickableWords(
                             text = vietnameseText.data ?: "",
