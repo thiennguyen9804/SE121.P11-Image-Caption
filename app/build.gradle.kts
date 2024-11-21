@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -41,6 +43,12 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        resources {
+            excludes += "META-INF/*"
+        }
+    }
 }
 
 dependencies {
@@ -53,6 +61,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -98,9 +107,21 @@ dependencies {
 //    Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.vertexai)
+    implementation(libs.firebase.auth)
 
-//    ML Kit Transalation
+//    ML Kit Translation
     implementation(libs.translate)
+
+//    Facebook SDK
+    implementation(libs.facebook.login)
+
+//    GCP Translation
+    implementation(libs.google.cloud.translate) {
+        exclude(group = "org.apache.httpcomponents")
+        exclude(group = "org.json", module = "json")
+    }
+    annotationProcessor(libs.google.cloud.translate)
+
 }
 
 kapt {

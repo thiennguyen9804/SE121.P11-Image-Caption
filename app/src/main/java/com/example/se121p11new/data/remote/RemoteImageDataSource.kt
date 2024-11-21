@@ -4,13 +4,18 @@ import android.graphics.Bitmap
 import com.example.se121p11new.core.data.PromptConstants
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.data.remote.dto.EnglishTextRequestDto
+import com.google.cloud.translate.Translate
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.type.content
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RemoteImageDataSource @Inject constructor(
     private val generativeModel: GenerativeModel,
-    private val api: GcpApi
+    private val translate: Translate
 ) {
     suspend fun generateEnglishText(bitmap: Bitmap): Resource<String> {
         val prompt = content {
@@ -27,17 +32,14 @@ class RemoteImageDataSource @Inject constructor(
         return Resource.Error("Something went wrong!!!")
     }
 
-    suspend fun generateVietnameseText(englishText: String): Resource<String> {
+    fun generateVietnameseText(englishText: String): Resource<String> {
         try {
-            val req = EnglishTextRequestDto(
-                q = listOf(englishText),
-                source = "en",
-                target = "vi"
+            val translated = translate.translate(
+                englishText,
+                Translate.TranslateOption.targetLanguage("vi"),
+                Translate.TranslateOption.model("base")
             )
-            val res = api.translateEnglishToVietnamese(req)
-            println("vietnamese res: $res")
-            val result = res.data.translations[0].translatedText
-            return Resource.Success(result)
+            return Resource.Success(translated.translatedText)
         } catch (e: Exception) {
             e.printStackTrace()
             return Resource.Error("Something went wrong!!!")

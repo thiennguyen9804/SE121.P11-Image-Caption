@@ -4,6 +4,7 @@ cameraCore = "1.5.0-alpha03"
 coilCompose = "3.0.2"
 converterGson = "2.11.0"
 firebaseBom = "33.6.0"
+googleCloudTranslate = "2.54.0"
 hiltAndroid = "2.51.1"
 hiltNavigationFragment = "1.2.0"
 kotlin = "2.0.20"
@@ -23,6 +24,9 @@ cameraView = "1.4.0"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
 translate = "17.0.3"
+firebaseAuth = "23.1.0"
+playServicesAuth = "21.2.0"
+facebookLogin = "17.0.2"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
@@ -40,6 +44,7 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-vertexai = { module = "com.google.firebase:firebase-vertexai" }
+google-cloud-translate = { module = "com.google.cloud:google-cloud-translate", version.ref = "googleCloudTranslate" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -61,6 +66,9 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 translate = { module = "com.google.mlkit:translate", version.ref = "translate" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookLogin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

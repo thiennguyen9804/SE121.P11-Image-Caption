@@ -17,7 +17,7 @@ class ImageCaptioningViewModel @Inject constructor(
 ) : ViewModel() {
     var bitmap: Bitmap? = null
         private set
-
+    var accessToken: String? = null
     private val _generatedEnglishText = MutableStateFlow<Resource<String>>(Resource.Loading())
     val generatedEnglishText = _generatedEnglishText.asStateFlow()
     private val _generatedVietnameseText = MutableStateFlow<Resource<String>>(Resource.Loading())

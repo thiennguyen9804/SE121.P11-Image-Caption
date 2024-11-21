@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.forget_password_code_enter_screen
+package com.example.se121p11new.presentation.auth_group_screen.forget_password_code_enter_screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,7 +25,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
@@ -48,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.AuthScreenImage
 import com.example.se121p11new.core.presentation.components.SignInWithButton
-import com.example.se121p11new.presentation.forget_password_code_enter_screen.components.OTPTextField
+import com.example.se121p11new.presentation.auth_group_screen.forget_password_code_enter_screen.components.OTPTextField
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable

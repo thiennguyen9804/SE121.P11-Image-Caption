@@ -18,8 +18,8 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun SignInWithButton(
+    @DrawableRes resId: Int,
     onClick: () -> Unit,
-    @DrawableRes resId: Int
 ) {
     Button(
         onClick = onClick,

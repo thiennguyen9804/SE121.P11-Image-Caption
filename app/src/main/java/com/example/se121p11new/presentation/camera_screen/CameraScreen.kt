@@ -126,7 +126,5 @@ fun CameraScreen(
 
             )
         }
-
-
     }
 }

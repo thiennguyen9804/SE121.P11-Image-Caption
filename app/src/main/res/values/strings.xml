@@ -24,4 +24,8 @@
     <string name="enter_otp_text">Nhập mã xác thực</string>
     <string name="code_havent_sent_yet_text">Chưa nhận được mã?</string>
     <string name="resend_text">Gửi lại mã!</string>
+    <string name="web_client_id">937027103160-5t53hq8fc93igaiaoe79mptc1gs9q8gc.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">1613181859270266</string>
+    <string name="fb_login_protocol_scheme">fb1613181859270266</string>
+    <string name="facebook_client_token">71592b9b14669e2cf9a0e9f7e7c43fc1</string>
 </resources>
