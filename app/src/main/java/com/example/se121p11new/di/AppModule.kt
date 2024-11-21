@@ -2,11 +2,12 @@ package com.example.se121p11new.di
 
 import android.content.Context
 import com.example.se121p11new.R
-import com.example.se121p11new.core.data.AppConstants
-import com.example.se121p11new.data.repository.ImageRepositoryImpl
+import com.example.se121p11new.data.local.LocalImageDataSource
+import com.example.se121p11new.data.local.dao.ImageDao
+import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.remote.RemoteImageDataSource
+import com.example.se121p11new.data.repository.ImageRepositoryImpl
 import com.example.se121p11new.domain.repository.ImageRepository
-import com.google.android.gms.common.internal.Constants
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
@@ -19,11 +20,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttp
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import javax.inject.Singleton
 
 @Module
@@ -47,9 +45,22 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideLocalImageDataSource(
+        imageDao: ImageDao
+    ): LocalImageDataSource = LocalImageDataSource(imageDao)
+
+    @Provides
+    @Singleton
+    fun provideImageDao(
+        realm: Realm
+    ) = ImageDao(realm)
+
+    @Provides
+    @Singleton
     fun provideImageRepository(
-        remoteImageDataSource: RemoteImageDataSource
-    ): ImageRepository = ImageRepositoryImpl(remoteImageDataSource)
+        remoteImageDataSource: RemoteImageDataSource,
+        localImageDataSource: LocalImageDataSource
+    ): ImageRepository = ImageRepositoryImpl(remoteImageDataSource, localImageDataSource)
 
     @Provides
     @Singleton
@@ -62,9 +73,14 @@ object AppModule {
                 TranslateOptions.newBuilder().setCredentials(myCredentials).build()
             translateOptions.service
         }
+
     @Provides
     @Singleton
-    fun provideFirebaseAuth(
-        @ApplicationContext context: Context
-    ): FirebaseAuth = FirebaseAuth.getInstance()
+    fun provideRealmDb(): Realm = Realm.open(
+        configuration = RealmConfiguration.create(
+            schema = setOf(
+                Image::class
+            )
+        )
+    )
 }

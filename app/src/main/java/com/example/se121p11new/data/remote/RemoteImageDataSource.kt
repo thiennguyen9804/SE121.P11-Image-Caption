@@ -3,14 +3,9 @@ package com.example.se121p11new.data.remote
 import android.graphics.Bitmap
 import com.example.se121p11new.core.data.PromptConstants
 import com.example.se121p11new.core.presentation.utils.Resource
-import com.example.se121p11new.data.remote.dto.EnglishTextRequestDto
 import com.google.cloud.translate.Translate
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.type.content
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RemoteImageDataSource @Inject constructor(
