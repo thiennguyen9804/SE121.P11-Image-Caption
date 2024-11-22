@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
@@ -29,12 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
+import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.presentation.dashboard_screen.components.CapturedImageItem
 import com.example.se121p11new.presentation.dashboard_screen.components.SavedVocabularyItem
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun DashboardScreen(
+    images: List<Image>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -102,8 +105,8 @@ fun DashboardScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(3) { item ->
-                   CapturedImageItem()
+                items(images) { image ->
+                    CapturedImageItem(image)
                 }
             }
         }
@@ -159,6 +162,13 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreenPreview() {
     SE121P11NewTheme {
-        DashboardScreen()
+        DashboardScreen(listOf(image, image, image))
     }
+}
+
+val image = Image().apply {
+    pictureUri = ""
+    englishText = ""
+    vietnameseText = ""
+    name = "Image 1"
 }

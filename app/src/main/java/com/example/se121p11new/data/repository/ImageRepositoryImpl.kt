@@ -6,6 +6,9 @@ import com.example.se121p11new.data.local.LocalImageDataSource
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.remote.RemoteImageDataSource
 import com.example.se121p11new.domain.repository.ImageRepository
+import io.realm.kotlin.notifications.ObjectChange
+import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject constructor(
@@ -20,8 +23,16 @@ class ImageRepositoryImpl @Inject constructor(
         return remoteImageDataSource.generateVietnameseText(englishText)
     }
 
-    override suspend fun addImageLocally(newImage: Image) {
-        localImageDataSource.addImage(newImage)
+    override suspend fun addImageLocally(newImage: Image): Flow<ObjectChange<Image>> {
+        return localImageDataSource.addImage(newImage)
+    }
+
+    override fun getAllImagesLocally(): Flow<ResultsChange<Image>> {
+        return localImageDataSource.getAllImages()
+    }
+
+    override fun getFirstNImage(n: Int): Flow<ResultsChange<Image>> {
+        return localImageDataSource.getFirstNImage(n)
     }
 
 }

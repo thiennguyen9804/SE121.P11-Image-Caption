@@ -41,6 +41,7 @@ import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreen
 import com.example.se121p11new.core.presentation.utils.LoginScreen
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreen
+import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.SignInResult
 import com.example.se121p11new.presentation.auth_group_screen.UserData
@@ -56,6 +57,7 @@ import com.example.se121p11new.presentation.image_captioning_screen.ImageCaption
 import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
 import com.example.se121p11new.presentation.shared_view_model.SharedViewModel
 import com.example.se121p11new.presentation.auth_group_screen.sign_up_screen.SignUpScreen
+import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -116,7 +118,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = CameraScreen
+                    startDestination = DashboardScreen
                 ) {
                     composable<LoginScreen> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -218,6 +220,9 @@ class MainActivity : ComponentActivity() {
                         }
                         val englishText by imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle()
                         val vietnameseText by imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle()
+                        imageCaptioningViewModel.imageUri = sharedViewModel.imageUri
+                        imageCaptioningViewModel.imageName = sharedViewModel.imageName.collectAsStateWithLifecycle().value
+
                         ImageCaptioningScreen(
                             bitmap = imageCaptioningViewModel.bitmap!!,
                             englishText = englishText,
@@ -232,7 +237,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<DashboardScreen> {
-                        DashboardScreen()
+                        val dashboardViewModel = hiltViewModel<DashboardViewModel>()
+                        val images by dashboardViewModel.images.collectAsStateWithLifecycle()
+                        LaunchedEffect(key1 = Unit) {
+                            println("image $images")
+                        }
+                        DashboardScreen(images = images)
                     }
                 }
             }
@@ -293,6 +303,8 @@ class MainActivity : ComponentActivity() {
                     sharedViewModel.updateBitmap(bitmap)
                     navController.navigate(CapturedImagePreviewScreen)
                     println("image uri ${outputFileResults.savedUri.toString()}")
+                    sharedViewModel.imageUri = outputFileResults.savedUri.toString()
+
 
                     Toast.makeText(
                         applicationContext,

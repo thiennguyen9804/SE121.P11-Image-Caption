@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.se121p11new.domain.repository.ImageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,8 @@ class SharedViewModel @Inject constructor() : ViewModel() {
 
     var normalImageName = ""
 
+    var imageUri = ""
+
     fun setImageName(name: String) {
         _imageName.value = name
     }
@@ -37,6 +40,4 @@ class SharedViewModel @Inject constructor() : ViewModel() {
 
         }
     }
-
-
 }

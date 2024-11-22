@@ -46,6 +46,7 @@ fun CapturedImagePreviewScreen(
 ) {
     // TODO chuyển launch effect ra ngoài sub graph
     val context = LocalContext.current as ComponentActivity
+    var dontDeleteFlag = false
     LaunchedEffect(key1 = true) {
         context.enableEdgeToEdge()
     }
@@ -53,7 +54,7 @@ fun CapturedImagePreviewScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
+            if (event == Lifecycle.Event.ON_STOP && !dontDeleteFlag) {
                 val dir: File = context.filesDir
                 val file = File(dir, imageName)
                 val deleted = file.delete()
@@ -101,6 +102,7 @@ fun CapturedImagePreviewScreen(
                     .height(35.dp)
                     .offset(x = (-20).dp)
             ) {
+                dontDeleteFlag = true
                 onSubmit()
             }
         }

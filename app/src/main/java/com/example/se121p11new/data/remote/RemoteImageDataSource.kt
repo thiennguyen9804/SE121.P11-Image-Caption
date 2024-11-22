@@ -6,6 +6,8 @@ import com.example.se121p11new.core.presentation.utils.Resource
 import com.google.cloud.translate.Translate
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.type.content
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RemoteImageDataSource @Inject constructor(
@@ -27,18 +29,21 @@ class RemoteImageDataSource @Inject constructor(
         return Resource.Error("Something went wrong!!!")
     }
 
-    fun generateVietnameseText(englishText: String): Resource<String> {
-        try {
-            val translated = translate.translate(
-                englishText,
-                Translate.TranslateOption.targetLanguage("vi"),
-                Translate.TranslateOption.model("base")
-            )
-            return Resource.Success(translated.translatedText)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return Resource.Error("Something went wrong!!!")
+    suspend fun generateVietnameseText(englishText: String): Resource<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val translated = translate.translate(
+                    englishText,
+                    Translate.TranslateOption.targetLanguage("vi"),
+                    Translate.TranslateOption.model("base")
+                )
+                return@withContext Resource.Success(translated.translatedText)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return@withContext Resource.Error("Something went wrong!!!")
+            }
         }
+
 
     }
 

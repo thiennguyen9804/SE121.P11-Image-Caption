@@ -6,8 +6,8 @@ import org.mongodb.kbson.ObjectId
 
 class Image : RealmObject {
     @PrimaryKey var _id: ObjectId = ObjectId()
+    var name: String = ""
     var pictureUri: String = ""
     var englishText: String = ""
     var vietnameseText: String = ""
-
 }
