@@ -8,8 +8,8 @@ import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.flow.Flow
 
 interface ImageRepository {
-    suspend fun generateEnglishText(image: Bitmap): Resource<String>
-    suspend fun generateVietnameseText(englishText: String): Resource<String>
+    suspend fun generateEnglishText(image: Bitmap): Flow<Resource<String>>
+    suspend fun generateVietnameseText(englishText: String): Flow<Resource<String>>
     suspend fun addImageLocally(newImage: Image): Flow<ObjectChange<Image>>
     fun getAllImagesLocally(): Flow<ResultsChange<Image>>
     fun getFirstNImage(n: Int): Flow<ResultsChange<Image>>

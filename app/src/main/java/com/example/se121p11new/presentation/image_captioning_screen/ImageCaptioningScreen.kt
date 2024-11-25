@@ -3,6 +3,7 @@ package com.example.se121p11new.presentation.image_captioning_screen
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,16 +54,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
+import com.example.se121p11new.core.presentation.components.LocalAsyncImage
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.presentation.image_captioning_screen.components.ClickableWords
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun ImageCaptioningScreen(
-    bitmap: Bitmap,
-    englishText: Resource<String> = Resource.Loading(),
-    vietnameseText: Resource<String> = Resource.Loading()
+    uri: String,
+    englishText: Resource<String>,
+    vietnameseText: Resource<String>,
+    onBack: () -> Unit
 ) {
+    BackHandler {
+        onBack()
+    }
+
+//    val (uri, englishText, vietnameseText) = imageUI
+
     var selectedWord by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current as ComponentActivity
     LaunchedEffect(key1 = true) {
@@ -92,15 +101,30 @@ fun ImageCaptioningScreen(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(180.dp)
-                    .aspectRatio(9.0f / 16.0f)
-                    .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.FillHeight
+//            when(bitmap) {
+//                is Resource.Loading ->
+//                    CircularProgressIndicator()
+////                        modifier = Modifier.align(Alignment.Center),
+//                is Resource.Error ->
+//                    Toast.makeText(context, bitmap.message, Toast.LENGTH_SHORT).show()
+//
+//                is Resource.Success ->
+//                    Image(
+//                        bitmap = bitmap.data!!.asImageBitmap(),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .width(180.dp)
+//                            .aspectRatio(9.0f / 16.0f)
+//                            .clip(RoundedCornerShape(20.dp)),
+//                        contentScale = ContentScale.FillHeight
+//                    )
+//            }
+
+            LocalAsyncImage(
+                uriString = uri,
+                modifier = Modifier.fillMaxSize()
             )
+
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.description_text),
@@ -203,8 +227,12 @@ fun ImageCaptioningScreen(
 private fun ImageCaptioningScreenPreview() {
     SE121P11NewTheme {
         ImageCaptioningScreen(
-            bitmap = ImageBitmap.imageResource(R.drawable.kiana_and_captain).asAndroidBitmap(),
-            englishText = Resource.Loading()
+//            bitmap = Resource.Success(ImageBitmap.imageResource(R.drawable.kiana_and_captain).asAndroidBitmap()),
+//            englishText = Resource.Loading(),
+            uri = "",
+            vietnameseText = Resource.Loading(),
+            englishText = Resource.Loading(),
+            onBack = {}
         )
     }
 }

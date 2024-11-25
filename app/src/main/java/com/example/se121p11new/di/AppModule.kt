@@ -77,21 +77,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRealmDb(): Realm {
-//        val config2 = RealmConfiguration.create(
-//            schema = setOf(
-//                Image::class
-//            )
-//        )
+
         val config = RealmConfiguration.Builder(
             schema = setOf(
                 Image::class
-            )
-        )
+            ))
             .deleteRealmIfMigrationNeeded()
             .build()
-//        config.deleteRealmIfMigrationNeeded
-        return Realm.open(
-            configuration = config
-        )
+
+        val realm = Realm.open(configuration = config)
+
+        return realm
     }
 }

@@ -4,11 +4,8 @@ import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.ImageDecoder
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
-import android.os.StrictMode
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,16 +31,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.se121p11new.core.presentation.utils.CameraScreen
-import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreen
-import com.example.se121p11new.core.presentation.utils.DashboardScreen
-import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreen
-import com.example.se121p11new.core.presentation.utils.LoginScreen
+import androidx.navigation.toRoute
+import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
+import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
+import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
+import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
+import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
-import com.example.se121p11new.core.presentation.utils.SignUpScreen
-import com.example.se121p11new.data.local.realm_object.Image
+import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
+import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
+//import com.example.se121p11new.core.presentation.utils.takePhoto
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
-import com.example.se121p11new.presentation.auth_group_screen.SignInResult
 import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthClient
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.FacebookAuthClient
@@ -55,7 +53,6 @@ import com.example.se121p11new.presentation.captured_image_preview_screen.Captur
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
 import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
-import com.example.se121p11new.presentation.shared_view_model.SharedViewModel
 import com.example.se121p11new.presentation.auth_group_screen.sign_up_screen.SignUpScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -65,7 +62,6 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -74,8 +70,6 @@ import java.io.File
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
-    private lateinit var sharedViewModel: SharedViewModel
-
     private val googleAuthClient by lazy {
         GoogleAuthClient(
             context = applicationContext,
@@ -113,14 +107,12 @@ class MainActivity : ComponentActivity() {
                 }
 
                 navController = rememberNavController()
-                sharedViewModel = hiltViewModel<SharedViewModel>()
-                val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
 
                 NavHost(
                     navController = navController,
-                    startDestination = DashboardScreen
+                    startDestination = CameraScreenRoute
                 ) {
-                    composable<LoginScreen> {
+                    composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
                         val userState by authViewModel.userState.collectAsStateWithLifecycle()
                         val googleLauncher = getGoogleLauncher(
@@ -158,7 +150,7 @@ class MainActivity : ComponentActivity() {
 
                         LoginScreen(
                             navigateToSignUp = {
-                                navController.navigate(SignUpScreen)
+                                navController.navigate(SignUpScreenRoute)
                             },
                             onSignInWithGoogleClick = {
                                 this@MainActivity.providerType = googleAuthClient.providerType
@@ -187,62 +179,92 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    composable<SignUpScreen> {
+                    composable<SignUpScreenRoute> {
                         SignUpScreen(
                             navigateToLogin = {
-                                navController.navigate(LoginScreen)
+                                navController.navigate(LoginScreenRoute)
                             },
                             signUp = {}
                         )
                     }
 
-                    composable<CameraScreen> {
+                    composable<CameraScreenRoute> {
                         CameraScreen(
                             controller = controller,
-                        ) {
-                            takePhoto(controller)
-                        }
+                            takePhoto = {
+                                takePhoto(
+                                    controller,
+                                    imageSavedHandler = { uri, imageName ->
+                                        navController.navigate(CapturedImagePreviewScreenRoute(
+                                            uriString = uri.toString(),
+                                            imageName = imageName
+                                        ))
+                                    }
+                                )
+                            }
+                        )
                     }
 
-                    composable<CapturedImagePreviewScreen> {
-                        val bitmap by sharedViewModel.bitmap.collectAsStateWithLifecycle()
-                        val imageName by sharedViewModel.imageName.collectAsStateWithLifecycle()
-                        CapturedImagePreviewScreen(bitmap, imageName) {
-                            imageCaptioningViewModel.setBitmap(bitmap!!)
-                            navController.navigate(ImageCaptioningScreen)
-                        }
+                    composable<CapturedImagePreviewScreenRoute> {
+                        val args = it.toRoute<CapturedImagePreviewScreenRoute>()
+                        CapturedImagePreviewScreen(
+                            uriString = args.uriString,
+                            onSubmit = {
+                                navController.navigate(ImageCaptioningScreenRoute(
+                                    uriString = args.uriString,
+                                    imageName = args.imageName,
+                                ))
+                            }
+                        )
                     }
 
-                    composable<ImageCaptioningScreen> {
-                        LaunchedEffect(key1 = true) {
-                            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-                            StrictMode.setThreadPolicy(policy)
+                    composable<ImageCaptioningScreenRoute> {
+                        val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
+                        imageCaptioningViewModel.apiTurnOn = false
+                        val args = it.toRoute<ImageCaptioningScreenRoute>()
+                        LaunchedEffect(key1 = Unit) {
+                            val bitmap = getBitmapFromUri(
+                                uri = Uri.parse(args.uriString),
+                                applicationContext = applicationContext
+                            )
+                            imageCaptioningViewModel.imageName = args.imageName
+                            imageCaptioningViewModel.imageUri = args.uriString
+                            imageCaptioningViewModel.generateText(bitmap)
                         }
+
                         val englishText by imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle()
                         val vietnameseText by imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle()
-                        imageCaptioningViewModel.imageUri = sharedViewModel.imageUri
-                        imageCaptioningViewModel.imageName = sharedViewModel.imageName.collectAsStateWithLifecycle().value
-
                         ImageCaptioningScreen(
-                            bitmap = imageCaptioningViewModel.bitmap!!,
+                            uri = args.uriString,
                             englishText = englishText,
-                            vietnameseText = vietnameseText
-
+                            vietnameseText = vietnameseText,
+                            onBack = {
+                                navController.navigate(CameraScreenRoute) {
+                                    popUpTo(CameraScreenRoute)
+                                }
+                            }
                         )
-//                        Box(modifier = Modifier
-//                            .fillMaxSize()
-//                        ) {
-//                            Text(text = "Under testing...", modifier = Modifier.align(Alignment.Center))
-//                        }
                     }
 
-                    composable<DashboardScreen> {
+                    composable<DashboardScreenRoute> {
                         val dashboardViewModel = hiltViewModel<DashboardViewModel>()
                         val images by dashboardViewModel.images.collectAsStateWithLifecycle()
                         LaunchedEffect(key1 = Unit) {
                             println("image $images")
                         }
-                        DashboardScreen(images = images)
+                        DashboardScreen(
+                            images = images,
+                            onClick = { image ->
+                                navController.navigate(
+                                    ImageCaptioningScreenRoute(
+                                        uriString = image.pictureUri,
+                                        englishText = image.englishText,
+                                        vietnameseText = image.vietnameseText,
+                                        imageName = image.imageName
+                                    )
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -259,7 +281,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun takePhoto(
-        controller: LifecycleCameraController
+        controller: LifecycleCameraController,
+        imageSavedHandler: (Uri, String) -> Unit
     ) {
         if (!hasRequiredPermissions()) {
             return
@@ -270,13 +293,10 @@ class MainActivity : ComponentActivity() {
                 (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA)
         }
 
-        sharedViewModel.setImageName("${System.currentTimeMillis()}.jpg")
-//        viewModel.normalImageName = "${System.currentTimeMillis()}.jpg"
-        println("image name ${sharedViewModel.normalImageName}")
-
+        val imageName = "${System.currentTimeMillis()}"
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(
-                File(filesDir, sharedViewModel.imageName.value)
+                File(filesDir, imageName)
             )
             .setMetadata(metadata)
             .build()
@@ -286,26 +306,7 @@ class MainActivity : ComponentActivity() {
             ContextCompat.getMainExecutor(applicationContext),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        outputFileResults.savedUri?.let {
-                            ImageDecoder.createSource(
-                                applicationContext.contentResolver,
-                                it
-                            )
-                        }?.let { ImageDecoder.decodeBitmap(it) }
-                    } else {
-                        MediaStore.Images.Media.getBitmap(
-                            applicationContext.contentResolver,
-                            outputFileResults.savedUri
-                        )
-                    }
-
-                    sharedViewModel.updateBitmap(bitmap)
-                    navController.navigate(CapturedImagePreviewScreen)
-                    println("image uri ${outputFileResults.savedUri.toString()}")
-                    sharedViewModel.imageUri = outputFileResults.savedUri.toString()
-
-
+                    imageSavedHandler(outputFileResults.savedUri!!, imageName)
                     Toast.makeText(
                         applicationContext,
                         "Succeed!",

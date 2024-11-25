@@ -16,6 +16,11 @@ import javax.inject.Inject
 class ImageDao @Inject constructor(
     private val realm: Realm
 ) {
+    init {
+        val schema = realm.schema()
+        val imageSchema = schema["Image"]
+        println("Image realm schema: $imageSchema")
+    }
     suspend fun addImage(newImage: Image): Flow<ObjectChange<Image>> {
         val image = realm.write {
             newImage

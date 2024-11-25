@@ -64,10 +64,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.play.services.auth)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.junit.jupiter.v560)
+//    androidTestImplementation(libs.androidx.junit)
+//    androidTestImplementation(libs.androidx.espresso.core)
+//    androidTestImplementation(platform(libs.androidx.compose.bom))
+//    androidTestImplementation(libs.androidx.ui.test.junit4)
+//    androidTestImplementation(libs.junit.jupiter)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -125,6 +127,16 @@ dependencies {
 
 //    Realm Db
     implementation(libs.library.base)
+
+//    Mockito
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    runtimeOnly(libs.mockito.android)
+
+
+//    Kotlin Coroutines Test
+    testImplementation(libs.kotlinx.coroutines.test)
+
 
 }
 

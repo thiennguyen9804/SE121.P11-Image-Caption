@@ -7,6 +7,10 @@ import com.google.cloud.translate.Translate
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.type.content
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -14,37 +18,32 @@ class RemoteImageDataSource @Inject constructor(
     private val generativeModel: GenerativeModel,
     private val translate: Translate
 ) {
-    suspend fun generateEnglishText(bitmap: Bitmap): Resource<String> {
+    fun generateEnglishText(bitmap: Bitmap) = flow {
+        emit(Resource.Loading())
         val prompt = content {
             image(bitmap)
             text(PromptConstants.BASIC_SENTENCE)
         }
 
         val response = generativeModel.generateContent(prompt)
-        val result = response.text
-        result?.let {
-            return Resource.Success(it)
+        response.text?.let {
+            emit(Resource.Success(it))
         }
+//        delay(500)
+//        emit(Resource.Success("Test"))
+    }.flowOn(Dispatchers.IO)
 
-        return Resource.Error("Something went wrong!!!")
-    }
-
-    suspend fun generateVietnameseText(englishText: String): Resource<String> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val translated = translate.translate(
-                    englishText,
-                    Translate.TranslateOption.targetLanguage("vi"),
-                    Translate.TranslateOption.model("base")
-                )
-                return@withContext Resource.Success(translated.translatedText)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return@withContext Resource.Error("Something went wrong!!!")
-            }
+    fun generateVietnameseText(englishText: String) = flow {
+        emit(Resource.Loading())
+        val translated = translate.translate(
+            englishText,
+            Translate.TranslateOption.targetLanguage("vi"),
+            Translate.TranslateOption.model("base")
+        )
+        translated.translatedText?.let {
+            emit(Resource.Success(it))
         }
-
-
-    }
-
+//        delay(500)
+//        emit(Resource.Success("Kiểm thử"))
+    }.flowOn(Dispatchers.IO)
 }

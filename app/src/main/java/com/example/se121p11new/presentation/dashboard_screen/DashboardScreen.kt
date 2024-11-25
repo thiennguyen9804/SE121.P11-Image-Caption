@@ -1,8 +1,11 @@
 package com.example.se121p11new.presentation.dashboard_screen
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
@@ -38,13 +43,15 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 @Composable
 fun DashboardScreen(
     images: List<Image>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (Image) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 15.dp, horizontal = 10.dp)
+            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Row(
             modifier = Modifier
@@ -102,13 +109,25 @@ fun DashboardScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(images) { image ->
-                    CapturedImageItem(image)
+            if(images.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = stringResource(R.string.no_image_text),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(images) { image ->
+                        CapturedImageItem(image) {
+                            onClick(image)
+                        }
+                    }
                 }
             }
+
         }
 
         Spacer(modifier = Modifier.height(25.dp))
@@ -153,6 +172,7 @@ fun DashboardScreen(
                 items(4) { item ->
                     SavedVocabularyItem()
                 }
+
             }
         }
     }
@@ -162,7 +182,9 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreenPreview() {
     SE121P11NewTheme {
-        DashboardScreen(listOf(image, image, image))
+        DashboardScreen(listOf(image, image, image)) {
+
+        }
     }
 }
 
@@ -170,5 +192,5 @@ val image = Image().apply {
     pictureUri = ""
     englishText = ""
     vietnameseText = ""
-    name = "Image 1"
+    imageName = "Image 1"
 }

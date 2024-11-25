@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.placeholder
 import com.example.se121p11new.R
 import com.example.se121p11new.presentation.captured_image_preview_screen.components.SubmitButton
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -40,8 +44,7 @@ import java.io.File
 
 @Composable
 fun CapturedImagePreviewScreen(
-    bitmap: Bitmap?,
-    imageName: String = "",
+    uriString: String,
     onSubmit: () -> Unit
 ) {
     // TODO chuyển launch effect ra ngoài sub graph
@@ -52,11 +55,11 @@ fun CapturedImagePreviewScreen(
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val file = File(uriString)
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP && !dontDeleteFlag) {
-                val dir: File = context.filesDir
-                val file = File(dir, imageName)
+//                val dir: File = context.filesDir
                 val deleted = file.delete()
             }
         }
@@ -80,13 +83,14 @@ fun CapturedImagePreviewScreen(
                 .aspectRatio(9.0f / 16.0f)
 
         ) {
-            bitmap?.asImageBitmap()?.let {
-                Image(
-                    bitmap = it,
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = null
-                )
-            }
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(uriString)
+//                    .placeholder(R.drawable.kiana_placeholder)
+                    .build(),
+                contentDescription = "Captured Image",
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         Row(
@@ -116,7 +120,7 @@ fun CapturedImagePreviewScreen(
 private fun CapturedImagePreviewScreenPreview() {
     SE121P11NewTheme {
         CapturedImagePreviewScreen(
-            bitmap = ImageBitmap.imageResource(R.drawable.kiana_and_captain).asAndroidBitmap()
+            uriString = ""
         ) {
 
         }

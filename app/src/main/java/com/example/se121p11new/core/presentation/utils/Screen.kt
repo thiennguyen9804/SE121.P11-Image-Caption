@@ -26,19 +26,27 @@ import kotlinx.serialization.Serializable
 //}
 
 @Serializable
-object CameraScreen
+object CameraScreenRoute
 
 @Serializable
-object LoginScreen
+object LoginScreenRoute
 
 @Serializable
-object SignUpScreen
+object SignUpScreenRoute
 
 @Serializable
-object CapturedImagePreviewScreen
+data class CapturedImagePreviewScreenRoute(
+    val uriString: String,
+    val imageName: String,
+)
 
 @Serializable
-object ImageCaptioningScreen
+data class ImageCaptioningScreenRoute(
+    val uriString: String,
+    val imageName: String,
+    val englishText: String = "",
+    val vietnameseText: String = ""
+)
 
 @Serializable
-object DashboardScreen
+object DashboardScreenRoute

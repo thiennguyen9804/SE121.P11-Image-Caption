@@ -1,12 +1,11 @@
 package com.example.se121p11new.presentation.dashboard_screen.components
 
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,10 +15,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,34 +31,36 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun CapturedImageItem(
-    image: Image
+    image: Image,
+    onClick: (Image) -> Unit,
 ) {
-    var bitmap: Resource<Bitmap> = Resource.Loading()
     val context = LocalContext.current
-//    val file = File(image.pictureUri)
-    LaunchedEffect(key1 = true) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val source = ImageDecoder.createSource(context.contentResolver, Uri.parse(image.pictureUri))
-            bitmap = Resource.Success(ImageDecoder.decodeBitmap(source))
+
+    val bitmap by produceState<Resource<Bitmap>>(Resource.Loading(), image.pictureUri) {
+        val tempBitmap = context.contentResolver.openInputStream(Uri.parse(image.pictureUri)).use { inputStream ->
+            BitmapFactory.decodeStream(inputStream)
+        }
+        value = if(tempBitmap == null) {
+            Resource.Error("Image not found")
         } else {
-            bitmap = Resource.Success(MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(image.pictureUri)))
+            Resource.Success(tempBitmap)
         }
     }
-//    context.contentResolver.query(
-//        MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-//        projection = null
-//    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
+            .padding(vertical = 5.dp)
+            .clickable {
+                onClick(image)
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         when(bitmap) {
             is Resource.Error ->
                 Toast.makeText(
                     context,
-                    "Cannot load image from local",
+                    bitmap.message,
                     Toast.LENGTH_SHORT
                 ).show()
             is Resource.Loading ->
@@ -66,14 +69,15 @@ fun CapturedImageItem(
                 Image(
                     bitmap = bitmap.data!!.asImageBitmap(),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(100.dp),
+                    contentScale = ContentScale.FillWidth
                 )
         }
 
         Spacer(modifier = Modifier.width(20.dp))
         Text(
-            text = image.name,
-            fontSize = 20.sp,
+            text = image.imageName,
+            fontSize = 17.sp,
 //            fontWeight = FontWeight.Bold
         )
     }
@@ -88,8 +92,9 @@ private fun CapturedImageItemPreview() {
                 pictureUri = ""
                 englishText = ""
                 vietnameseText = ""
-                name = "Image 1"
-            }
+                imageName = "Image 1"
+            },
+            onClick = { }
         )
     }
 }
