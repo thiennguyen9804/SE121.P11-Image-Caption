@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = CameraScreenRoute
+                    startDestination = DashboardScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -213,35 +213,46 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(ImageCaptioningScreenRoute(
                                     uriString = args.uriString,
                                     imageName = args.imageName,
-                                ))
+                                )) {
+                                    popUpTo<CapturedImagePreviewScreenRoute> {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         )
                     }
 
                     composable<ImageCaptioningScreenRoute> {
                         val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
-                        imageCaptioningViewModel.apiTurnOn = false
                         val args = it.toRoute<ImageCaptioningScreenRoute>()
-                        LaunchedEffect(key1 = Unit) {
-                            val bitmap = getBitmapFromUri(
-                                uri = Uri.parse(args.uriString),
-                                applicationContext = applicationContext
-                            )
-                            imageCaptioningViewModel.imageName = args.imageName
-                            imageCaptioningViewModel.imageUri = args.uriString
-                            imageCaptioningViewModel.generateText(bitmap)
+                        lateinit var englishText: Resource<String>
+                        lateinit var vietnameseText: Resource<String>
+                        if(args.englishText == "" && args.vietnameseText == "") {
+                            imageCaptioningViewModel.apiTurnOn = true
+                            LaunchedEffect(key1 = Unit) {
+                                val bitmap = getBitmapFromUri(
+                                    uri = Uri.parse(args.uriString),
+                                    applicationContext = applicationContext
+                                )
+                                imageCaptioningViewModel.imageName = args.imageName
+                                imageCaptioningViewModel.imageUri = args.uriString
+                                imageCaptioningViewModel.generateText(bitmap)
+                            }
+                            englishText = imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle().value
+                            vietnameseText = imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle().value
+                        } else {
+                            imageCaptioningViewModel.apiTurnOn = false
+                            englishText = Resource.Success(args.englishText)
+                            vietnameseText = Resource.Success(args.vietnameseText)
                         }
 
-                        val englishText by imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle()
-                        val vietnameseText by imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle()
+
                         ImageCaptioningScreen(
                             uri = args.uriString,
                             englishText = englishText,
                             vietnameseText = vietnameseText,
                             onBack = {
-                                navController.navigate(CameraScreenRoute) {
-                                    popUpTo(CameraScreenRoute)
-                                }
+                                navController.popBackStack()
                             }
                         )
                     }
@@ -396,3 +407,4 @@ fun getFacebookLauncher(
         }
     )
 }
+

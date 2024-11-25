@@ -11,10 +11,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val imageRepository: ImageRepository
+    imageRepository: ImageRepository
 ) : ViewModel() {
     val images = imageRepository
-        .getFirstNImage(5)
+        .getFirstNImage(3)
         .map {
             it.list.toList()
         }

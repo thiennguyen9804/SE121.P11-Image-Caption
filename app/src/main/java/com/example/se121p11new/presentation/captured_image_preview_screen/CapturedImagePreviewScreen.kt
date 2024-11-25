@@ -59,7 +59,6 @@ fun CapturedImagePreviewScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP && !dontDeleteFlag) {
-//                val dir: File = context.filesDir
                 val deleted = file.delete()
             }
         }
@@ -86,7 +85,6 @@ fun CapturedImagePreviewScreen(
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(uriString)
-//                    .placeholder(R.drawable.kiana_placeholder)
                     .build(),
                 contentDescription = "Captured Image",
                 modifier = Modifier.fillMaxSize()

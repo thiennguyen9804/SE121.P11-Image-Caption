@@ -53,8 +53,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.example.se121p11new.R
-import com.example.se121p11new.core.presentation.components.LocalAsyncImage
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.presentation.image_captioning_screen.components.ClickableWords
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -69,8 +70,6 @@ fun ImageCaptioningScreen(
     BackHandler {
         onBack()
     }
-
-//    val (uri, englishText, vietnameseText) = imageUI
 
     var selectedWord by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current as ComponentActivity
@@ -101,28 +100,16 @@ fun ImageCaptioningScreen(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            when(bitmap) {
-//                is Resource.Loading ->
-//                    CircularProgressIndicator()
-////                        modifier = Modifier.align(Alignment.Center),
-//                is Resource.Error ->
-//                    Toast.makeText(context, bitmap.message, Toast.LENGTH_SHORT).show()
-//
-//                is Resource.Success ->
-//                    Image(
-//                        bitmap = bitmap.data!!.asImageBitmap(),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .width(180.dp)
-//                            .aspectRatio(9.0f / 16.0f)
-//                            .clip(RoundedCornerShape(20.dp)),
-//                        contentScale = ContentScale.FillHeight
-//                    )
-//            }
-
-            LocalAsyncImage(
-                uriString = uri,
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(uri)
+                    .build(),
+                contentDescription = "Captured Image",
                 modifier = Modifier.fillMaxSize()
+                    .width(180.dp)
+                    .aspectRatio(9.0f / 16.0f)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentScale = ContentScale.FillHeight
             )
 
             Spacer(modifier = Modifier.height(10.dp))
