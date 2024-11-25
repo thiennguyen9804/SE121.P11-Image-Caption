@@ -1,9 +1,7 @@
 package com.example.se121p11new.presentation.dashboard_screen
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
 import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.presentation.dashboard_screen.components.CapturedImageItem
+import com.example.se121p11new.core.presentation.components.CapturedImageItem
 import com.example.se121p11new.presentation.dashboard_screen.components.SavedVocabularyItem
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 

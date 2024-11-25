@@ -29,4 +29,8 @@
     <string name="fb_login_protocol_scheme">fb1613181859270266</string>
     <string name="facebook_client_token">71592b9b14669e2cf9a0e9f7e7c43fc1</string>
     <string name="no_image_text">Bạn chưa chụp tấm hình nào cả :((</string>
+    <string name="image_storing_text">Lưu trữ hình ảnh</string>
+    <string name="captured_history_text">Lịch sử đã chụp</string>
+    <string name="offline_storing_text">Lưu trữ ngoại tuyến</string>
+    <string name="created_folder_text">Thư mục hình ảnh tự tạo</string>
 </resources>
