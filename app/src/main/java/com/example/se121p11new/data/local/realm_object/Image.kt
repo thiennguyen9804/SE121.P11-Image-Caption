@@ -11,4 +11,5 @@ class Image : RealmObject {
     var pictureUri: String = ""
     var englishText: String = ""
     var vietnameseText: String = ""
+    var captureTime: String = ""
 }

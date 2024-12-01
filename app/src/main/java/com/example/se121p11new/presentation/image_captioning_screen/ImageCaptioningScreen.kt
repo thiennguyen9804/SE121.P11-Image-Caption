@@ -1,6 +1,7 @@
 package com.example.se121p11new.presentation.image_captioning_screen
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -10,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,6 +52,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,20 +64,24 @@ import coil3.request.ImageRequest
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.presentation.image_captioning_screen.components.ClickableWords
+import com.example.se121p11new.presentation.image_captioning_screen.components.SelectedVocabulary
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun ImageCaptioningScreen(
-    uri: String,
+    uri: Any,
     englishText: Resource<String>,
     vietnameseText: Resource<String>,
+    imageName: String,
+    capturedTime: String,
+    onGoToVocabularyDetail: (String) -> Unit,
     onBack: () -> Unit
 ) {
     BackHandler {
         onBack()
     }
 
-    var selectedWord by remember { mutableStateOf<String?>(null) }
+    val selectedWords = remember { mutableStateListOf<String>() }
     val context = LocalContext.current as ComponentActivity
     LaunchedEffect(key1 = true) {
         context.enableEdgeToEdge()
@@ -109,9 +119,18 @@ fun ImageCaptioningScreen(
                     .width(180.dp)
                     .aspectRatio(9.0f / 16.0f)
                     .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.FillHeight
+                contentScale = ContentScale.FillHeight,
+                placeholder = painterResource(R.drawable.kiana_and_captain)
             )
-
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.image_name_text) + ": ", fontWeight = FontWeight.Bold)
+                Text(imageName, )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.capture_time_text) + ": ", fontWeight = FontWeight.Bold)
+                Text(capturedTime, fontSize = 13.sp)
+            }
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.description_text),
@@ -137,9 +156,9 @@ fun ImageCaptioningScreen(
                         ClickableWords(
                             text = englishText.data ?: "",
                             fontSize = 18.sp,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         ) {
-                            selectedWord = it
+                            selectedWords += it
                         }
                 }
 
@@ -164,7 +183,7 @@ fun ImageCaptioningScreen(
                             fontSize = 18.sp,
                             textAlign = TextAlign.Center
                         ) {
-                            selectedWord = it
+
                         }
                 }
             }
@@ -175,18 +194,22 @@ fun ImageCaptioningScreen(
                 fontSize = 17.sp
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color.White)
-                .padding(10.dp)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .height(150.dp)
+                    .background(Color.White)
+                    .padding(10.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = "sleeping: ngủ",
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                items(selectedWords) { selectedWord ->
+                    SelectedVocabulary(
+                        word = selectedWord,
+                        onGoToDetail = onGoToVocabularyDetail
+                    )
+                }
+
             }
             Spacer(modifier = Modifier.height(50.dp))
             OutlinedButton(
@@ -216,9 +239,14 @@ private fun ImageCaptioningScreenPreview() {
         ImageCaptioningScreen(
 //            bitmap = Resource.Success(ImageBitmap.imageResource(R.drawable.kiana_and_captain).asAndroidBitmap()),
 //            englishText = Resource.Loading(),
-            uri = "",
+            uri = Uri.parse(
+                "android.resource://com.example.se121p11new/drawable/kiana_and_captain"
+            ),
             vietnameseText = Resource.Loading(),
             englishText = Resource.Loading(),
+            imageName = "PTR-061124.",
+            capturedTime = "16:53, Thứ tư, ngày 06 tháng 11, 2024.",
+            onGoToVocabularyDetail = {},
             onBack = {}
         )
     }

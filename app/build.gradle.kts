@@ -65,11 +65,6 @@ dependencies {
     implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.v560)
-//    androidTestImplementation(libs.androidx.junit)
-//    androidTestImplementation(libs.androidx.espresso.core)
-//    androidTestImplementation(platform(libs.androidx.compose.bom))
-//    androidTestImplementation(libs.androidx.ui.test.junit4)
-//    androidTestImplementation(libs.junit.jupiter)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -137,6 +132,8 @@ dependencies {
 //    Kotlin Coroutines Test
     testImplementation(libs.kotlinx.coroutines.test)
 
+//    Kotlinx DateTime
+    implementation(libs.kotlinx.datetime)
 
 }
 

@@ -33,4 +33,13 @@
     <string name="captured_history_text">Lịch sử đã chụp</string>
     <string name="offline_storing_text">Lưu trữ ngoại tuyến</string>
     <string name="created_folder_text">Thư mục hình ảnh tự tạo</string>
+    <string name="monday_text">Thứ hai</string>
+    <string name="tuesday_text">Thứ ba</string>
+    <string name="wednesday_text">Thứ tư</string>
+    <string name="thursday_text">Thứ năm</string>
+    <string name="friday_text">Thứ sáu</string>
+    <string name="saturday_text">Thứ bảy</string>
+    <string name="sunday_text">Chủ nhật</string>
+    <string name="image_name_text">Tên ảnh</string>
+    <string name="capture_time_text">Thời gian chụp</string>
 </resources>

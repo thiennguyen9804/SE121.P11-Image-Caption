@@ -28,6 +28,7 @@ class ImageCaptioningViewModel @Inject constructor(
     var apiTurnOn = false
     var imageUri = ""
     var imageName = ""
+    var captureTime = ""
 
     fun generateText(newBitmap: Bitmap) {
         if(!apiTurnOn) {

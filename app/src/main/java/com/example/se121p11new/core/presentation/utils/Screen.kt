@@ -38,15 +38,22 @@ object SignUpScreenRoute
 data class CapturedImagePreviewScreenRoute(
     val uriString: String,
     val imageName: String,
+    val captureTime: String,
 )
 
 @Serializable
 data class ImageCaptioningScreenRoute(
     val uriString: String,
     val imageName: String,
+    val captureTime: String,
     val englishText: String = "",
     val vietnameseText: String = ""
 )
 
 @Serializable
 object DashboardScreenRoute
+
+@Serializable
+data class VocabularyDetailRoute(
+    val word: String,
+)

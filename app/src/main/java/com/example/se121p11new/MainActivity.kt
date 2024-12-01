@@ -5,6 +5,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -22,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +35,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import coil3.request.ImageRequest
 import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
 import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
@@ -39,6 +43,7 @@ import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRout
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
+import com.example.se121p11new.core.presentation.utils.StringFromTime
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
 //import com.example.se121p11new.core.presentation.utils.takePhoto
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
@@ -65,6 +70,9 @@ import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.io.File
 
 @AndroidEntryPoint
@@ -88,6 +96,15 @@ class MainActivity : ComponentActivity() {
     private var authClient = AuthClient()
 
     private var providerType = ""
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun testDateTime() {
+        val res = StringFromTime.buildDateTimeString()
+        println("buildDateTimeString $res")
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!hasRequiredPermissions()) {
@@ -95,6 +112,7 @@ class MainActivity : ComponentActivity() {
                 this, CAMERAX_PERMISSIONS, 0
             )
         }
+        testDateTime()
         setContent {
             this.enableEdgeToEdge()
             SE121P11NewTheme {
@@ -194,10 +212,11 @@ class MainActivity : ComponentActivity() {
                             takePhoto = {
                                 takePhoto(
                                     controller,
-                                    imageSavedHandler = { uri, imageName ->
+                                    imageSavedHandler = { uri, imageName, captureTime ->
                                         navController.navigate(CapturedImagePreviewScreenRoute(
                                             uriString = uri.toString(),
-                                            imageName = imageName
+                                            imageName = imageName,
+                                            captureTime = captureTime,
                                         ))
                                     }
                                 )
@@ -213,6 +232,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(ImageCaptioningScreenRoute(
                                     uriString = args.uriString,
                                     imageName = args.imageName,
+                                    captureTime = args.captureTime,
                                 )) {
                                     popUpTo<CapturedImagePreviewScreenRoute> {
                                         inclusive = true
@@ -236,6 +256,7 @@ class MainActivity : ComponentActivity() {
                                 )
                                 imageCaptioningViewModel.imageName = args.imageName
                                 imageCaptioningViewModel.imageUri = args.uriString
+                                imageCaptioningViewModel.captureTime = args.captureTime
                                 imageCaptioningViewModel.generateText(bitmap)
                             }
                             englishText = imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle().value
@@ -246,11 +267,15 @@ class MainActivity : ComponentActivity() {
                             vietnameseText = Resource.Success(args.vietnameseText)
                         }
 
-
                         ImageCaptioningScreen(
                             uri = args.uriString,
                             englishText = englishText,
                             vietnameseText = vietnameseText,
+                            imageName = args.imageName,
+                            capturedTime = args.captureTime,
+                            onGoToVocabularyDetail = {
+
+                            },
                             onBack = {
                                 navController.popBackStack()
                             }
@@ -271,7 +296,8 @@ class MainActivity : ComponentActivity() {
                                         uriString = image.pictureUri,
                                         englishText = image.englishText,
                                         vietnameseText = image.vietnameseText,
-                                        imageName = image.imageName
+                                        imageName = image.imageName,
+                                        captureTime = image.captureTime
                                     )
                                 )
                             }
@@ -291,9 +317,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun takePhoto(
         controller: LifecycleCameraController,
-        imageSavedHandler: (Uri, String) -> Unit
+        imageSavedHandler: (Uri, String, String) -> Unit
     ) {
         if (!hasRequiredPermissions()) {
             return
@@ -304,7 +331,8 @@ class MainActivity : ComponentActivity() {
                 (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA)
         }
 
-        val imageName = "${System.currentTimeMillis()}"
+        val imageName = StringFromTime.buildPictureName()
+        val capturedTime = StringFromTime.buildDateTimeString()
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(
                 File(filesDir, imageName)
@@ -317,7 +345,7 @@ class MainActivity : ComponentActivity() {
             ContextCompat.getMainExecutor(applicationContext),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    imageSavedHandler(outputFileResults.savedUri!!, imageName)
+                    imageSavedHandler(outputFileResults.savedUri!!, imageName, capturedTime)
                     Toast.makeText(
                         applicationContext,
                         "Succeed!",
@@ -407,4 +435,3 @@ fun getFacebookLauncher(
         }
     )
 }
-

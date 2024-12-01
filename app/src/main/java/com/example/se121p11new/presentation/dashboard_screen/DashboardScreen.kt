@@ -35,6 +35,7 @@ import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.core.presentation.components.CapturedImageItem
+import com.example.se121p11new.core.presentation.utils.SelectItem
 import com.example.se121p11new.presentation.dashboard_screen.components.SavedVocabularyItem
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
@@ -44,6 +45,7 @@ fun DashboardScreen(
     modifier: Modifier = Modifier,
     onClick: (Image) -> Unit,
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -2,17 +2,23 @@ package com.example.se121p11new.di
 
 import android.content.Context
 import com.example.se121p11new.R
+import com.example.se121p11new.core.data.AppConstants
 import com.example.se121p11new.data.local.LocalImageDataSource
+import com.example.se121p11new.data.local.LocalVocabularyDataSource
 import com.example.se121p11new.data.local.dao.ImageDao
+import com.example.se121p11new.data.local.dao.VocabularyDao
 import com.example.se121p11new.data.local.realm_object.Image
+import com.example.se121p11new.data.local.realm_object.Vocabulary
 import com.example.se121p11new.data.remote.RemoteImageDataSource
+import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
+import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.example.se121p11new.data.repository.ImageRepositoryImpl
+import com.example.se121p11new.data.repository.VocabularyRepositoryImpl
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.vertexAI
 import dagger.Module
@@ -22,6 +28,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -51,9 +60,27 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideRemoteVocabularyDataSource(
+        api: VocabularyApi
+    ): RemoteVocabularyDataSource = RemoteVocabularyDataSource(api)
+
+    @Provides
+    @Singleton
+    fun provideLocalVocabularyDataSource(
+        dao: VocabularyDao
+    ) = LocalVocabularyDataSource(dao)
+
+    @Provides
+    @Singleton
     fun provideImageDao(
         realm: Realm
     ) = ImageDao(realm)
+
+    @Provides
+    @Singleton
+    fun provideVocabularyDao(
+        realm: Realm
+    ) = VocabularyDao(realm)
 
     @Provides
     @Singleton
@@ -61,6 +88,14 @@ object AppModule {
         remoteImageDataSource: RemoteImageDataSource,
         localImageDataSource: LocalImageDataSource
     ): ImageRepository = ImageRepositoryImpl(remoteImageDataSource, localImageDataSource)
+
+    @Provides
+    @Singleton
+    fun provideVocabularyRepository(
+        remoteVocabularyDataSource: RemoteVocabularyDataSource,
+        localVocabularyDataSource: LocalVocabularyDataSource
+    ) = VocabularyRepositoryImpl(remoteVocabularyDataSource, localVocabularyDataSource)
+
 
     @Provides
     @Singleton
@@ -77,7 +112,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRealmDb(): Realm {
-
         val config = RealmConfiguration.Builder(
             schema = setOf(
                 Image::class
@@ -89,4 +123,12 @@ object AppModule {
 
         return realm
     }
+
+    @Provides
+    @Singleton
+    fun provideVocabularyApi() = Retrofit.Builder()
+        .baseUrl(AppConstants.VOCABULARY_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(VocabularyApi::class.java)
 }
