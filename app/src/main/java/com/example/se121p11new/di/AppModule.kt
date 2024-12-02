@@ -15,6 +15,7 @@ import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.example.se121p11new.data.repository.ImageRepositoryImpl
 import com.example.se121p11new.data.repository.VocabularyRepositoryImpl
 import com.example.se121p11new.domain.repository.ImageRepository
+import com.example.se121p11new.domain.repository.VocabularyRepository
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
@@ -94,7 +95,7 @@ object AppModule {
     fun provideVocabularyRepository(
         remoteVocabularyDataSource: RemoteVocabularyDataSource,
         localVocabularyDataSource: LocalVocabularyDataSource
-    ) = VocabularyRepositoryImpl(remoteVocabularyDataSource, localVocabularyDataSource)
+    ): VocabularyRepository = VocabularyRepositoryImpl(remoteVocabularyDataSource, localVocabularyDataSource)
 
 
     @Provides
@@ -117,6 +118,7 @@ object AppModule {
                 Image::class
             ))
             .deleteRealmIfMigrationNeeded()
+            .name("app_db.realm")
             .build()
 
         val realm = Realm.open(configuration = config)
@@ -126,7 +128,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideVocabularyApi() = Retrofit.Builder()
+    fun provideVocabularyApi(): VocabularyApi = Retrofit.Builder()
         .baseUrl(AppConstants.VOCABULARY_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

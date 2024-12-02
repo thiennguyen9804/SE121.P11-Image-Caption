@@ -1,15 +1,17 @@
 package com.example.se121p11new.data.local.realm_object
 
+import com.example.se121p11new.data.remote.dto.DomainPhrasalVerb
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
-import org.mongodb.kbson.ObjectId
 
-class PhrasalVerb : RealmObject {
-    @PrimaryKey
-    var _id: ObjectId = ObjectId()
+class PhrasalVerb : EmbeddedRealmObject {
     var phrasalVerb: String = ""
     var definitions: RealmList<Definition> = realmListOf()
+    var vocabulary: Vocabulary? = null
 
+    fun toDomainPhrasalVerb() = DomainPhrasalVerb(
+        phrasalVerb = phrasalVerb,
+        definitions = definitions.map { it.toDomainDefinition() }
+    )
 }

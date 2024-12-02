@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 import io.realm.kotlin.ext.toRealmList
 
 typealias RealmDefinition = Definition
+typealias DomainDefinition = com.example.se121p11new.domain.data.Definition
 
 data class DefinitionDto(
     @SerializedName("definition")
@@ -16,6 +17,10 @@ data class DefinitionDto(
     fun toRealmDefinition() = RealmDefinition().apply {
         this.definition = this@DefinitionDto.definition
         this.examples = this@DefinitionDto.examples.toRealmList()
-
     }
+
+    fun toDomainDefinition() = DomainDefinition(
+        definition = this.definition,
+        examples = this.examples
+    )
 }

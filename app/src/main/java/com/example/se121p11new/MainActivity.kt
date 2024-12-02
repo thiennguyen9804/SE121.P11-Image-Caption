@@ -20,6 +20,7 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,8 +45,8 @@ import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
 import com.example.se121p11new.core.presentation.utils.StringFromTime
+import com.example.se121p11new.core.presentation.utils.VocabularyDetailScreenRoute
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
-//import com.example.se121p11new.core.presentation.utils.takePhoto
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthClient
@@ -60,6 +61,8 @@ import com.example.se121p11new.presentation.image_captioning_screen.ImageCaption
 import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
 import com.example.se121p11new.presentation.auth_group_screen.sign_up_screen.SignUpScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
+import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
+import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailViewModel
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -128,7 +131,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = DashboardScreenRoute
+                    startDestination = VocabularyDetailScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -302,6 +305,19 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         )
+                    }
+
+                    composable<VocabularyDetailScreenRoute> {
+//                        val args = it.toRoute<VocabularyDetailScreenRoute>()
+                        val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
+                        vocabularyDetailViewModel.getVocabulary("hello")
+//                        VocabularyDetailScreen(
+//                            engWord = ""
+//                            vocabulary = vocabulary
+//                        )
+                        Box() {
+
+                        }
                     }
                 }
             }

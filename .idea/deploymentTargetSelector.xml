@@ -17,6 +17,9 @@
       <SelectionState runConfigName="VocabularyDetailScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="VocabularyDetailScreenSuccessPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

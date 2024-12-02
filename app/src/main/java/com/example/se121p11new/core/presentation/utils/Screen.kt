@@ -54,6 +54,4 @@ data class ImageCaptioningScreenRoute(
 object DashboardScreenRoute
 
 @Serializable
-data class VocabularyDetailRoute(
-    val word: String,
-)
+object VocabularyDetailScreenRoute

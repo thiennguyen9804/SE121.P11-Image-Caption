@@ -6,5 +6,5 @@ import retrofit2.http.Path
 
 interface VocabularyApi {
     @GET("words/{word}")
-    suspend fun getVocabularyByWord(@Path("word") word: String): VocabularyDto
+    suspend fun getVocabularyByWord(@Path("word") word: String): VocabularyDto?
 }

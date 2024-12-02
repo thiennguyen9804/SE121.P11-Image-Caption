@@ -1,5 +1,6 @@
 package com.example.se121p11new.data.local.realm_object
 
+import com.example.se121p11new.data.remote.dto.DomainVocabulary
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -14,4 +15,10 @@ class Vocabulary : RealmObject {
     var partOfSpeeches: RealmList<PartOfSpeech> = realmListOf()
     var phrasalVerbs: RealmList<PhrasalVerb> = realmListOf()
 
+    fun toDomainVocabulary() = DomainVocabulary(
+        engVocab = engVocab,
+        ipa = ipa,
+        partOfSpeeches = partOfSpeeches.map { it.toDomainPartOfSpeech() },
+        phrasalVerbs = phrasalVerbs.map { it.toDomainPhrasalVerb() }
+    )
 }

@@ -10,6 +10,7 @@ class VocabularyDao @Inject constructor(
     private val realm: Realm
 ) {
     suspend fun addVocabulary(newVocabulary: Vocabulary) = realm.write {
+        newVocabulary
         copyToRealm(newVocabulary)
     }.asFlow()
 

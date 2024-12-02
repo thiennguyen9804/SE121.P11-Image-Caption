@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 import io.realm.kotlin.ext.toRealmList
 
 typealias RealmPhrasalVerb = com.example.se121p11new.data.local.realm_object.PhrasalVerb
+typealias DomainPhrasalVerb = com.example.se121p11new.domain.data.PhrasalVerb
 
 data class PhrasalVerbDto(
     @SerializedName("definitions")
@@ -16,4 +17,10 @@ data class PhrasalVerbDto(
         this.phrasalVerb = this@PhrasalVerbDto.phrasalVerb
         this.definitions = this@PhrasalVerbDto.definitions.map { it.toRealmDefinition() }.toRealmList()
     }
+
+    fun toDomainPhrasalVerb() = DomainPhrasalVerb(
+        phrasalVerb = this.phrasalVerb,
+        definitions = this.definitions.map { it.toDomainDefinition() }
+
+    )
 }
