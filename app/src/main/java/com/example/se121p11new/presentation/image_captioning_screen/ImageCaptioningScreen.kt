@@ -35,6 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,11 +70,21 @@ fun ImageCaptioningScreen(
     onGoToVocabularyDetail: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    BackHandler {
-        onBack()
+    val selectedWords = rememberMutableStateListOf<String>()
+
+    val testSelectedWords = rememberSaveable {
+        mutableListOf<String>()
     }
 
-    val selectedWords = remember { mutableStateListOf<String>() }
+    LaunchedEffect(key1 = Unit) {
+        println("test selected words: $testSelectedWords")
+    }
+
+    BackHandler {
+        onBack()
+
+    }
+
     val context = LocalContext.current as ComponentActivity
     LaunchedEffect(key1 = true) {
         context.enableEdgeToEdge()
@@ -156,11 +170,14 @@ fun ImageCaptioningScreen(
                             text = englishText.data ?: "",
                             fontSize = 18.sp,
                             textAlign = TextAlign.Center,
+                            selectedWords = selectedWords
                         ) {
                             if(selectedWords.contains(it)) {
                                 selectedWords -= it
+                                testSelectedWords -= it
                             } else {
                                 selectedWords += it
+                                testSelectedWords += it
                             }
                         }
                 }
@@ -261,3 +278,15 @@ private fun ImageCaptioningScreenPreview() {
         )
     }
 }
+
+@Composable
+fun <T: Any> rememberMutableStateListOf(vararg elements: T): SnapshotStateList<T> {
+    return rememberSaveable(saver = snapshotStateListSaver()) {
+        elements.toList().toMutableStateList()
+    }
+}
+
+private fun <T : Any> snapshotStateListSaver() = listSaver<SnapshotStateList<T>, T>(
+    save = { stateList -> stateList.toList() },
+    restore = { it.toMutableStateList() },
+)

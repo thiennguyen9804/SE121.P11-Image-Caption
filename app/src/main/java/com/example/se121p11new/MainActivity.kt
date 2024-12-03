@@ -127,7 +127,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = DashboardScreenRoute
+                    startDestination = CameraScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -212,11 +212,13 @@ class MainActivity : ComponentActivity() {
                                 takePhoto(
                                     controller,
                                     imageSavedHandler = { uri, imageName, captureTime ->
-                                        navController.navigate(CapturedImagePreviewScreenRoute(
-                                            uriString = uri.toString(),
-                                            imageName = imageName,
-                                            captureTime = captureTime,
-                                        ))
+                                        navController.navigate(
+                                            CapturedImagePreviewScreenRoute(
+                                                uriString = uri.toString(),
+                                                imageName = imageName,
+                                                captureTime = captureTime,
+                                            )
+                                        )
                                     }
                                 )
                             }
@@ -227,6 +229,9 @@ class MainActivity : ComponentActivity() {
                         val args = it.toRoute<CapturedImagePreviewScreenRoute>()
                         CapturedImagePreviewScreen(
                             uriString = args.uriString,
+                            onBack = {
+                                navController.popBackStack()
+                            },
                             onSubmit = {
                                 navController.navigate(ImageCaptioningScreenRoute(
                                     uriString = args.uriString,
@@ -279,7 +284,7 @@ class MainActivity : ComponentActivity() {
                                 ))
                             },
                             onBack = {
-//                                vocabularyDetailViewModel.clearCache()
+                                vocabularyDetailViewModel.clearCache()
                                 navController.popBackStack()
                             }
                         )

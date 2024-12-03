@@ -2,6 +2,7 @@ package com.example.se121p11new.presentation.captured_image_preview_screen
 
 import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,29 +46,46 @@ import java.io.File
 @Composable
 fun CapturedImagePreviewScreen(
     uriString: String,
+    onBack: () -> Unit,
     onSubmit: () -> Unit
 ) {
     // TODO chuyển launch effect ra ngoài sub graph
     val context = LocalContext.current as ComponentActivity
     var dontDeleteFlag = false
     LaunchedEffect(key1 = true) {
+
         context.enableEdgeToEdge()
     }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val file = File(uriString)
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP && !dontDeleteFlag) {
-                val deleted = file.delete()
-            }
-        }
+//    LaunchedEffect(key1 = dontDeleteFlag) {
+//        println("don't delete flag $dontDeleteFlag")
+//    }
 
-        lifecycleOwner.lifecycle.addObserver(observer)
+//    val lifecycleOwner = LocalLifecycleOwner.current
+//    DisposableEffect(lifecycleOwner) {
+//
+//        val observer = LifecycleEventObserver { _, event ->
+//            if (event == Lifecycle.Event.ON_STOP && !dontDeleteFlag) {
+//                val file = File(uriString)
+//                val deleted = file.delete()
+//                if(!deleted) {
+//                    file.delete()
+//                }
+//            }
+//        }
+//
+//        lifecycleOwner.lifecycle.addObserver(observer)
+//
+//        onDispose {
+//            lifecycleOwner.lifecycle.removeObserver(observer)
+//        }
+//    }
 
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+    BackHandler(!dontDeleteFlag) {
+        val file = File(uriString)
+        val deleted = file.delete()
+        println("file deleted successful $deleted")
+        onBack()
     }
 
     Box(
@@ -118,7 +136,8 @@ fun CapturedImagePreviewScreen(
 private fun CapturedImagePreviewScreenPreview() {
     SE121P11NewTheme {
         CapturedImagePreviewScreen(
-            uriString = ""
+            uriString = "",
+            onBack = {}
         ) {
 
         }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,68 +40,65 @@ fun VocabularyDetailScreen(
     vocabulary: Resource<Vocabulary>
 ) {
     val context = LocalContext.current
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(top = 10.dp)
+            .padding(vertical = 10.dp)
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = engWord,
             color = Color(0xff9A00F7),
             textDecoration = TextDecoration.Underline,
             fontSize = 40.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            when (vocabulary) {
-                is Resource.Error -> {
-                    Toast.makeText(
-                        context,
-                        vocabulary.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                is Resource.Loading ->
-                    CircularProgressIndicator(
-                        color = Color(0xff9A00F7),
-                        modifier = Modifier.align(Alignment.Center)
+        when (vocabulary) {
+            is Resource.Error -> {
+                Toast.makeText(
+                    context,
+                    vocabulary.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            is Resource.Loading ->
+                CircularProgressIndicator(
+                    color = Color(0xff9A00F7),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+
+            is Resource.Success -> {
+                val data = vocabulary.data!!
+
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(horizontal = 10.dp)
+                        .offset(y = 60.dp),
+                ) {
+                    Text(
+                        text = data.engVocab,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.ExtraBold
                     )
 
-                is Resource.Success -> {
-                    val data = vocabulary.data!!
+                    Text(
+                        text = data.ipa,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Light
+                    )
 
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                            .padding(horizontal = 10.dp)
-                    ) {
-                        Text(
-                            text = data.engVocab,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
+                    data.partOfSpeeches.forEach {
+                        PartOfSpeechText(it)
+                    }
 
-                        Text(
-                            text = data.ipa,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Light
-                        )
-
-                        data.partOfSpeeches.forEach {
-                            PartOfSpeechText(it)
-                        }
-
-                        data.phrasalVerbs.forEach {
-                            PhrasalVerbText(it)
-                        }
+                    data.phrasalVerbs.forEach {
+                        PhrasalVerbText(it)
                     }
                 }
-
             }
+
         }
     }
 }

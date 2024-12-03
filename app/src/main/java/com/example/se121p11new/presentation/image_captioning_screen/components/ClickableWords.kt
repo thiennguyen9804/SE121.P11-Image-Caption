@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -31,12 +32,11 @@ fun ClickableWords(
     fontWeight: FontWeight = FontWeight.Normal,
     textColor: Color = Color.Black,
     textAlign: TextAlign = TextAlign.Left,
+    selectedWords: SnapshotStateList<String> = remember { mutableStateListOf() },
     onWordTap: (String) -> Unit,
 ) {
     val words = text.trim().split(" ")
-    val selectedWords = remember {
-        mutableStateListOf<String>()
-    }
+
 
     val annotatedString = buildAnnotatedString {
         words.forEachIndexed { index, word ->
@@ -71,11 +71,6 @@ fun ClickableWords(
     ) { offset ->
         annotatedString.getStringAnnotations(tag = "WORD", start = offset, end = offset)
             .firstOrNull()?.let { annotation ->
-                if(selectedWords.contains(annotation.item)) {
-                    selectedWords -= annotation.item
-                } else {
-                    selectedWords += annotation.item
-                }
                 onWordTap(annotation.item)
             }
     }
@@ -89,6 +84,7 @@ private fun ClickableWordsPreview() {
         ClickableWords(
             modifier = Modifier.background(Color.White),
             text = "Hello World, my crush is Kiana",
+            selectedWords = remember { mutableStateListOf() }
         ) {
             selectedWord = it
             println("You just tapped on $selectedWord")
