@@ -54,4 +54,6 @@ data class ImageCaptioningScreenRoute(
 object DashboardScreenRoute
 
 @Serializable
-object VocabularyDetailScreenRoute
+data class VocabularyDetailScreenRoute(
+    val engVocab: String = ""
+)

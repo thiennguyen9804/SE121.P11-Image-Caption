@@ -1,27 +1,42 @@
 package com.example.se121p11new.data.local
 
-import com.example.se121p11new.data.local.dao.ImageDao
-import com.example.se121p11new.data.local.dao.VocabularyDao
+
 import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.data.local.realm_object.Vocabulary
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.asFlow
+import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ObjectChange
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LocalImageDataSource @Inject constructor(
-    private val imageDao: ImageDao,
+    private val realm: Realm
 ) {
     suspend fun addImage(newImage: Image): Flow<ObjectChange<Image>> {
-        return imageDao.addImage(newImage)
+        val image = realm.write {
+            newImage
+            copyToRealm(newImage, UpdatePolicy.ALL)
+        }.asFlow()
+        return image
     }
 
     fun getAllImages(): Flow<ResultsChange<Image>> {
-        return imageDao.getAllImages()
+        val res = realm
+            .query<Image>()
+            .asFlow()
+        return res
     }
 
     fun getFirstNImage(n: Int): Flow<ResultsChange<Image>> {
-        return imageDao.getFirstNImage(n)
+        val res = realm
+            .query<Image>()
+//            .sort("_id.timestamp", Sort.DESCENDING)
+            .limit(n)
+            .find()
+            .asFlow()
+        return res
     }
 
 

@@ -75,9 +75,11 @@ fun ImageCaptioningScreen(
     LaunchedEffect(key1 = true) {
         context.enableEdgeToEdge()
     }
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
         IconButton(
             modifier = Modifier
                 .offset(x = 5.dp, y = 10.dp),
@@ -104,20 +106,25 @@ fun ImageCaptioningScreen(
                     .data(uri)
                     .build(),
                 contentDescription = "Captured Image",
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .width(180.dp)
                     .aspectRatio(9.0f / 16.0f)
                     .clip(RoundedCornerShape(20.dp)),
                 contentScale = ContentScale.FillHeight,
                 placeholder = painterResource(R.drawable.kiana_and_captain)
             )
+            Spacer(modifier = Modifier.height(10.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.image_name_text) + ": ", fontWeight = FontWeight.Bold)
-                Text(imageName, )
+                Text(imageName)
             }
             Spacer(modifier = Modifier.height(10.dp))
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.capture_time_text) + ": ", fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.capture_time_text) + ": ",
+                    fontWeight = FontWeight.Bold
+                )
                 Text(capturedTime, fontSize = 13.sp)
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -127,17 +134,20 @@ fun ImageCaptioningScreen(
                 fontSize = 17.sp
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color.White)
-                .padding(10.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.White)
+                    .padding(10.dp)
             ) {
-                when(englishText) {
+                when (englishText) {
                     is Resource.Loading ->
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
+                            color = Color(0xff9A00F7)
                         )
+
                     is Resource.Error ->
                         Toast.makeText(context, vietnameseText.message, Toast.LENGTH_SHORT).show()
 
@@ -147,33 +157,39 @@ fun ImageCaptioningScreen(
                             fontSize = 18.sp,
                             textAlign = TextAlign.Center,
                         ) {
-                            selectedWords += it
+                            if(selectedWords.contains(it)) {
+                                selectedWords -= it
+                            } else {
+                                selectedWords += it
+                            }
                         }
                 }
 
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color.White)
-                .padding(10.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.White)
+                    .padding(10.dp)
             ) {
-                when(vietnameseText) {
+                when (vietnameseText) {
                     is Resource.Loading ->
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center),
+                            color = Color(0xff9A00F7)
                         )
+
                     is Resource.Error ->
                         Toast.makeText(context, vietnameseText.message, Toast.LENGTH_SHORT).show()
+
                     is Resource.Success ->
-                        ClickableWords(
+                        Text(
                             text = vietnameseText.data ?: "",
                             fontSize = 18.sp,
                             textAlign = TextAlign.Center
-                        ) {
-
-                        }
+                        )
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -183,23 +199,28 @@ fun ImageCaptioningScreen(
                 fontSize = 17.sp
             )
             Spacer(modifier = Modifier.height(10.dp))
-            LazyColumn(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .height(150.dp)
+                    .height(300.dp)
                     .background(Color.White)
                     .padding(10.dp)
-                    .verticalScroll(rememberScrollState())
             ) {
-                items(selectedWords) { selectedWord ->
-                    SelectedVocabulary(
-                        word = selectedWord,
-                        onGoToDetail = onGoToVocabularyDetail
-                    )
-                }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(selectedWords) { selectedWord ->
+                        SelectedVocabulary(
+                            word = selectedWord,
+                            onGoToDetail = onGoToVocabularyDetail
+                        )
+                    }
 
+                }
             }
+
             Spacer(modifier = Modifier.height(50.dp))
             OutlinedButton(
                 colors = ButtonDefaults.buttonColors(
@@ -231,8 +252,8 @@ private fun ImageCaptioningScreenPreview() {
             uri = Uri.parse(
                 "android.resource://com.example.se121p11new/drawable/kiana_and_captain"
             ),
-            vietnameseText = Resource.Loading(),
-            englishText = Resource.Loading(),
+            vietnameseText = Resource.Success("Xin chào, đây là Kiana"),
+            englishText = Resource.Success("Hello, this is Kiana"),
             imageName = "PTR-061124.",
             capturedTime = "16:53, Thứ tư, ngày 06 tháng 11, 2024.",
             onGoToVocabularyDetail = {},

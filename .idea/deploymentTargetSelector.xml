@@ -8,16 +8,13 @@
       <SelectionState runConfigName="ImageCaptioningScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ClickableWordsPreview">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="VocabularyDetailScreenRoute">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="VocabularyDetailScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="VocabularyDetailScreenSuccessPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="VocabularyDetailScreenLoadingPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

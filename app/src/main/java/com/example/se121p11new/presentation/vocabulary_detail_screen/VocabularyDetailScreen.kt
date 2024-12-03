@@ -1,5 +1,6 @@
 package com.example.se121p11new.presentation.vocabulary_detail_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,7 @@ fun VocabularyDetailScreen(
     engWord: String,
     vocabulary: Resource<Vocabulary>
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,45 +54,53 @@ fun VocabularyDetailScreen(
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold
         )
-        when (vocabulary) {
-            is Resource.Error -> {}
-            is Resource.Loading ->
-                Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            when (vocabulary) {
+                is Resource.Error -> {
+                    Toast.makeText(
+                        context,
+                        vocabulary.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is Resource.Loading ->
                     CircularProgressIndicator(
                         color = Color(0xff9A00F7),
                         modifier = Modifier.align(Alignment.Center)
                     )
+
+                is Resource.Success -> {
+                    val data = vocabulary.data!!
+
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                            .padding(horizontal = 10.dp)
+                    ) {
+                        Text(
+                            text = data.engVocab,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+
+                        Text(
+                            text = data.ipa,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Light
+                        )
+
+                        data.partOfSpeeches.forEach {
+                            PartOfSpeechText(it)
+                        }
+
+                        data.phrasalVerbs.forEach {
+                            PhrasalVerbText(it)
+                        }
+                    }
                 }
 
-            is Resource.Success -> {
-                val data = vocabulary.data!!
-
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                        .padding(horizontal = 10.dp)
-                ) {
-                    Text(
-                        text = data.engVocab,
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-
-                    Text(
-                        text = data.ipa,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Light
-                    )
-
-                    data.partOfSpeeches.forEach {
-                        PartOfSpeechText(it)
-                    }
-
-                    data.phrasalVerbs.forEach {
-                        PhrasalVerbText(it)
-                    }
-                }
             }
-
         }
     }
 }

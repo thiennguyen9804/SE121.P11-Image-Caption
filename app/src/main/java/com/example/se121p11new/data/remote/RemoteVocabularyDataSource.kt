@@ -12,7 +12,7 @@ class RemoteVocabularyDataSource @Inject constructor (
 ) {
     fun getVocabularyByEngVocab(engVocab: String) = flow<Resource<VocabularyDto>> {
         try {
-            api.getVocabularyByWord(engVocab)
+            emit(Resource.Success(api.getVocabularyByWord(engVocab)))
         } catch(e: HttpException) {
             when(e.code()) {
                 404 -> {

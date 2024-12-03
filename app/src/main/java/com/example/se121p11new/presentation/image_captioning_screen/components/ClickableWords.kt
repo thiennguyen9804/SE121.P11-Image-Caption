@@ -34,20 +34,19 @@ fun ClickableWords(
     onWordTap: (String) -> Unit,
 ) {
     val words = text.trim().split(" ")
-        val selectedWords = remember {
+    val selectedWords = remember {
         mutableStateListOf<String>()
     }
 
     val annotatedString = buildAnnotatedString {
         words.forEachIndexed { index, word ->
-            // Add annotation to make each word clickable
             pushStringAnnotation(tag = "WORD", annotation = word)
             withStyle(
                 style = if (!selectedWords.contains(word))
                     SpanStyle(color = textColor)
                 else
                     SpanStyle(
-                        color = Color.Green,
+                        color = Color(0xff9A00F7),
                         fontWeight = FontWeight.Bold,
                         textDecoration = TextDecoration.Underline
                     )
@@ -72,7 +71,11 @@ fun ClickableWords(
     ) { offset ->
         annotatedString.getStringAnnotations(tag = "WORD", start = offset, end = offset)
             .firstOrNull()?.let { annotation ->
-                selectedWords += annotation.item
+                if(selectedWords.contains(annotation.item)) {
+                    selectedWords -= annotation.item
+                } else {
+                    selectedWords += annotation.item
+                }
                 onWordTap(annotation.item)
             }
     }

@@ -5,13 +5,15 @@ import com.example.se121p11new.R
 import com.example.se121p11new.core.data.AppConstants
 import com.example.se121p11new.data.local.LocalImageDataSource
 import com.example.se121p11new.data.local.LocalVocabularyDataSource
-import com.example.se121p11new.data.local.dao.ImageDao
-import com.example.se121p11new.data.local.dao.VocabularyDao
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.Vocabulary
 import com.example.se121p11new.data.remote.RemoteImageDataSource
 import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
 import com.example.se121p11new.data.remote.api.VocabularyApi
+import com.example.se121p11new.data.remote.dto.RealmDefinition
+import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
+import com.example.se121p11new.data.remote.dto.RealmPhrasalVerb
+import com.example.se121p11new.data.remote.dto.RealmVocabulary
 import com.example.se121p11new.data.repository.ImageRepositoryImpl
 import com.example.se121p11new.data.repository.VocabularyRepositoryImpl
 import com.example.se121p11new.domain.repository.ImageRepository
@@ -29,8 +31,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -53,11 +57,6 @@ object AppModule {
         translate: Translate
     ): RemoteImageDataSource = RemoteImageDataSource(generativeModel, translate)
 
-    @Provides
-    @Singleton
-    fun provideLocalImageDataSource(
-        imageDao: ImageDao
-    ): LocalImageDataSource = LocalImageDataSource(imageDao)
 
     @Provides
     @Singleton
@@ -68,20 +67,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideLocalVocabularyDataSource(
-        dao: VocabularyDao
-    ) = LocalVocabularyDataSource(dao)
+        @Named("appDb") realm: Realm,
+        @Named("cache") cache: Realm
+    ): LocalVocabularyDataSource = LocalVocabularyDataSource(realm, cache)
 
     @Provides
     @Singleton
-    fun provideImageDao(
-        realm: Realm
-    ) = ImageDao(realm)
+    fun provideLocalImageDataSource(
+        @Named("appDb") realm: Realm
+    ): LocalImageDataSource = LocalImageDataSource(realm)
 
-    @Provides
-    @Singleton
-    fun provideVocabularyDao(
-        realm: Realm
-    ) = VocabularyDao(realm)
 
     @Provides
     @Singleton
@@ -94,8 +89,11 @@ object AppModule {
     @Singleton
     fun provideVocabularyRepository(
         remoteVocabularyDataSource: RemoteVocabularyDataSource,
-        localVocabularyDataSource: LocalVocabularyDataSource
-    ): VocabularyRepository = VocabularyRepositoryImpl(remoteVocabularyDataSource, localVocabularyDataSource)
+        localVocabularyDataSource: LocalVocabularyDataSource,
+        remoteImageDataSource: RemoteImageDataSource
+    ): VocabularyRepository = VocabularyRepositoryImpl(
+        remoteVocabularyDataSource, localVocabularyDataSource, remoteImageDataSource
+    )
 
 
     @Provides
@@ -112,6 +110,7 @@ object AppModule {
 
     @Provides
     @Singleton
+    @Named("appDb")
     fun provideRealmDb(): Realm {
         val config = RealmConfiguration.Builder(
             schema = setOf(
@@ -122,15 +121,40 @@ object AppModule {
             .build()
 
         val realm = Realm.open(configuration = config)
-
         return realm
     }
 
     @Provides
     @Singleton
-    fun provideVocabularyApi(): VocabularyApi = Retrofit.Builder()
-        .baseUrl(AppConstants.VOCABULARY_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(VocabularyApi::class.java)
+    @Named("cache")
+    fun provideCache(): Realm {
+        val config = RealmConfiguration.Builder(
+            schema = setOf(
+                RealmVocabulary::class,
+                RealmPhrasalVerb::class,
+                RealmDefinition::class,
+                RealmPartOfSpeech::class
+            ))
+            .deleteRealmIfMigrationNeeded()
+            .name("cache.realm")
+            .build()
+
+        val realm = Realm.open(configuration = config)
+        return realm
+    }
+
+    @Provides
+    @Singleton
+    fun provideVocabularyApi(): VocabularyApi {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl(AppConstants.VOCABULARY_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+            .create(VocabularyApi::class.java)
+    }
 }

@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,7 +35,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import coil3.request.ImageRequest
 import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
 import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
@@ -53,14 +51,14 @@ import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthCl
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.FacebookAuthClient
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.GoogleAuthClient
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.TwitterAuthUiClient
-import com.example.se121p11new.presentation.camera_screen.CameraScreen
-import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
-import com.example.se121p11new.presentation.captured_image_preview_screen.CapturedImagePreviewScreen
-import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
-import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
 import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
 import com.example.se121p11new.presentation.auth_group_screen.sign_up_screen.SignUpScreen
+import com.example.se121p11new.presentation.camera_screen.CameraScreen
+import com.example.se121p11new.presentation.captured_image_preview_screen.CapturedImagePreviewScreen
+import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
+import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
+import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailViewModel
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -73,10 +71,8 @@ import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import java.io.File
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -131,7 +127,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = VocabularyDetailScreenRoute
+                    startDestination = DashboardScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -247,6 +243,7 @@ class MainActivity : ComponentActivity() {
 
                     composable<ImageCaptioningScreenRoute> {
                         val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
+                        val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
                         val args = it.toRoute<ImageCaptioningScreenRoute>()
                         lateinit var englishText: Resource<String>
                         lateinit var vietnameseText: Resource<String>
@@ -276,10 +273,13 @@ class MainActivity : ComponentActivity() {
                             vietnameseText = vietnameseText,
                             imageName = args.imageName,
                             capturedTime = args.captureTime,
-                            onGoToVocabularyDetail = {
-
+                            onGoToVocabularyDetail = { engVocab ->
+                                navController.navigate(VocabularyDetailScreenRoute(
+                                    engVocab = engVocab
+                                ))
                             },
                             onBack = {
+//                                vocabularyDetailViewModel.clearCache()
                                 navController.popBackStack()
                             }
                         )
@@ -308,16 +308,19 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<VocabularyDetailScreenRoute> {
-//                        val args = it.toRoute<VocabularyDetailScreenRoute>()
+                        val args = it.toRoute<VocabularyDetailScreenRoute>()
                         val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
-                        vocabularyDetailViewModel.getVocabulary("hello")
-//                        VocabularyDetailScreen(
-//                            engWord = ""
-//                            vocabulary = vocabulary
-//                        )
-                        Box() {
-
+                        LaunchedEffect(key1 = Unit) {
+                            vocabularyDetailViewModel.getVocabulary(args.engVocab.lowercase(Locale.ENGLISH).replace(Regex("\\p{Punct}"), ""))
                         }
+                        val vocabulary by vocabularyDetailViewModel.vocabulary.collectAsStateWithLifecycle()
+                        VocabularyDetailScreen(
+                            engWord = args.engVocab,
+                            vocabulary = vocabulary
+                        )
+//                        Box() {
+//
+//                        }
                     }
                 }
             }
