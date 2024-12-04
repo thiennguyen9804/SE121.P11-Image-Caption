@@ -5,10 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -40,12 +43,13 @@ fun VocabularyDetailScreen(
     vocabulary: Resource<Vocabulary>
 ) {
     val context = LocalContext.current
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(vertical = 10.dp)
             .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = engWord,
@@ -53,7 +57,6 @@ fun VocabularyDetailScreen(
             textDecoration = TextDecoration.Underline,
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.TopCenter)
         )
         when (vocabulary) {
             is Resource.Error -> {
@@ -63,19 +66,20 @@ fun VocabularyDetailScreen(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            is Resource.Loading ->
+            is Resource.Loading -> {
+                Spacer(modifier = Modifier.height(50.dp))
                 CircularProgressIndicator(
                     color = Color(0xff9A00F7),
-                    modifier = Modifier.align(Alignment.Center)
                 )
+            }
 
             is Resource.Success -> {
                 val data = vocabulary.data!!
 
+
                 Column(
                     modifier = Modifier.fillMaxSize()
                         .padding(horizontal = 10.dp)
-                        .offset(y = 60.dp),
                 ) {
                     Text(
                         text = data.engVocab,
@@ -108,7 +112,7 @@ fun VocabularyDetailScreen(
 private fun VocabularyDetailScreenLoadingPreview() {
     SE121P11NewTheme {
         VocabularyDetailScreen(
-            engWord = "Hello",
+            engWord = "learn",
             vocabulary = Resource.Loading()
         )
     }

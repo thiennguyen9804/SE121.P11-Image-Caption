@@ -181,7 +181,6 @@ fun ImageCaptioningScreen(
                             }
                         }
                 }
-
             }
             Spacer(modifier = Modifier.height(20.dp))
             Box(
@@ -205,7 +204,7 @@ fun ImageCaptioningScreen(
                         Text(
                             text = vietnameseText.data ?: "",
                             fontSize = 18.sp,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                 }
             }

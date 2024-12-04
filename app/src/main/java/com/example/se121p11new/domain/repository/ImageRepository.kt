@@ -13,4 +13,6 @@ interface ImageRepository {
     suspend fun addImageLocally(newImage: Image): Flow<ObjectChange<Image>>
     fun getAllImagesLocally(): Flow<ResultsChange<Image>>
     fun getFirstNImage(n: Int): Flow<ResultsChange<Image>>
+    suspend fun deleteImageLocally(image: Image)
+
 }

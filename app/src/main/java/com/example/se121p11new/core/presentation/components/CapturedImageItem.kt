@@ -60,6 +60,7 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 fun CapturedImageItem(
     image: Image,
     onClick: (Image) -> Unit,
+    onDeleteImage: (Image) -> Unit,
 ) {
 //    val context = LocalContext.current
     var expanded by remember {
@@ -69,14 +70,18 @@ fun CapturedImageItem(
         SelectItem(
             title = "View",
             icon = R.drawable.ic_view,
-            onClick = {},
+            onClick = {
+                onClick(image)
+            },
             tint = Color(0xff616AE5)
         ),
 
         SelectItem(
             title = "Delete",
             icon = R.drawable.ic_delete,
-            onClick = {},
+            onClick = {
+                onDeleteImage(image)
+            },
             tint = Color(0xffEA1616)
         ),
     )
@@ -174,6 +179,7 @@ fun CapturedImageItem(
                             },
                             onClick = {
                                 expanded = false
+                                item.onClick()
                             }
                         )
                         if(item != items.last()) {
@@ -203,7 +209,8 @@ private fun CapturedImageItemPreview() {
                 vietnameseText = ""
                 imageName = "Image 1"
             },
-            onClick = { }
+            onClick = { },
+            onDeleteImage = {}
         )
     }
 }

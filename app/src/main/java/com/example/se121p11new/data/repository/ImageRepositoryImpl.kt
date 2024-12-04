@@ -34,4 +34,8 @@ class ImageRepositoryImpl @Inject constructor(
     override fun getFirstNImage(n: Int): Flow<ResultsChange<Image>> {
         return localImageDataSource.getFirstNImage(n)
     }
+
+    override suspend fun deleteImageLocally(image: Image) {
+        return localImageDataSource.deleteImage(image)
+    }
 }

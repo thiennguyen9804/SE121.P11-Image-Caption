@@ -9,6 +9,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ObjectChange
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 import javax.inject.Inject
 
 class LocalImageDataSource @Inject constructor(
@@ -39,6 +40,17 @@ class LocalImageDataSource @Inject constructor(
         return res
     }
 
-
+    suspend fun deleteImage(image: Image) {
+        val deleted = File(image.pictureUri).delete()
+//        if(deleted) {
+//
+//        }
+        realm.write {
+            val imageToDelete = query<Image>("_id == $0", image._id).first().find()
+            imageToDelete?.let {
+                delete(it)
+            }
+        }
+    }
 
 }

@@ -39,6 +39,7 @@ import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
 import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
+import com.example.se121p11new.core.presentation.utils.ImageFolderScreenRoute
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
@@ -59,6 +60,8 @@ import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
+import com.example.se121p11new.presentation.image_folder_screen.ImageFolderScreen
+import com.example.se121p11new.presentation.image_folder_screen.ImageFolderViewModel
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailViewModel
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -127,7 +130,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = CameraScreenRoute
+                    startDestination = DashboardScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -308,7 +311,36 @@ class MainActivity : ComponentActivity() {
                                         captureTime = image.captureTime
                                     )
                                 )
+                            },
+                            onDeleteImage =  {
+                                dashboardViewModel.deleteImage(it)
+                            },
+                            onGoToImageFolder = {
+                                navController.navigate(ImageFolderScreenRoute)
                             }
+                        )
+                    }
+
+                    composable<ImageFolderScreenRoute> {
+                        val imageFolderViewModel = hiltViewModel<ImageFolderViewModel>()
+                        val images by imageFolderViewModel.images.collectAsStateWithLifecycle()
+                        ImageFolderScreen(
+                            onChangeFolder = {},
+                            onImageClick = { image ->
+                                navController.navigate(
+                                    ImageCaptioningScreenRoute(
+                                        uriString = image.pictureUri,
+                                        englishText = image.englishText,
+                                        vietnameseText = image.vietnameseText,
+                                        imageName = image.imageName,
+                                        captureTime = image.captureTime,
+                                    )
+                                )
+                            },
+                            onDeleteImage = {
+                                imageFolderViewModel.deleteImage(it)
+                            },
+                            images = images
                         )
                     }
 
@@ -323,9 +355,6 @@ class MainActivity : ComponentActivity() {
                             engWord = args.engVocab,
                             vocabulary = vocabulary
                         )
-//                        Box() {
-//
-//                        }
                     }
                 }
             }

@@ -6,6 +6,9 @@ import com.example.se121p11new.core.data.AppConstants
 import com.example.se121p11new.data.local.LocalImageDataSource
 import com.example.se121p11new.data.local.LocalVocabularyDataSource
 import com.example.se121p11new.data.local.realm_object.Image
+import com.example.se121p11new.data.local.realm_object.RealmImage
+import com.example.se121p11new.data.local.realm_object.RealmImageFolder
+import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
 import com.example.se121p11new.data.local.realm_object.Vocabulary
 import com.example.se121p11new.data.remote.RemoteImageDataSource
 import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
@@ -114,7 +117,13 @@ object AppModule {
     fun provideRealmDb(): Realm {
         val config = RealmConfiguration.Builder(
             schema = setOf(
-                Image::class
+                RealmImage::class,
+                RealmVocabulary::class,
+                RealmDefinition::class,
+                RealmPhrasalVerb::class,
+                RealmPartOfSpeech::class,
+                RealmImageFolder::class,
+                RealmVocabularyFolder::class,
             ))
             .deleteRealmIfMigrationNeeded()
             .name("app_db.realm")

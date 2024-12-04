@@ -53,7 +53,6 @@ fun CameraScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,7 +122,6 @@ fun CameraScreen(
                 border = 5.dp,
                 modifier = Modifier
                     .size(80.dp)
-
             )
         }
     }

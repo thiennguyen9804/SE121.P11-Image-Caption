@@ -57,3 +57,6 @@ object DashboardScreenRoute
 data class VocabularyDetailScreenRoute(
     val engVocab: String = ""
 )
+
+@Serializable
+object ImageFolderScreenRoute

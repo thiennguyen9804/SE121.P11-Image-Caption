@@ -44,13 +44,15 @@ fun DashboardScreen(
     images: List<Image>,
     modifier: Modifier = Modifier,
     onClick: (Image) -> Unit,
+    onDeleteImage: (Image) -> Unit,
+    onGoToImageFolder: () -> Unit
 ) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding(vertical = 20.dp, horizontal = 15.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Row(
@@ -92,7 +94,7 @@ fun DashboardScreen(
                 Row(
                     modifier = Modifier
                         .clickable {
-
+                            onGoToImageFolder()
                         }
                 ) {
                     Text(
@@ -121,9 +123,11 @@ fun DashboardScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(images) { image ->
-                        CapturedImageItem(image) {
-                            onClick(image)
-                        }
+                        CapturedImageItem(
+                            image = image,
+                            onClick = onClick,
+                            onDeleteImage = onDeleteImage
+                        )
                     }
                 }
             }
@@ -182,9 +186,12 @@ fun DashboardScreen(
 @Composable
 private fun DashboardScreenPreview() {
     SE121P11NewTheme {
-        DashboardScreen(listOf(image, image, image)) {
-
-        }
+        DashboardScreen(
+            images = listOf(image, image, image),
+            onGoToImageFolder = {},
+            onClick = {},
+            onDeleteImage = {}
+        )
     }
 }
 

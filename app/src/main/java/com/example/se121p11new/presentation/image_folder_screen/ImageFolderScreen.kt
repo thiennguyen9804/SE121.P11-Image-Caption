@@ -2,7 +2,6 @@ package com.example.se121p11new.presentation.image_folder_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.content.MediaType.Companion.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridView
@@ -49,13 +45,14 @@ fun ImageFolderScreen(
     modifier: Modifier = Modifier,
     onChangeFolder: () -> Unit,
     onImageClick: (Image) -> Unit,
+    onDeleteImage: (Image) -> Unit,
     images: List<Image> = emptyList(),
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding(vertical = 20.dp, horizontal = 15.dp)
 //            .verticalScroll(rememberScrollState())
     ) {
         Row(
@@ -181,9 +178,11 @@ fun ImageFolderScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(images) { image ->
-                    CapturedImageItem(image) {
-                        onImageClick(image)
-                    }
+                    CapturedImageItem(
+                        image = image,
+                        onClick = onImageClick,
+                        onDeleteImage = onDeleteImage,
+                    )
                 }
             }
         }
@@ -198,6 +197,7 @@ private fun ImageFolderScreenPreview() {
             onChangeFolder = {},
             onImageClick = {},
 //            images = images
+            onDeleteImage = {}
         )
     }
 }
