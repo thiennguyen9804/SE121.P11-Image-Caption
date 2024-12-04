@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.image_folder_screen
+package com.example.se121p11new.presentation.image_folder_dashboard_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,20 +41,19 @@ import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.components.CircularAvatar
-import com.example.se121p11new.core.presentation.components.CreatedFolderItem
 import com.example.se121p11new.core.presentation.components.CustomDialog
 import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
-fun ImageFolderScreen(
+fun ImageFolderDashboardScreen(
     modifier: Modifier = Modifier,
     onChangeFolder: () -> Unit,
-    onFolderClick: (ImageFolder) -> Unit,
-    onFolderDelete: (ImageFolder) -> Unit,
+    onImageClick: (Image) -> Unit,
+    onDeleteImage: (Image) -> Unit,
     onFolderCreate: (String) -> Unit,
-    folders: List<ImageFolder> = emptyList(),
+    onGoToAllImageFolder: () -> Unit,
+    images: List<Image> = emptyList(),
 ) {
     var openDialog by remember { mutableStateOf(false) }
     Column(
@@ -70,7 +69,10 @@ fun ImageFolderScreen(
                     openDialog = false
                 },
                 text = "Thư mục ảnh mới",
-                onFolderCreate = onFolderCreate
+                onFolderCreate = {
+                    openDialog = false
+                    onFolderCreate(it)
+                }
             )
         }
         Row(
@@ -114,7 +116,7 @@ fun ImageFolderScreen(
                     imageVector = Icons.Outlined.AddCircleOutline,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        onChangeFolder()
+                        openDialog = true
                     }
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -138,24 +140,70 @@ fun ImageFolderScreen(
 
         }
 
+        Spacer(modifier = Modifier.width(20.dp))
+        Column {
+            IconButton(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(Icons.Default.History, null)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = stringResource(R.string.captured_history_text))
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            IconButton(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(Icons.Rounded.Wifi, null)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = stringResource(R.string.offline_storing_text))
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            IconButton(
+                onClick = {
+                    onGoToAllImageFolder()
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(Icons.Default.Folder, null)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = stringResource(R.string.created_folder_text))
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+        }
 
-        if(folders.isEmpty()) {
+        if(images.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    text = stringResource(R.string.no_created_folder_text),
+                    text = stringResource(R.string.no_image_text),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
         } else {
-            Spacer(modifier = Modifier.height(15.dp))
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(folders) { folder ->
-                    CreatedFolderItem(
-                        imageFolder = folder,
-                        onDeleteImageFolder = { onFolderDelete(folder) },
-                        onGoToImageFolderDetail = {  }
+                items(images) { image ->
+                    CapturedImageItem(
+                        image = image,
+                        onClick = onImageClick,
+                        onDeleteImage = onDeleteImage,
                     )
                 }
             }
@@ -163,25 +211,26 @@ fun ImageFolderScreen(
     }
 }
 
-
 @Preview
 @Composable
-private fun ImageFolderPreview() {
+private fun ImageFolderScreenPreview() {
     SE121P11NewTheme {
-        ImageFolderScreen(
+        ImageFolderDashboardScreen(
             onChangeFolder = {},
+            onImageClick = {},
+//            images = images
+            onDeleteImage = {},
             onFolderCreate = {},
-            onFolderDelete = {},
-            onFolderClick = {},
+            onGoToAllImageFolder = {}
         )
     }
 }
 
-//val image = Image().apply {
-//    pictureUri = ""
-//    englishText = ""
-//    vietnameseText = ""
-//    imageName = "Image 1"
-//}
-//
-//val images = listOf(image, image, image, image, image)
+val image = Image().apply {
+    pictureUri = ""
+    englishText = ""
+    vietnameseText = ""
+    imageName = "Image 1"
+}
+
+val images = listOf(image, image, image, image, image)

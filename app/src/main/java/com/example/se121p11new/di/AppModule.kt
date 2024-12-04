@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.se121p11new.R
 import com.example.se121p11new.core.data.AppConstants
 import com.example.se121p11new.data.local.LocalImageDataSource
+import com.example.se121p11new.data.local.LocalImageFolderDataSource
 import com.example.se121p11new.data.local.LocalVocabularyDataSource
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
@@ -17,8 +18,10 @@ import com.example.se121p11new.data.remote.dto.RealmDefinition
 import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
 import com.example.se121p11new.data.remote.dto.RealmPhrasalVerb
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
+import com.example.se121p11new.data.repository.ImageFolderRepositoryImpl
 import com.example.se121p11new.data.repository.ImageRepositoryImpl
 import com.example.se121p11new.data.repository.VocabularyRepositoryImpl
+import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import com.google.auth.oauth2.GoogleCredentials
@@ -165,5 +168,19 @@ object AppModule {
             .client(client)
             .build()
             .create(VocabularyApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalImageFolderDataSource(@Named("appDb") realm: Realm) : LocalImageFolderDataSource {
+        return LocalImageFolderDataSource(realm)
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageFolderRepository(
+        localImageFolderDataSource: LocalImageFolderDataSource
+    ): ImageFolderRepository {
+        return ImageFolderRepositoryImpl(localImageFolderDataSource)
     }
 }

@@ -59,4 +59,7 @@ data class VocabularyDetailScreenRoute(
 )
 
 @Serializable
+object ImageFolderDashboardScreenRoute
+
+@Serializable
 object ImageFolderScreenRoute

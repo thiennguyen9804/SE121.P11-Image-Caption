@@ -20,7 +20,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +38,7 @@ import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
 import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
+import com.example.se121p11new.core.presentation.utils.ImageFolderDashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageFolderScreenRoute
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
@@ -60,6 +60,8 @@ import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
+import com.example.se121p11new.presentation.image_folder_dashboard_screen.ImageFolderDashboardScreen
+import com.example.se121p11new.presentation.image_folder_dashboard_screen.ImageFolderDashboardViewModel
 import com.example.se121p11new.presentation.image_folder_screen.ImageFolderScreen
 import com.example.se121p11new.presentation.image_folder_screen.ImageFolderViewModel
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
@@ -130,7 +132,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = DashboardScreenRoute
+                    startDestination = ImageFolderScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -316,15 +318,15 @@ class MainActivity : ComponentActivity() {
                                 dashboardViewModel.deleteImage(it)
                             },
                             onGoToImageFolder = {
-                                navController.navigate(ImageFolderScreenRoute)
+                                navController.navigate(ImageFolderDashboardScreenRoute)
                             }
                         )
                     }
 
-                    composable<ImageFolderScreenRoute> {
-                        val imageFolderViewModel = hiltViewModel<ImageFolderViewModel>()
-                        val images by imageFolderViewModel.images.collectAsStateWithLifecycle()
-                        ImageFolderScreen(
+                    composable<ImageFolderDashboardScreenRoute> {
+                        val imageFolderDashboardViewModel = hiltViewModel<ImageFolderDashboardViewModel>()
+                        val images by imageFolderDashboardViewModel.images.collectAsStateWithLifecycle()
+                        ImageFolderDashboardScreen(
                             onChangeFolder = {},
                             onImageClick = { image ->
                                 navController.navigate(
@@ -338,7 +340,13 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             onDeleteImage = {
-                                imageFolderViewModel.deleteImage(it)
+                                imageFolderDashboardViewModel.deleteImage(it)
+                            },
+                            onFolderCreate = {
+                                imageFolderDashboardViewModel.createFolder(it)
+                            },
+                            onGoToAllImageFolder = {
+                                navController.navigate(ImageFolderScreenRoute)
                             },
                             images = images
                         )
@@ -356,7 +364,21 @@ class MainActivity : ComponentActivity() {
                             vocabulary = vocabulary
                         )
                     }
+
+                    composable<ImageFolderScreenRoute> {
+                        val imageFolderViewModel = hiltViewModel<ImageFolderViewModel>()
+                        val folders by imageFolderViewModel.imageFolders.collectAsStateWithLifecycle()
+                        ImageFolderScreen(
+                            onChangeFolder = {},
+                            onFolderClick = {},
+                            onFolderDelete = {},
+                            onFolderCreate = {},
+                            folders = folders
+                        )
+                    }
                 }
+
+
             }
         }
     }
