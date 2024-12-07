@@ -26,17 +26,17 @@ import com.example.se121p11new.data.local.realm_object.RealmImage
 
 @Composable
 fun PopUpMenu(
+    expanded: Boolean,
+    onDismissPopUpMenuRequest: () -> Unit,
     items: List<SelectItem>
 ) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
+
     MaterialTheme(
         shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
     ) {
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = onDismissPopUpMenuRequest,
             containerColor = Color.White,
         ) {
             items.forEach { item ->
@@ -54,7 +54,7 @@ fun PopUpMenu(
                         Text(text = item.title, color = Color.Black)
                     },
                     onClick = {
-                        expanded = false
+//                        expanded = false
                         item.onClick.invoke()
                     }
                 )

@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.data.local.realm_object.Image
+import com.example.se121p11new.data.remote.dto.DomainVocabulary
+import com.example.se121p11new.data.remote.dto.RealmVocabulary
 import com.example.se121p11new.domain.repository.ImageRepository
+import com.example.se121p11new.domain.repository.VocabularyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ImageCaptioningViewModel @Inject constructor(
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
+    private val vocabularyRepository: VocabularyRepository
 ) : ViewModel() {
     private val _generatedEnglishText = MutableStateFlow<Resource<String>>(Resource.Loading())
     val generatedEnglishText = _generatedEnglishText.asStateFlow()
@@ -31,7 +35,7 @@ class ImageCaptioningViewModel @Inject constructor(
     var captureTime = ""
 
     fun generateText(newBitmap: Bitmap) {
-        if(!apiTurnOn) {
+        if(!apiTurnOn || _generatedVietnameseText.value is Resource.Success) {
             return
         }
         viewModelScope.launch {
@@ -50,8 +54,10 @@ class ImageCaptioningViewModel @Inject constructor(
                                                 this.pictureUri = this@ImageCaptioningViewModel.imageUri
                                                 this.englishText = engText.data
                                                 this.vietnameseText = vieText.data
+                                                this.captureTime = this@ImageCaptioningViewModel.captureTime
                                             }
                                         )
+                                        apiTurnOn = false
                                     }
                                     is Resource.Error -> _generatedVietnameseText.value = (Resource.Error("Cannot translate to Vietnamese"))
                                     is Resource.Loading -> {}
@@ -65,5 +71,37 @@ class ImageCaptioningViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun saveVocabularyLocally(engVocab: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest {
+                    when(it) {
+                        is Resource.Error -> {}
+                        is Resource.Loading -> {}
+                        is Resource.Success -> {
+                            vocabularyRepository.addVocabulary(it.data!!.toRealmVocabulary())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteVocabularyLocally(engVocab: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                vocabularyRepository.getVocabularyByEngVocabLocally(engVocab).collectLatest {
+                    when(it) {
+                        is Resource.Error -> {}
+                        is Resource.Loading -> {}
+                        is Resource.Success -> {
+                            vocabularyRepository.deleteVocabularyLocally(it.data!!.toRealmVocabulary())
+                        }
+                    }
+                }
+            }
+        }
     }
 }

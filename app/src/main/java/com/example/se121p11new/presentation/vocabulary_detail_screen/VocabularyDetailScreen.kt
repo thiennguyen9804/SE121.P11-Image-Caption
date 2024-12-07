@@ -130,6 +130,7 @@ private fun VocabularyDetailScreenSuccessPreview() {
 }
 
 internal val vocab = Vocabulary(
+    "",
     "learn",
     "/lə:n/",
     partOfSpeeches = listOf(
@@ -159,5 +160,6 @@ internal val vocab = Vocabulary(
                 )
             )
         )
-    )
+    ),
+    vocabularyList = emptyList()
 )

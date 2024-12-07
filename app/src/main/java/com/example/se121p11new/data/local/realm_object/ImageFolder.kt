@@ -11,7 +11,7 @@ typealias RealmImageFolder = ImageFolder
 
 class ImageFolder : RealmObject {
     @PrimaryKey
-    var _id: ObjectId = BsonObjectId()
+    var _id: ObjectId = ObjectId()
     var name: String = "Image Folder"
     var imageList: RealmList<Image> = realmListOf()
 }

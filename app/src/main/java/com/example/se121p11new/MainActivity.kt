@@ -22,6 +22,7 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
@@ -34,17 +35,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.se121p11new.core.presentation.utils.AllSavedVocabularyScreenRoute
 import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
 import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageFolderDashboardScreenRoute
+import com.example.se121p11new.core.presentation.utils.ImageFolderDetailScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageFolderScreenRoute
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
 import com.example.se121p11new.core.presentation.utils.StringFromTime
 import com.example.se121p11new.core.presentation.utils.VocabularyDetailScreenRoute
+import com.example.se121p11new.core.presentation.utils.VocabularyFolderDashboardScreenRoute
+import com.example.se121p11new.core.presentation.utils.VocabularyFolderDetailScreenRoute
+import com.example.se121p11new.core.presentation.utils.VocabularyFolderScreenRoute
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
@@ -60,12 +66,23 @@ import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
-import com.example.se121p11new.presentation.image_folder_dashboard_screen.ImageFolderDashboardScreen
-import com.example.se121p11new.presentation.image_folder_dashboard_screen.ImageFolderDashboardViewModel
-import com.example.se121p11new.presentation.image_folder_screen.ImageFolderScreen
-import com.example.se121p11new.presentation.image_folder_screen.ImageFolderViewModel
+import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_dashboard_screen.ImageFolderDashboardScreen
+import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_dashboard_screen.ImageFolderDashboardViewModel
+import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen.ImageFolderDetailScreen
+import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen.ImageFolderDetailViewModel
+import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen.ImageFolderScreen
+import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen.ImageFolderViewModel
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailViewModel
+import com.example.se121p11new.presentation.vocabulary_detail_screen.vocab
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.all_saved_vocabulary_screen.AllSavedVocabularyScreen
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.all_saved_vocabulary_screen.AllSavedVocabularyViewModel
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_dashboard_screen.VocabularyFolderDashboardScreen
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_dashboard_screen.VocabularyFolderDashboardViewModel
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_detail_screen.VocabularyFolderDetailScreen
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_detail_screen.VocabularyFolderDetailViewModel
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_screen.VocabularyFolderScreen
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_screen.VocabularyFolderViewModel
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -76,6 +93,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.mongodb.kbson.ObjectId
 import java.io.File
 import java.util.Locale
 
@@ -101,12 +119,7 @@ class MainActivity : ComponentActivity() {
 
     private var providerType = ""
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun testDateTime() {
-        val res = StringFromTime.buildDateTimeString()
-        println("buildDateTimeString $res")
-    }
-
+    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,7 +129,6 @@ class MainActivity : ComponentActivity() {
                 this, CAMERAX_PERMISSIONS, 0
             )
         }
-        testDateTime()
         setContent {
             this.enableEdgeToEdge()
             SE121P11NewTheme {
@@ -132,7 +144,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = ImageFolderScreenRoute
+                    startDestination = VocabularyFolderDashboardScreenRoute
                 ) {
                     composable<LoginScreenRoute> {
                         val authViewModel = hiltViewModel<AuthViewModel>()
@@ -154,7 +166,7 @@ class MainActivity : ComponentActivity() {
                         )
 
                         LaunchedEffect(key1 = userState.isSignInSuccessful) {
-                            if(userState.isSignInSuccessful) {
+                            if (userState.isSignInSuccessful) {
                                 Toast.makeText(
                                     applicationContext,
                                     "Sign in success",
@@ -165,7 +177,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         LaunchedEffect(key1 = Unit) {
-                            if(authClient.getSignInUser() != null) {
+                            if (authClient.getSignInUser() != null) {
                                 navController.navigate("profile")
                             }
                         }
@@ -238,11 +250,13 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             },
                             onSubmit = {
-                                navController.navigate(ImageCaptioningScreenRoute(
-                                    uriString = args.uriString,
-                                    imageName = args.imageName,
-                                    captureTime = args.captureTime,
-                                )) {
+                                navController.navigate(
+                                    ImageCaptioningScreenRoute(
+                                        uriString = args.uriString,
+                                        imageName = args.imageName,
+                                        captureTime = args.captureTime,
+                                    )
+                                ) {
                                     popUpTo<CapturedImagePreviewScreenRoute> {
                                         inclusive = true
                                     }
@@ -252,12 +266,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<ImageCaptioningScreenRoute> {
-                        val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
+                        imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
                         val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
                         val args = it.toRoute<ImageCaptioningScreenRoute>()
                         lateinit var englishText: Resource<String>
                         lateinit var vietnameseText: Resource<String>
-                        if(args.englishText == "" && args.vietnameseText == "") {
+                        if (args.englishText == "" && args.vietnameseText == "") {
                             imageCaptioningViewModel.apiTurnOn = true
                             LaunchedEffect(key1 = Unit) {
                                 val bitmap = getBitmapFromUri(
@@ -267,10 +281,15 @@ class MainActivity : ComponentActivity() {
                                 imageCaptioningViewModel.imageName = args.imageName
                                 imageCaptioningViewModel.imageUri = args.uriString
                                 imageCaptioningViewModel.captureTime = args.captureTime
-                                imageCaptioningViewModel.generateText(bitmap)
+                                if(imageCaptioningViewModel.apiTurnOn) {
+                                    imageCaptioningViewModel.generateText(bitmap)
+                                }
                             }
-                            englishText = imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle().value
-                            vietnameseText = imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle().value
+                            englishText =
+                                imageCaptioningViewModel.generatedEnglishText.collectAsState().value
+                            vietnameseText =
+                                imageCaptioningViewModel.generatedVietnameseText.collectAsState().value
+
                         } else {
                             imageCaptioningViewModel.apiTurnOn = false
                             englishText = Resource.Success(args.englishText)
@@ -284,20 +303,39 @@ class MainActivity : ComponentActivity() {
                             imageName = args.imageName,
                             capturedTime = args.captureTime,
                             onGoToVocabularyDetail = { engVocab ->
-                                navController.navigate(VocabularyDetailScreenRoute(
-                                    engVocab = engVocab
-                                ))
+                                navController.navigate(
+                                    VocabularyDetailScreenRoute(
+                                        engVocab = engVocab
+                                    )
+                                )
                             },
                             onBack = {
                                 vocabularyDetailViewModel.clearCache()
                                 navController.popBackStack()
-                            }
+                            },
+                            onSaveVocabulary = { engVocab ->
+                                imageCaptioningViewModel.saveVocabularyLocally(engVocab)
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Đã lưu từ vựng!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            onDeleteVocabulary = { engVocab ->
+                                imageCaptioningViewModel.deleteVocabularyLocally(engVocab)
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Đã xóa từ vựng!",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            },
                         )
                     }
 
                     composable<DashboardScreenRoute> {
                         val dashboardViewModel = hiltViewModel<DashboardViewModel>()
                         val images by dashboardViewModel.images.collectAsStateWithLifecycle()
+                        val imageFolderList by dashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
                         LaunchedEffect(key1 = Unit) {
                             println("image $images")
                         }
@@ -314,18 +352,31 @@ class MainActivity : ComponentActivity() {
                                     )
                                 )
                             },
-                            onDeleteImage =  {
+                            allImageFolder = imageFolderList,
+                            onDeleteImage = {
                                 dashboardViewModel.deleteImage(it)
                             },
                             onGoToImageFolder = {
                                 navController.navigate(ImageFolderDashboardScreenRoute)
-                            }
+                            },
+
+                            onAddImageToFolder = { image, imageFolder ->
+                                dashboardViewModel.addImageToFolder(image, imageFolder)
+                            },
+                            onRemoveImageOutOfFolder = { image, imageFolder ->
+                                dashboardViewModel.removeImageOutOfFolder(
+                                    image,
+                                    imageFolder
+                                )
+                            },
                         )
                     }
 
                     composable<ImageFolderDashboardScreenRoute> {
-                        val imageFolderDashboardViewModel = hiltViewModel<ImageFolderDashboardViewModel>()
+                        val imageFolderDashboardViewModel =
+                            hiltViewModel<ImageFolderDashboardViewModel>()
                         val images by imageFolderDashboardViewModel.images.collectAsStateWithLifecycle()
+                        val imageFolderList by imageFolderDashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
                         ImageFolderDashboardScreen(
                             onChangeFolder = {},
                             onImageClick = { image ->
@@ -348,20 +399,17 @@ class MainActivity : ComponentActivity() {
                             onGoToAllImageFolder = {
                                 navController.navigate(ImageFolderScreenRoute)
                             },
-                            images = images
-                        )
-                    }
-
-                    composable<VocabularyDetailScreenRoute> {
-                        val args = it.toRoute<VocabularyDetailScreenRoute>()
-                        val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
-                        LaunchedEffect(key1 = Unit) {
-                            vocabularyDetailViewModel.getVocabulary(args.engVocab.lowercase(Locale.ENGLISH).replace(Regex("\\p{Punct}"), ""))
-                        }
-                        val vocabulary by vocabularyDetailViewModel.vocabulary.collectAsStateWithLifecycle()
-                        VocabularyDetailScreen(
-                            engWord = args.engVocab,
-                            vocabulary = vocabulary
+                            images = images,
+                            folderList = imageFolderList,
+                            onAddImageToFolder = { image, imageFolder ->
+                                imageFolderDashboardViewModel.addImageToFolder(image, imageFolder)
+                            },
+                            onRemoveImageOutOfFolder = { image, imageFolder ->
+                                imageFolderDashboardViewModel.removeImageOutOfFolder(
+                                    image,
+                                    imageFolder
+                                )
+                            },
                         )
                     }
 
@@ -370,15 +418,189 @@ class MainActivity : ComponentActivity() {
                         val folders by imageFolderViewModel.imageFolders.collectAsStateWithLifecycle()
                         ImageFolderScreen(
                             onChangeFolder = {},
-                            onFolderClick = {},
+                            onFolderClick = { imageFolder ->
+                                navController.navigate(
+                                    ImageFolderDetailScreenRoute(
+                                        imageFolder._id
+                                            .toString()
+                                            .substringAfter("(")
+                                            .substringBefore(")")
+                                    )
+                                )
+                            },
                             onFolderDelete = {},
-                            onFolderCreate = {},
-                            folders = folders
+                            onFolderCreate = {
+                                imageFolderViewModel.createFolder(it)
+                            },
+                            folders = folders,
                         )
                     }
+
+                    composable<ImageFolderDetailScreenRoute> {
+                        val args = it.toRoute<ImageFolderDetailScreenRoute>()
+                        val imageFolderDetailViewModel = hiltViewModel<ImageFolderDetailViewModel>()
+                        val imageFolderList by imageFolderDetailViewModel.imageFolderList.collectAsStateWithLifecycle()
+                        val folderId = ObjectId(args.folderId)
+                        LaunchedEffect(key1 = Unit) {
+                            println("id ${args.folderId}")
+                            imageFolderDetailViewModel.getImageFolderId(folderId)
+                        }
+                        val imageFolder by imageFolderDetailViewModel.imageFolder.collectAsStateWithLifecycle()
+
+                        ImageFolderDetailScreen(
+                            imageFolder = imageFolder,
+                            onImageClick = { image ->
+                                navController.navigate(
+                                    ImageCaptioningScreenRoute(
+                                        uriString = image.pictureUri,
+                                        englishText = image.englishText,
+                                        vietnameseText = image.vietnameseText,
+                                        imageName = image.imageName,
+                                        captureTime = image.captureTime,
+                                    )
+                                )
+                            },
+                            onDeleteImage = { image ->
+                                imageFolderDetailViewModel.deleteImage(image)
+                            },
+
+                            onAddImageToFolder = { image, addedImageFolder ->
+                                imageFolderDetailViewModel.addImageToFolder(image, addedImageFolder)
+                            },
+                            onRemoveImageOutOfFolder = { image, removedImageFolder ->
+                                imageFolderDetailViewModel.removeImageOutOfFolder(
+                                    image,
+                                    removedImageFolder
+                                )
+                            },
+                            allFolder = imageFolderList
+
+                        )
+                    }
+
+                    composable<VocabularyDetailScreenRoute> {
+                        val args = it.toRoute<VocabularyDetailScreenRoute>()
+                        val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
+                        LaunchedEffect(key1 = Unit) {
+                            vocabularyDetailViewModel.getVocabulary(
+                                args.engVocab.lowercase(Locale.ENGLISH)
+                                    .replace(Regex("\\p{Punct}"), "")
+                            )
+                        }
+                        val vocabulary by vocabularyDetailViewModel.vocabulary.collectAsStateWithLifecycle()
+                        VocabularyDetailScreen(
+                            engWord = args.engVocab.lowercase(Locale.ENGLISH)
+                                .replace(Regex("\\p{Punct}"), ""),
+                            vocabulary = vocabulary
+                        )
+                    }
+
+                    composable<VocabularyFolderDashboardScreenRoute> {
+                        val vocabularyFolderDashboardViewModel =
+                            hiltViewModel<VocabularyFolderDashboardViewModel>()
+                        VocabularyFolderDashboardScreen(
+                            onFolderCreate = {
+                                vocabularyFolderDashboardViewModel.createFolder(it)
+                            },
+                            onGoToVocabularyFolder = {
+                                navController.navigate(VocabularyFolderScreenRoute)
+                            },
+
+                            onGoToAllSavedVocabulary = {
+                                navController.navigate(AllSavedVocabularyScreenRoute)
+                            }
+                        )
+                    }
+
+                    composable<VocabularyFolderScreenRoute> {
+                        val vocabularyFolderViewModel = hiltViewModel<VocabularyFolderViewModel>()
+                        val vocabularyFolderList by vocabularyFolderViewModel.vocabularyFolders.collectAsStateWithLifecycle()
+                        VocabularyFolderScreen(
+                            onFolderCreate = {
+                                vocabularyFolderViewModel.createFolder(it)
+                            },
+                            vocabularyFolderList = vocabularyFolderList,
+                            onFolderDelete = {},
+                            onFolderClick = { folder ->
+                                navController.navigate(
+                                    VocabularyFolderDetailScreenRoute(
+                                        folderId = folder._id
+                                            .toString()
+                                            .substringAfter("(")
+                                            .substringBefore(")")
+                                    )
+                                )
+//                                val a = folder._id
+//                                    .toString()
+//                                    .substringAfter("(")
+//                                    .substringBefore(")")
+//                                println(folder)
+                            },
+                        )
+                    }
+
+                    composable<VocabularyFolderDetailScreenRoute> {
+                        val args = it.toRoute<VocabularyFolderDetailScreenRoute>()
+                        val vocabularyFolderDetailViewModel =
+                            hiltViewModel<VocabularyFolderDetailViewModel>()
+                        val folderId = ObjectId(args.folderId)
+                        LaunchedEffect(key1 = Unit) {
+                            println("id ${args.folderId}")
+                            vocabularyFolderDetailViewModel.getVocabularyFolderId(folderId)
+                        }
+                        val vocabularyFolderList by vocabularyFolderDetailViewModel.vocabularyFolderList.collectAsStateWithLifecycle()
+                        val vocabularyFolder by vocabularyFolderDetailViewModel.vocabularyFolder.collectAsStateWithLifecycle()
+                        println(vocabularyFolder.vocabularyList.size)
+
+
+                        VocabularyFolderDetailScreen(
+                            vocabularyFolder = vocabularyFolder,
+                            onVocabularyClick = { vocabulary ->
+                                navController.navigate(
+                                    VocabularyDetailScreenRoute(
+                                        engVocab = vocabulary.engVocab
+                                    )
+                                )
+                            },
+                            onDeleteVocabulary = { vocabulary ->
+                                vocabularyFolderDetailViewModel.deleteVocabulary(vocabulary)
+                            },
+                            onAddVocabularyToFolder = { _vocabulary, _vocabularyFolder ->
+                                vocabularyFolderDetailViewModel.addVocabularyToFolder(_vocabulary, _vocabularyFolder)
+                            },
+                            onRemoveVocabularyOutOfFolder = { _vocabulary, _vocabularyFolder ->
+                                vocabularyFolderDetailViewModel.removeVocabularyOutOfFolder(_vocabulary, _vocabularyFolder)
+                            },
+                            allFolder = vocabularyFolderList
+                        )
+                    }
+
+                    composable<AllSavedVocabularyScreenRoute> {
+                        val allSavedVocabularyViewModel = hiltViewModel<AllSavedVocabularyViewModel>()
+                        val allVocabularies by allSavedVocabularyViewModel.vocabularyList.collectAsStateWithLifecycle()
+                        val allFolders by allSavedVocabularyViewModel.vocabularyFolderList.collectAsStateWithLifecycle()
+                        AllSavedVocabularyScreen(
+                            vocabularyList = allVocabularies,
+                            onVocabularyClick = { vocabulary ->
+                                navController.navigate(
+                                    VocabularyDetailScreenRoute(
+                                        engVocab = vocabulary.engVocab
+                                    )
+                                )},
+                            onDeleteVocabulary = { vocabulary ->
+                                allSavedVocabularyViewModel.deleteVocabulary(vocabulary)
+                            },
+                            allFolder = allFolders,
+                            onAddVocabularyToFolder = { _vocabulary, _vocabularyFolder ->
+                                allSavedVocabularyViewModel.addVocabularyToFolder(_vocabulary, _vocabularyFolder)
+                            },
+                            onRemoveVocabularyOutOfFolder = { _vocabulary, _vocabularyFolder ->
+                                allSavedVocabularyViewModel.removeVocabularyOutOfFolder(_vocabulary, _vocabularyFolder)
+                            },
+                        )
+                    }
+
                 }
-
-
             }
         }
     }

@@ -10,10 +10,12 @@ import com.example.se121p11new.data.remote.dto.RealmDefinition
 import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
 import com.example.se121p11new.domain.data.Definition
+import com.example.se121p11new.domain.data.DomainVocabularyFolder
 import com.example.se121p11new.domain.data.PartOfSpeech
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.notifications.InitialResults
+import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.UpdatedResults
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -43,28 +45,38 @@ class VocabularyRepositoryImpl @Inject constructor(
             value.list.map { it.toDomainVocabulary() }
         }.flowOn(Dispatchers.IO)
 
+    override suspend fun getAllVocabulariesAndReturnRealmObject(): Flow<ResultsChange<Vocabulary>> {
+        return localVocabularyDataSource.getAllVocabularies()
+    }
+
+    override suspend fun getVocabularyByEngVocabLocally(
+        engVocab: String
+    ): Flow<Resource<DomainVocabulary>> = channelFlow {
+        localVocabularyDataSource.getVocabularyByEngVocabFromCache(engVocab).map { value ->
+            val res = value.list.toList().firstOrNull() ?: return@map
+            send(Resource.Success(res.toDomainVocabulary()))
+        }
+        localVocabularyDataSource.getVocabularyByEngVocabLocally(engVocab).map { value ->
+            val res = value.list.toList().firstOrNull() ?: return@map
+            send(Resource.Success(res.toDomainVocabulary()))
+        }
+    }
+
+    override suspend fun deleteVocabularyLocally(vocabulary: Vocabulary) {
+        localVocabularyDataSource.deleteVocabularyLocally(vocabulary)
+    }
+
 
     override suspend fun getVocabularyByEngVocab(
         engVocab: String,
     ): Flow<Resource<DomainVocabulary>> = channelFlow {
         try {
-            localVocabularyDataSource.getVocabularyByEngVocabFromCache(engVocab).map { value ->
-                println("vocab repo: searching for cache value...")
-                val res = value.list.toList().firstOrNull()
-                if(res == null) {
-                    println("vocab repo: cache misses")
-                    return@map
-                }
-                println("vocab repo: cache hits")
-                send(Resource.Success(res.toDomainVocabulary()))
-            }
             remoteVocabularyDataSource.getVocabularyByEngVocab(engVocab).let { value ->
                 value.collectLatest {
                     when(it) {
                         is Resource.Error -> send(Resource.Error(message = it.message!!))
                         is Resource.Loading -> send(Resource.Loading())
                         is Resource.Success -> {
-                            println("vocab repo: backend hits")
                             localVocabularyDataSource.addVocabularyToCache(it.data!!.toRealmVocabulary())
                             send(Resource.Success(it.data.toDomainVocabulary()))
                         }
@@ -74,7 +86,6 @@ class VocabularyRepositoryImpl @Inject constructor(
         } catch(e: HttpException) {
             when(e.code()) {
                 404 -> {
-                    println("vocab repo: backend misses, looking for data in gcp...")
                     remoteImageDataSource.generateVietnameseText(engVocab).collectLatest {
                         when(it) {
                             is Resource.Error -> send(Resource.Error(message = it.message!!))
@@ -100,6 +111,7 @@ class VocabularyRepositoryImpl @Inject constructor(
                                 }
 
                                 val res = DomainVocabulary(
+                                    idString = "",
                                     engVocab = engVocab,
                                     ipa = "",
                                     partOfSpeeches = listOf(
@@ -114,7 +126,9 @@ class VocabularyRepositoryImpl @Inject constructor(
                                         )
                                     ),
 
-                                    phrasalVerbs = emptyList()
+                                    phrasalVerbs = emptyList(),
+                                    vocabularyList = emptyList()
+
                                 )
                                 send(Resource.Success(res))
                             }
@@ -132,7 +146,10 @@ class VocabularyRepositoryImpl @Inject constructor(
         }
     }
 
+
     override suspend fun clearCache() {
         localVocabularyDataSource.clearCache()
     }
+
+
 }

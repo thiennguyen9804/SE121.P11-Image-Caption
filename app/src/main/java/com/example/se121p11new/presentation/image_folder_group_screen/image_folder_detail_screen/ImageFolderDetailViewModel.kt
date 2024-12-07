@@ -1,40 +1,34 @@
-package com.example.se121p11new.presentation.dashboard_screen
+package com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.ImageFolder
+import com.example.se121p11new.data.local.realm_object.RealmImage
+import com.example.se121p11new.data.local.realm_object.RealmImageFolder
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(
-    private val imageRepository: ImageRepository,
-    private val imageFolderRepository: ImageFolderRepository
+class ImageFolderDetailViewModel @Inject constructor(
+    private val imageFolderRepository: ImageFolderRepository,
+    private val imageRepository: ImageRepository
 ) : ViewModel() {
+    private var _imageFolder = MutableStateFlow(RealmImageFolder())
+    val imageFolder = _imageFolder.asStateFlow()
     private val _imageFolderList = MutableStateFlow<List<ImageFolder>>(emptyList())
-    val images = imageRepository
-        .getFirstNImage(3)
-        .map {
-            it.list.toList()
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList()
-        )
-
     val imageFolderList = _imageFolderList
         .onStart { getAllImageFolder() }
         .stateIn(
@@ -43,19 +37,26 @@ class DashboardViewModel @Inject constructor(
             emptyList()
         )
 
-    fun deleteImage(image: Image) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                imageRepository.deleteImageLocally(image)
-            }
-        }
-    }
     private fun getAllImageFolder() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 imageFolderRepository.getAllFoldersLocally().collectLatest {
                     _imageFolderList.value = it.list.toList()
                 }
+            }
+        }
+    }
+
+    suspend fun getImageFolderId(id: ObjectId) {
+        imageFolderRepository.getImageFolderById(id).collectLatest {
+            _imageFolder.value = it.list.toList().first()
+        }
+    }
+
+    fun deleteImage(image: RealmImage) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                imageRepository.deleteImageLocally(image)
             }
         }
     }
@@ -78,7 +79,7 @@ class DashboardViewModel @Inject constructor(
                     imageFolderRepository.removeImageOutOfFolder(image, folder)
                 }
             }
-
         }
     }
+
 }

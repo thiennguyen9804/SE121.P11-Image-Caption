@@ -13,9 +13,6 @@ data class Definition(
 ) {
     fun toRealmDefinition() = RealmDefinition().apply {
         definition = this@Definition.definition
-//        val realmExamples: RealmList<String> = examples.map {
-//            it
-//        }.toRealmList()
-        examples = examples.toRealmList()
+        examples = this@Definition.examples.toRealmList()
     }
 }

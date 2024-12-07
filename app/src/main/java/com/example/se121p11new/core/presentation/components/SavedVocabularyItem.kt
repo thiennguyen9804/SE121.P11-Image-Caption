@@ -6,46 +6,40 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.utils.SelectItem
-import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.data.local.realm_object.ImageFolder
-import com.example.se121p11new.ui.theme.SE121P11NewTheme
-
-
+import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
+import com.example.se121p11new.data.remote.dto.DomainVocabulary
+import com.example.se121p11new.data.remote.dto.RealmVocabulary
+import com.example.se121p11new.domain.data.DomainVocabularyFolder
 
 @Composable
-fun CapturedImageItem(
-    image: Image, // hình ảnh để hiển thị
-    onClick: (Image) -> Unit,
-    onDeleteImage: (Image) -> Unit,
-    folderList: List<ImageFolder>, // tất cả các thư mục trong ứng dụng
-    onAddImageToFolder: (Image, ImageFolder) -> Unit,
-    onRemoveImageOutOfFolder: (Image, ImageFolder) -> Unit,
+fun SavedVocabularyItem(
+    vocabulary: RealmVocabulary,
+    onClick: (RealmVocabulary) -> Unit,
+    onDeleteVocabulary: (RealmVocabulary) -> Unit,
+    folderList: List<RealmVocabularyFolder>,
+    onAddVocabularyToFolder: (RealmVocabulary, RealmVocabularyFolder) -> Unit,
+    onRemoveVocabularyOutOfFolder: (RealmVocabulary, RealmVocabularyFolder) -> Unit,
 ) {
     var expanded by remember {
         mutableStateOf(false)
@@ -58,7 +52,7 @@ fun CapturedImageItem(
             title = "View",
             icon = R.drawable.ic_view,
             onClick = {
-                onClick(image)
+                onClick(vocabulary)
             },
             tint = Color(0xff616AE5)
         ),
@@ -67,7 +61,7 @@ fun CapturedImageItem(
             title = "Delete",
             icon = R.drawable.ic_delete,
             onClick = {
-                onDeleteImage(image)
+                onDeleteVocabulary(vocabulary)
             },
             tint = Color(0xffEA1616)
         ),
@@ -88,43 +82,37 @@ fun CapturedImageItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                onClick(image)
+                onClick(vocabulary)
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         if (showBottomSheet) {
-            ImageFolderBottomSheet(
+            VocabularyFolderBottomSheet(
                 folderList = folderList,
-                imageFolderList = image.imageList,
+                vocabularyFolderList = vocabulary.vocabularyList,
                 showBottomSheet = showBottomSheet,
                 onDismiss = {
                     showBottomSheet = false
                 },
-                onAddImageToFolder = {
-                    onAddImageToFolder(image, it)
+                onAddVocabularyToFolder = {
+                    onAddVocabularyToFolder(vocabulary, it)
                 },
-                onRemoveImageOutOfFolder = {
-                    onRemoveImageOutOfFolder(image, it)
+                onRemoveVocabularyOutOfFolder = {
+                    onRemoveVocabularyOutOfFolder(vocabulary, it)
                 },
-                onCreateNewImageFolder = {},
+                onCreateNewVocabularyFolder = {},
             )
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(image.pictureUri)
-                    .build(),
-                contentDescription = null,
-                modifier = Modifier.size(100.dp),
-                contentScale = ContentScale.FillWidth
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null
             )
-
             Spacer(modifier = Modifier.width(20.dp))
             Text(
-                text = image.imageName,
+                text = vocabulary.engVocab,
                 fontSize = 17.sp,
             )
         }
@@ -151,25 +139,5 @@ fun CapturedImageItem(
             }
 
         }
-    }
-}
-
-@Preview
-@Composable
-private fun CapturedImageItemPreview() {
-    SE121P11NewTheme {
-        CapturedImageItem(
-            image = Image().apply {
-                pictureUri = ""
-                englishText = ""
-                vietnameseText = ""
-                imageName = "Image 1"
-            },
-            onClick = { },
-            onDeleteImage = { },
-            folderList = emptyList(),
-            onAddImageToFolder = { _, _ -> },
-            onRemoveImageOutOfFolder = { _, _ ->},
-        )
     }
 }

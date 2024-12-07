@@ -6,6 +6,7 @@ import com.example.se121p11new.core.data.AppConstants
 import com.example.se121p11new.data.local.LocalImageDataSource
 import com.example.se121p11new.data.local.LocalImageFolderDataSource
 import com.example.se121p11new.data.local.LocalVocabularyDataSource
+import com.example.se121p11new.data.local.LocalVocabularyFolderDataSource
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
 import com.example.se121p11new.data.local.realm_object.RealmImageFolder
@@ -20,9 +21,11 @@ import com.example.se121p11new.data.remote.dto.RealmPhrasalVerb
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
 import com.example.se121p11new.data.repository.ImageFolderRepositoryImpl
 import com.example.se121p11new.data.repository.ImageRepositoryImpl
+import com.example.se121p11new.data.repository.VocabularyFolderRepositoryImpl
 import com.example.se121p11new.data.repository.VocabularyRepositoryImpl
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
+import com.example.se121p11new.domain.repository.VocabularyFolderRepository
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.translate.Translate
@@ -145,7 +148,8 @@ object AppModule {
                 RealmVocabulary::class,
                 RealmPhrasalVerb::class,
                 RealmDefinition::class,
-                RealmPartOfSpeech::class
+                RealmPartOfSpeech::class,
+                RealmVocabularyFolder::class,
             ))
             .deleteRealmIfMigrationNeeded()
             .name("cache.realm")
@@ -182,5 +186,20 @@ object AppModule {
         localImageFolderDataSource: LocalImageFolderDataSource
     ): ImageFolderRepository {
         return ImageFolderRepositoryImpl(localImageFolderDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalVocabularyFolderDataSource(@Named("appDb") realm: Realm) : LocalVocabularyFolderDataSource {
+        return LocalVocabularyFolderDataSource(realm)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVocabularyFolderRepository(
+        localVocabularyFolderDataSource: LocalVocabularyFolderDataSource
+    ): VocabularyFolderRepository {
+        return VocabularyFolderRepositoryImpl(localVocabularyFolderDataSource)
+
     }
 }

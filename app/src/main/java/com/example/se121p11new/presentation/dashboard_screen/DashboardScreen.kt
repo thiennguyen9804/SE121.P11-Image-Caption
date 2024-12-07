@@ -36,6 +36,7 @@ import com.example.se121p11new.core.presentation.components.CircularAvatar
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.core.presentation.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.utils.SelectItem
+import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.presentation.dashboard_screen.components.SavedVocabularyItem
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
@@ -45,7 +46,10 @@ fun DashboardScreen(
     modifier: Modifier = Modifier,
     onClick: (Image) -> Unit,
     onDeleteImage: (Image) -> Unit,
-    onGoToImageFolder: () -> Unit
+    onGoToImageFolder: () -> Unit,
+    allImageFolder: List<ImageFolder>,
+    onAddImageToFolder: (Image, ImageFolder) -> Unit, // khi bấm checkbox để thêm hình ảnh vào thư mục
+    onRemoveImageOutOfFolder: (Image, ImageFolder) -> Unit,
 ) {
 
     Column(
@@ -126,7 +130,10 @@ fun DashboardScreen(
                         CapturedImageItem(
                             image = image,
                             onClick = onClick,
-                            onDeleteImage = onDeleteImage
+                            onDeleteImage = onDeleteImage,
+                            folderList = allImageFolder,
+                            onAddImageToFolder = onAddImageToFolder,
+                            onRemoveImageOutOfFolder = onRemoveImageOutOfFolder,
                         )
                     }
                 }
@@ -190,7 +197,10 @@ private fun DashboardScreenPreview() {
             images = listOf(image, image, image),
             onGoToImageFolder = {},
             onClick = {},
-            onDeleteImage = {}
+            onDeleteImage = {},
+            allImageFolder = emptyList(),
+            onRemoveImageOutOfFolder = {_, _ ->},
+            onAddImageToFolder = {_, _ ->}
         )
     }
 }

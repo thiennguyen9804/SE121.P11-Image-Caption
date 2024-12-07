@@ -10,5 +10,10 @@ data class PartOfSpeech(
     val definitions: List<Definition>,
     val partOfSpeech: String
 ) {
-
+    fun toRealmPartOfSpeech() = RealmPartOfSpeech().apply {
+        partOfSpeech = this@PartOfSpeech.partOfSpeech
+        this.definitions = this@PartOfSpeech.definitions.map {
+            it.toRealmDefinition()
+        }.toRealmList()
+    }
 }

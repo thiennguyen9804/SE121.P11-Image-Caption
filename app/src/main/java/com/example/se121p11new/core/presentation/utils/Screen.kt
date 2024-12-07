@@ -63,3 +63,22 @@ object ImageFolderDashboardScreenRoute
 
 @Serializable
 object ImageFolderScreenRoute
+
+@Serializable
+data class ImageFolderDetailScreenRoute(
+    val folderId: String = "",
+)
+
+@Serializable
+object VocabularyFolderDashboardScreenRoute
+
+@Serializable
+object VocabularyFolderScreenRoute
+
+@Serializable
+data class VocabularyFolderDetailScreenRoute(
+    val folderId: String = ""
+)
+
+@Serializable
+object AllSavedVocabularyScreenRoute

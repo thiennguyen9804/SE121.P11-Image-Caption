@@ -25,9 +25,11 @@ data class VocabularyDto(
     }
 
     fun toDomainVocabulary() = DomainVocabulary(
+        idString = "",
         engVocab = this.engVocab,
         ipa = this.ipa,
         partOfSpeeches = this.partOfSpeeches.map { it.toDomainPartOfSpeech() },
-        phrasalVerbs = this.phrasalVerbs.map { it.toDomainPhrasalVerb() }
+        phrasalVerbs = this.phrasalVerbs.map { it.toDomainPhrasalVerb() },
+        vocabularyList = emptyList()
     )
 }

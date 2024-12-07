@@ -32,7 +32,8 @@
     <string name="image_storing_text">Lưu trữ hình ảnh</string>
     <string name="captured_history_text">Lịch sử đã chụp</string>
     <string name="offline_storing_text">Lưu trữ ngoại tuyến</string>
-    <string name="created_folder_text">Thư mục hình ảnh tự tạo</string>
+    <string name="created_image_folder_text">Thư mục hình ảnh tự tạo</string>
+    <string name="created_vocabulary_folder_text">Thư mục từ vựng tự tạo</string>
     <string name="monday_text">Thứ hai</string>
     <string name="tuesday_text">Thứ ba</string>
     <string name="wednesday_text">Thứ tư</string>
@@ -43,4 +44,7 @@
     <string name="image_name_text">Tên ảnh</string>
     <string name="capture_time_text">Thời gian chụp</string>
     <string name="no_created_folder_text">Bạn chưa tạo thư mục nào cả :((</string>
+    <string name="no_saved_image_text">Bạn chưa lưu hình ảnh nào cả :((</string>
+    <string name="vocabulary_storing_text">Lưu trữ từ vựng</string>
+    <string name="no_saved_vocabulary_text">Bạn chưa lưu từ vựng nào cả :((</string>
 </resources>

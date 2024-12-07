@@ -68,6 +68,8 @@ fun ImageCaptioningScreen(
     imageName: String,
     capturedTime: String,
     onGoToVocabularyDetail: (String) -> Unit,
+    onDeleteVocabulary: (String) -> Unit,
+    onSaveVocabulary: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val selectedWords = rememberMutableStateListOf<String>()
@@ -82,7 +84,6 @@ fun ImageCaptioningScreen(
 
     BackHandler {
         onBack()
-
     }
 
     val context = LocalContext.current as ComponentActivity
@@ -230,10 +231,11 @@ fun ImageCaptioningScreen(
                     items(selectedWords) { selectedWord ->
                         SelectedVocabulary(
                             word = selectedWord,
-                            onGoToDetail = onGoToVocabularyDetail
+                            onGoToDetail = onGoToVocabularyDetail,
+                            onDeleteVocabulary = onDeleteVocabulary,
+                            onSaveVocabulary = onSaveVocabulary,
                         )
                     }
-
                 }
             }
 
@@ -273,7 +275,9 @@ private fun ImageCaptioningScreenPreview() {
             imageName = "PTR-061124.",
             capturedTime = "16:53, Thứ tư, ngày 06 tháng 11, 2024.",
             onGoToVocabularyDetail = {},
-            onBack = {}
+            onBack = {},
+            onDeleteVocabulary = {},
+            onSaveVocabulary = {},
         )
     }
 }

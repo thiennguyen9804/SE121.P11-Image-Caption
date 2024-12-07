@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.image_folder_dashboard_screen
+package com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,15 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.rounded.Wifi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,34 +32,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
-import com.example.se121p11new.core.presentation.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.components.CircularAvatar
+import com.example.se121p11new.core.presentation.components.CreatedImageFolderItem
+import com.example.se121p11new.core.presentation.components.CreatedVocabularyFolderItem
 import com.example.se121p11new.core.presentation.components.CustomDialog
-import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.ui.theme.SE121P11NewTheme
+import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
+import com.example.se121p11new.data.local.realm_object.VocabularyFolder
+import com.example.se121p11new.domain.data.DomainVocabularyFolder
 
 @Composable
-fun ImageFolderDashboardScreen(
-    modifier: Modifier = Modifier,
-    onChangeFolder: () -> Unit,
-    onImageClick: (Image) -> Unit,
-    onDeleteImage: (Image) -> Unit,
+fun VocabularyFolderScreen(
     onFolderCreate: (String) -> Unit,
-    onGoToAllImageFolder: () -> Unit,
-    images: List<Image> = emptyList(),
-) {
+    vocabularyFolderList: List<RealmVocabularyFolder>,
+    onFolderDelete: (RealmVocabularyFolder) -> Unit,
+    onFolderClick: (RealmVocabularyFolder) -> Unit,
+
+    ) {
     var openDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(vertical = 30.dp, horizontal = 15.dp)
-//            .verticalScroll(rememberScrollState())
+        //            .verticalScroll(rememberScrollState())
     ) {
-        if(openDialog) {
+        if (openDialog) {
             CustomDialog(
                 onDismissRequest = {
                     openDialog = false
@@ -100,13 +95,13 @@ fun ImageFolderDashboardScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                Text(text = stringResource(R.string.image_storing_text))
+                Text(text = stringResource(R.string.vocabulary_storing_text))
                 Spacer(modifier = Modifier.width(5.dp))
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        onChangeFolder()
+
                     }
                 )
             }
@@ -124,7 +119,7 @@ fun ImageFolderDashboardScreen(
                     imageVector = Icons.Outlined.Delete,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        onChangeFolder()
+
                     }
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -132,7 +127,7 @@ fun ImageFolderDashboardScreen(
                     imageVector = Icons.Outlined.GridView,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        onChangeFolder()
+
                     }
                 )
 
@@ -140,97 +135,27 @@ fun ImageFolderDashboardScreen(
 
         }
 
-        Spacer(modifier = Modifier.width(20.dp))
-        Column {
-            IconButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(Icons.Default.History, null)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = stringResource(R.string.captured_history_text))
-                }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            IconButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(Icons.Rounded.Wifi, null)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = stringResource(R.string.offline_storing_text))
-                }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            IconButton(
-                onClick = {
-                    onGoToAllImageFolder()
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(Icons.Default.Folder, null)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = stringResource(R.string.created_folder_text))
-                }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-        }
 
-        if(images.isEmpty()) {
+        if (vocabularyFolderList.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    text = stringResource(R.string.no_image_text),
+                    text = stringResource(R.string.no_created_folder_text),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
         } else {
+            Spacer(modifier = Modifier.height(15.dp))
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(images) { image ->
-                    CapturedImageItem(
-                        image = image,
-                        onClick = onImageClick,
-                        onDeleteImage = onDeleteImage,
+                items(vocabularyFolderList) { folder ->
+                    CreatedVocabularyFolderItem(
+                        vocabularyFolder = folder,
+                        onDeleteVocabularyFolder = { onFolderDelete(folder) },
+                        onGoToVocabularyFolderDetail = { onFolderClick(folder) },
                     )
                 }
             }
         }
     }
 }
-
-@Preview
-@Composable
-private fun ImageFolderScreenPreview() {
-    SE121P11NewTheme {
-        ImageFolderDashboardScreen(
-            onChangeFolder = {},
-            onImageClick = {},
-//            images = images
-            onDeleteImage = {},
-            onFolderCreate = {},
-            onGoToAllImageFolder = {}
-        )
-    }
-}
-
-val image = Image().apply {
-    pictureUri = ""
-    englishText = ""
-    vietnameseText = ""
-    imageName = "Image 1"
-}
-
-val images = listOf(image, image, image, image, image)

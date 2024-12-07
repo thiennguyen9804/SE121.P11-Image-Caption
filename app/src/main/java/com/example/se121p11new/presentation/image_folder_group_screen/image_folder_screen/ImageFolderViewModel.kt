@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.image_folder_screen
+package com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,13 +8,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,6 +34,18 @@ class ImageFolderViewModel @Inject constructor(
                 imageFolderRepository.getAllFoldersLocally().collectLatest {
                     _imageFolders.value = it.list.toList()
                 }
+            }
+        }
+    }
+
+    fun createFolder(name: String) {
+        val folder = RealmImageFolder().apply {
+            this.name = name
+        }
+
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                imageFolderRepository.addFolder(folder)
             }
         }
     }

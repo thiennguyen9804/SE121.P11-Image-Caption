@@ -25,6 +25,9 @@ class LocalVocabularyDataSource @Inject constructor(
     fun getVocabularyByEngVocabFromCache(engVocab: String) =
         cache.query<Vocabulary>("engVocab == $0", engVocab).asFlow()
 
+    fun getVocabularyByEngVocabLocally(engVocab: String) =
+        realm.query<Vocabulary>("engVocab == $0", engVocab).asFlow()
+
     suspend fun addVocabulary(newVocabulary: Vocabulary) =
         realm.write {
             newVocabulary
@@ -35,4 +38,11 @@ class LocalVocabularyDataSource @Inject constructor(
 
     fun getVocabularyByEngVocab(engVocab: String) =
         realm.query<Vocabulary>("engVocab == $0", engVocab).asFlow()
+
+    suspend fun deleteVocabularyLocally(vocabulary: Vocabulary) {
+        realm.write {
+            val res = findLatest(vocabulary) ?: return@write
+            delete(res)
+        }
+    }
 }

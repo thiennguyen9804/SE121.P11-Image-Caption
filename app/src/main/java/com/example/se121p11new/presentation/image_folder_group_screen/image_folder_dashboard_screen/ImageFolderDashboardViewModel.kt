@@ -1,8 +1,9 @@
-package com.example.se121p11new.presentation.image_folder_dashboard_screen
+package com.example.se121p11new.presentation.image_folder_group_screen.image_folder_dashboard_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.se121p11new.data.local.realm_object.Image
+import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.data.local.realm_object.RealmImageFolder
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
@@ -22,10 +23,20 @@ class ImageFolderDashboardViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
     private val imageFolderRepository: ImageFolderRepository
 ) : ViewModel() {
+
+    private val _imageFolderList = MutableStateFlow<List<ImageFolder>>(emptyList())
     private val _images = MutableStateFlow<List<Image>>(emptyList())
 
     val images = _images
         .onStart { getAllImages() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
+
+    val imageFolderList = _imageFolderList
+        .onStart { getAllImageFolder() }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -37,6 +48,16 @@ class ImageFolderDashboardViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 imageRepository.getAllImagesLocally().collectLatest {
                     _images.value = it.list.toList()
+                }
+            }
+        }
+    }
+
+    private fun getAllImageFolder() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                imageFolderRepository.getAllFoldersLocally().collectLatest {
+                    _imageFolderList.value = it.list.toList()
                 }
             }
         }
@@ -61,5 +82,27 @@ class ImageFolderDashboardViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun addImageToFolder(image: Image, folder: ImageFolder) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if(!image.imageList.contains(folder)) {
+                    imageFolderRepository.addImageToFolder(image, folder)
+                }
+            }
+
+        }
+    }
+
+    fun removeImageOutOfFolder(image: Image, folder: ImageFolder) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                if(image.imageList.contains(folder)) {
+                    imageFolderRepository.removeImageOutOfFolder(image, folder)
+                }
+            }
+
+        }
     }
 }

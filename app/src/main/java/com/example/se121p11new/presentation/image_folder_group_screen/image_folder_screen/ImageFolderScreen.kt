@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.image_folder_screen
+package com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,15 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.rounded.Wifi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,11 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
-import com.example.se121p11new.core.presentation.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.components.CircularAvatar
-import com.example.se121p11new.core.presentation.components.CreatedFolderItem
+import com.example.se121p11new.core.presentation.components.CreatedImageFolderItem
 import com.example.se121p11new.core.presentation.components.CustomDialog
-import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
@@ -62,15 +56,18 @@ fun ImageFolderScreen(
             .fillMaxSize()
             .background(Color.White)
             .padding(vertical = 30.dp, horizontal = 15.dp)
-//            .verticalScroll(rememberScrollState())
+        //            .verticalScroll(rememberScrollState())
     ) {
-        if(openDialog) {
+        if (openDialog) {
             CustomDialog(
                 onDismissRequest = {
                     openDialog = false
                 },
                 text = "Thư mục ảnh mới",
-                onFolderCreate = onFolderCreate
+                onFolderCreate = {
+                    openDialog = false
+                    onFolderCreate(it)
+                }
             )
         }
         Row(
@@ -114,7 +111,7 @@ fun ImageFolderScreen(
                     imageVector = Icons.Outlined.AddCircleOutline,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        onChangeFolder()
+                        openDialog = true
                     }
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -139,7 +136,7 @@ fun ImageFolderScreen(
         }
 
 
-        if(folders.isEmpty()) {
+        if (folders.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(
                     text = stringResource(R.string.no_created_folder_text),
@@ -152,10 +149,12 @@ fun ImageFolderScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(folders) { folder ->
-                    CreatedFolderItem(
+                    CreatedImageFolderItem(
                         imageFolder = folder,
                         onDeleteImageFolder = { onFolderDelete(folder) },
-                        onGoToImageFolderDetail = {  }
+                        onGoToImageFolderDetail = { onFolderClick(folder) },
+                        onOpenBottomSheet = {}
+
                     )
                 }
             }
