@@ -1,30 +1,53 @@
 package com.example.se121p11new.data.repository
 
 import android.graphics.Bitmap
+import android.net.Uri
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.data.local.LocalImageDataSource
 import com.example.se121p11new.data.local.realm_object.Image
+import com.example.se121p11new.data.local.realm_object.RealmImage
 import com.example.se121p11new.data.remote.RemoteImageDataSource
 import com.example.se121p11new.domain.repository.ImageRepository
 import io.realm.kotlin.notifications.ObjectChange
 import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject constructor(
     private val remoteImageDataSource: RemoteImageDataSource,
     private val localImageDataSource: LocalImageDataSource,
 ) : ImageRepository {
-    override suspend fun generateEnglishText(image: Bitmap): Flow<Resource<String>> {
-        return remoteImageDataSource.generateEnglishText(image)
+    override suspend fun getImageByUriLocally(uri: Uri): Flow<ResultsChange<Image>> {
+        return localImageDataSource.getImageByUri(uri)
     }
 
-    override suspend fun generateVietnameseText(englishText: String): Flow<Resource<String>> {
-        return remoteImageDataSource.generateVietnameseText(englishText)
+//    override suspend fun getImageByUri(uri: Uri): Flow<ResultsChange<Image>> = flow {
+//        getImageByUriLocally(uri).collectLatest {
+//            if(!it.list.isEmpty()) {
+//                emit(it)
+//                return@collectLatest
+//            }
+//        }
+//    }
+
+    override suspend fun generateEnglishText(image: Bitmap): String {
+//        return remoteImageDataSource.generateEnglishText(image)
+        delay(3000)
+        return "Hello"
     }
 
-    override suspend fun addImageLocally(newImage: Image): Flow<ObjectChange<Image>> {
-        return localImageDataSource.addImage(newImage)
+    override suspend fun generateVietnameseText(englishText: String): String {
+//        return remoteImageDataSource.generateVietnameseText(englishText)
+        delay(3000)
+        return "Xin chào"
+    }
+
+    override suspend fun addImageLocally(newImage: Image) {
+        localImageDataSource.addImage(newImage)
     }
 
     override fun getAllImagesLocally(): Flow<ResultsChange<Image>> {
@@ -38,4 +61,14 @@ class ImageRepositoryImpl @Inject constructor(
     override suspend fun deleteImageLocally(image: Image) {
         return localImageDataSource.deleteImage(image)
     }
+
+    override suspend fun updateVietnameseText(image: RealmImage, newVietnameseText: String) {
+        localImageDataSource.updateVietnameseText(image, newVietnameseText)
+    }
+
+    override suspend fun updateEnglishText(image: RealmImage, newEnglishText: String) {
+        localImageDataSource.updateEnglishText(image, newEnglishText)
+    }
+
+
 }

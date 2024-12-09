@@ -42,4 +42,11 @@ class LocalImageFolderDataSource @Inject constructor(
             findLatest(folder)!!.imageList.remove(findLatest(image)!!)
         }
     }
+
+    suspend fun deleteFolder(folder: ImageFolder) {
+        realm.write {
+            val toBeDeleted = findLatest(folder) ?: return@write
+            delete(toBeDeleted)
+        }
+    }
 }

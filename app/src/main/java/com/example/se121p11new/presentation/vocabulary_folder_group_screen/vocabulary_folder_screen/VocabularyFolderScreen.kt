@@ -35,12 +35,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
-import com.example.se121p11new.core.presentation.components.CreatedImageFolderItem
-import com.example.se121p11new.core.presentation.components.CreatedVocabularyFolderItem
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.components.CreatedVocabularyFolderItem
 import com.example.se121p11new.core.presentation.components.CustomDialog
+import com.example.se121p11new.core.presentation.utils.toIdString
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
-import com.example.se121p11new.data.local.realm_object.VocabularyFolder
-import com.example.se121p11new.domain.data.DomainVocabularyFolder
 
 @Composable
 fun VocabularyFolderScreen(
@@ -55,15 +53,14 @@ fun VocabularyFolderScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
-        //            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 15.dp)
     ) {
         if (openDialog) {
             CustomDialog(
                 onDismissRequest = {
                     openDialog = false
                 },
-                text = "Thư mục ảnh mới",
+                text = "Thư mục từ vựng mới",
                 onFolderCreate = {
                     openDialog = false
                     onFolderCreate(it)
@@ -148,7 +145,10 @@ fun VocabularyFolderScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(vocabularyFolderList) { folder ->
+                items(
+                    vocabularyFolderList,
+                    key = { folder -> folder._id.toIdString() }
+                ) { folder ->
                     CreatedVocabularyFolderItem(
                         vocabularyFolder = folder,
                         onDeleteVocabularyFolder = { onFolderDelete(folder) },

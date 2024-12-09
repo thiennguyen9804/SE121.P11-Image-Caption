@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.camera_screen.components
+package com.example.se121p11new.presentation.camera_group_screen.camera_screen.components
 
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView

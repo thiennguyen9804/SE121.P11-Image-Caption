@@ -35,7 +35,6 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun CustomDialog(
-    modifier: Modifier = Modifier,
     text: String,
     onFolderCreate: (String) -> Unit,
     onDismissRequest: () -> Unit,

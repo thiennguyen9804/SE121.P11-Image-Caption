@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen
+package com.example.se121p11new.presentation.image_folder_group_screen.all_captured_images
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,16 +30,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
-import com.example.se121p11new.presentation.image_folder_group_screen.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.components.CircularAvatar
+import com.example.se121p11new.core.presentation.utils.toIdString
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.data.local.realm_object.RealmImage
+import com.example.se121p11new.presentation.image_folder_group_screen.components.CapturedImageItem
 
 @Composable
 // hiển thị tất cả các hình có trong thư mục, đang xây dựng
-fun ImageFolderDetailScreen(
-    imageFolder: ImageFolder,
+fun AllCapturedImagesScreen(
+    imageList: List<RealmImage>,
     onImageClick: (RealmImage) -> Unit,
     onDeleteImage: (RealmImage) -> Unit,
     onAddImageToFolder: (Image, ImageFolder) -> Unit,
@@ -119,10 +120,10 @@ fun ImageFolderDetailScreen(
         }
 
 
-        if(imageFolder.imageList.isEmpty()) {
+        if(imageList.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    text = stringResource(R.string.no_saved_image_text),
+                    text = stringResource(R.string.no_image_text),
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -131,7 +132,10 @@ fun ImageFolderDetailScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(imageFolder.imageList.toList()) { image ->
+                items(
+                    imageList.toList(),
+                    key = { image -> image._id.toIdString() }
+                ) { image ->
                     CapturedImageItem(
                         image = image,
                         onClick = onImageClick,

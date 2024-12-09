@@ -30,15 +30,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
-import com.example.se121p11new.core.presentation.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.components.CircularAvatar
-import com.example.se121p11new.core.presentation.components.SavedVocabularyItem
-import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.data.local.realm_object.ImageFolder
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.components.SavedVocabularyItem
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
-import com.example.se121p11new.data.remote.dto.DomainVocabulary
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
-import com.example.se121p11new.domain.data.DomainVocabularyFolder
 
 @Composable
 fun VocabularyFolderDetailScreen(
@@ -53,7 +48,7 @@ fun VocabularyFolderDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding(horizontal = 15.dp)
     ) {
         Row(
             modifier = Modifier
@@ -134,7 +129,7 @@ fun VocabularyFolderDetailScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(vocabularyFolder.vocabularyList) { vocabulary ->
+                items(vocabularyFolder.vocabularyList.toList()) { vocabulary ->
                     SavedVocabularyItem(
                         vocabulary = vocabulary,
                         onClick = onVocabularyClick,

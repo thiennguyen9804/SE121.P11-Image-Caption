@@ -18,32 +18,30 @@ class RemoteImageDataSource @Inject constructor(
     private val generativeModel: GenerativeModel,
     private val translate: Translate
 ) {
-    fun generateEnglishText(bitmap: Bitmap) = flow {
-        emit(Resource.Loading())
+    suspend fun generateEnglishText(bitmap: Bitmap): String {
+//        emit(Resource.Loading())
         val prompt = content {
             image(bitmap)
             text(PromptConstants.BASIC_SENTENCE)
         }
 
         val response = generativeModel.generateContent(prompt)
-        response.text?.let {
-            emit(Resource.Success(it))
-        }
+        return response.text!!
 //        delay(500)
 //        emit(Resource.Success("Test"))
-    }.flowOn(Dispatchers.IO)
+    }
 
-    fun generateVietnameseText(englishText: String) = flow {
-        emit(Resource.Loading())
-        val translated = translate.translate(
-            englishText,
-            Translate.TranslateOption.targetLanguage("vi"),
-            Translate.TranslateOption.model("base")
-        )
-        translated.translatedText?.let {
-            emit(Resource.Success(it))
+    suspend fun generateVietnameseText(englishText: String): String {
+        return withContext(Dispatchers.IO) {
+
+            val translated = translate.translate(
+                englishText,
+                Translate.TranslateOption.targetLanguage("vi"),
+                Translate.TranslateOption.model("base")
+            )
+            return@withContext translated.translatedText!!
         }
 //        delay(500)
 //        emit(Resource.Success("Kiểm thử"))
-    }.flowOn(Dispatchers.IO)
+    }
 }

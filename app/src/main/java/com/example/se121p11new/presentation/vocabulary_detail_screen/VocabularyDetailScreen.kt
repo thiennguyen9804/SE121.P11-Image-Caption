@@ -75,8 +75,6 @@ fun VocabularyDetailScreen(
 
             is Resource.Success -> {
                 val data = vocabulary.data!!
-
-
                 Column(
                     modifier = Modifier.fillMaxSize()
                         .padding(horizontal = 10.dp)

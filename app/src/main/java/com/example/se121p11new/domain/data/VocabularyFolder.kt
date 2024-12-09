@@ -2,6 +2,7 @@ package com.example.se121p11new.domain.data
 
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.ext.toRealmSet
 import org.mongodb.kbson.ObjectId
 
 typealias DomainVocabularyFolder = VocabularyFolder
@@ -16,7 +17,7 @@ data class VocabularyFolder (
         name = this@VocabularyFolder.name
         vocabularyList = this@VocabularyFolder.vocabularyList.map {
             it.toRealmVocabulary()
-        }.toRealmList()
+        }.toRealmSet()
 
     }
 }

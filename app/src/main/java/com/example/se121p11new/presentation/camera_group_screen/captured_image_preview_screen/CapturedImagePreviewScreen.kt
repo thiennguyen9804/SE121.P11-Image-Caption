@@ -1,5 +1,6 @@
-package com.example.se121p11new.presentation.captured_image_preview_screen
+package com.example.se121p11new.presentation.camera_group_screen.captured_image_preview_screen
 
+import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.enableEdgeToEdge
@@ -25,15 +26,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.example.se121p11new.presentation.captured_image_preview_screen.components.SubmitButton
+import com.example.se121p11new.presentation.camera_group_screen.captured_image_preview_screen.components.SubmitButton
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 import java.io.File
 
 
 @Composable
 fun CapturedImagePreviewScreen(
-    uriString: String,
-    onBack: () -> Unit,
+    bitmap: Bitmap,
+//    onBack: () -> Unit,
     onSubmit: () -> Unit
 ) {
     // TODO chuyển launch effect ra ngoài sub graph
@@ -68,12 +69,12 @@ fun CapturedImagePreviewScreen(
 //        }
 //    }
 
-    BackHandler(!dontDeleteFlag) {
-        val file = File(uriString)
-        val deleted = file.delete()
-        println("file deleted successful $deleted")
-        onBack()
-    }
+//    BackHandler(!dontDeleteFlag) {
+//        val file = File(uriString)
+//        val deleted = file.delete()
+//        println("file deleted successful $deleted")
+//        onBack()
+//    }
 
     Box(
         modifier = Modifier
@@ -89,7 +90,7 @@ fun CapturedImagePreviewScreen(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(uriString)
+                    .data(bitmap)
                     .build(),
                 contentDescription = "Captured Image",
                 modifier = Modifier.fillMaxSize()
@@ -123,8 +124,7 @@ fun CapturedImagePreviewScreen(
 private fun CapturedImagePreviewScreenPreview() {
     SE121P11NewTheme {
         CapturedImagePreviewScreen(
-            uriString = "",
-            onBack = {}
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
         ) {
 
         }

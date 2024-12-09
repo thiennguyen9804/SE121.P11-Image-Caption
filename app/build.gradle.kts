@@ -47,8 +47,14 @@ android {
 
     packaging {
         resources {
-            excludes += "META-INF/*"
+            excludes += "META-INF/INDEX.LIST"
         }
+    }
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) {
+        it.packaging.resources.excludes.add("META-INF/INDEX.LIST")
     }
 }
 

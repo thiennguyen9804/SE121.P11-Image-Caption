@@ -26,6 +26,9 @@ import kotlinx.serialization.Serializable
 //}
 
 @Serializable
+object CameraGroupScreenRoute
+
+@Serializable
 object CameraScreenRoute
 
 @Serializable
@@ -35,19 +38,15 @@ object LoginScreenRoute
 object SignUpScreenRoute
 
 @Serializable
-data class CapturedImagePreviewScreenRoute(
-    val uriString: String,
-    val imageName: String,
-    val captureTime: String,
-)
+object CapturedImagePreviewScreenRoute
 
 @Serializable
 data class ImageCaptioningScreenRoute(
     val uriString: String,
-    val imageName: String,
-    val captureTime: String,
-    val englishText: String = "",
-    val vietnameseText: String = ""
+//    val imageName: String,
+//    val captureTime: String,
+//    val englishText: String = "",
+//    val vietnameseText: String = ""
 )
 
 @Serializable
@@ -59,6 +58,9 @@ data class VocabularyDetailScreenRoute(
 )
 
 @Serializable
+object ImageFolderGroupScreenRoute
+
+@Serializable
 object ImageFolderDashboardScreenRoute
 
 @Serializable
@@ -68,6 +70,9 @@ object ImageFolderScreenRoute
 data class ImageFolderDetailScreenRoute(
     val folderId: String = "",
 )
+
+@Serializable
+object VocabularyFolderGroupScreenRoute
 
 @Serializable
 object VocabularyFolderDashboardScreenRoute
@@ -82,3 +87,6 @@ data class VocabularyFolderDetailScreenRoute(
 
 @Serializable
 object AllSavedVocabularyScreenRoute
+
+@Serializable
+object AllCapturedImagesScreenRoute

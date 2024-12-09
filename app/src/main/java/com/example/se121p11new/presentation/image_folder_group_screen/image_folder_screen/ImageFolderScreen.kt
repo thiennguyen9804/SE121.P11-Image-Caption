@@ -36,14 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
-import com.example.se121p11new.core.presentation.components.CreatedImageFolderItem
+import com.example.se121p11new.presentation.image_folder_group_screen.components.CreatedImageFolderItem
 import com.example.se121p11new.core.presentation.components.CustomDialog
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun ImageFolderScreen(
-    modifier: Modifier = Modifier,
     onChangeFolder: () -> Unit,
     onFolderClick: (ImageFolder) -> Unit,
     onFolderDelete: (ImageFolder) -> Unit,
@@ -55,8 +54,7 @@ fun ImageFolderScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
-        //            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 15.dp)
     ) {
         if (openDialog) {
             CustomDialog(

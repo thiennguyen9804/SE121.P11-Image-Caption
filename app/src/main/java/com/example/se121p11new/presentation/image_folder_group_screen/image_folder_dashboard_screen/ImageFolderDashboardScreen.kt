@@ -39,16 +39,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
-import com.example.se121p11new.core.presentation.components.CapturedImageItem
+import com.example.se121p11new.presentation.image_folder_group_screen.components.CapturedImageItem
 import com.example.se121p11new.core.presentation.components.CircularAvatar
 import com.example.se121p11new.core.presentation.components.CustomDialog
+import com.example.se121p11new.core.presentation.utils.toIdString
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun ImageFolderDashboardScreen(
-    onChangeFolder: () -> Unit, // hàm không dùng, có thể xóa bỏ
     onImageClick: (Image) -> Unit, // khi bấm vô hình thì sẽ chuyển tới ImageCaptioningScreen
     onDeleteImage: (Image) -> Unit, // để xóa hình
     onFolderCreate: (String) -> Unit, // tạo folder mới
@@ -57,13 +57,15 @@ fun ImageFolderDashboardScreen(
     folderList: List<ImageFolder>, // tất cả các folder đã tạo
     onAddImageToFolder: (Image, ImageFolder) -> Unit, // khi bấm checkbox để thêm hình ảnh vào thư mục
     onRemoveImageOutOfFolder: (Image, ImageFolder) -> Unit, // khi bấm checkbox để xóa hình ảnh ra khỏi thư mục
+    onGoToAllCapturedImages: () -> Unit
 ) {
     var openDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding(horizontal = 15.dp)
 
     ) {
         if(openDialog) {
@@ -108,9 +110,6 @@ fun ImageFolderDashboardScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = null,
-                    modifier = Modifier.clickable {
-                        onChangeFolder()
-                    }
                 )
             }
 
@@ -126,17 +125,12 @@ fun ImageFolderDashboardScreen(
                 Icon(
                     imageVector = Icons.Outlined.Delete,
                     contentDescription = null,
-                    modifier = Modifier.clickable {
-                        onChangeFolder()
-                    }
+
                 )
                 Spacer(modifier = Modifier.width(5.dp))
                 Icon(
                     imageVector = Icons.Outlined.GridView,
                     contentDescription = null,
-                    modifier = Modifier.clickable {
-                        onChangeFolder()
-                    }
                 )
 
             }
@@ -146,7 +140,7 @@ fun ImageFolderDashboardScreen(
         Spacer(modifier = Modifier.width(20.dp))
         Column {
             IconButton(
-                onClick = {},
+                onClick = onGoToAllCapturedImages,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
@@ -174,9 +168,7 @@ fun ImageFolderDashboardScreen(
             }
             Spacer(modifier = Modifier.height(10.dp))
             IconButton(
-                onClick = {
-                    onGoToAllImageFolder()
-                },
+                onClick = onGoToAllImageFolder,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
@@ -202,7 +194,10 @@ fun ImageFolderDashboardScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(images) { image ->
+                items(
+                    images,
+                    key = { image -> image._id.toIdString() }
+                ) { image ->
                     CapturedImageItem(
                         image = image,
                         onClick = onImageClick,
@@ -222,7 +217,6 @@ fun ImageFolderDashboardScreen(
 private fun ImageFolderScreenPreview() {
     SE121P11NewTheme {
         ImageFolderDashboardScreen(
-            onChangeFolder = {},
             onImageClick = {},
 //            images = images
             onDeleteImage = {},
@@ -232,14 +226,15 @@ private fun ImageFolderScreenPreview() {
 //            onBottomSheetDismiss = { _, _ -> },
             onAddImageToFolder = { _, _ -> },
             onRemoveImageOutOfFolder = { _, _ -> },
+            onGoToAllCapturedImages = {}
         )
     }
 }
 
 val image = Image().apply {
     pictureUri = ""
-    englishText = ""
-    vietnameseText = ""
+    englishText = "Hello"
+    vietnameseText = "Xin chao"
     imageName = "Image 1"
 }
 

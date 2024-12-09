@@ -1,4 +1,4 @@
-package com.example.se121p11new.core.presentation.components
+package com.example.se121p11new.presentation.vocabulary_folder_group_screen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.data.local.realm_object.VocabularyFolder
-import com.example.se121p11new.domain.data.DomainVocabularyFolder
 
 @Composable
 fun VocabularyFolderSheetItem(

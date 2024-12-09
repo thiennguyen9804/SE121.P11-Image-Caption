@@ -1,4 +1,4 @@
-package com.example.se121p11new.core.presentation.components
+package com.example.se121p11new.presentation.image_folder_group_screen.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,35 +25,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
+import com.example.se121p11new.core.presentation.components.PopUpMenu
 import com.example.se121p11new.core.presentation.utils.SelectItem
 import com.example.se121p11new.data.local.realm_object.ImageFolder
-import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
-import com.example.se121p11new.data.local.realm_object.VocabularyFolder
-import com.example.se121p11new.domain.data.DomainVocabularyFolder
+import kotlin.math.exp
 
 @Composable
-fun CreatedVocabularyFolderItem(
-    vocabularyFolder: RealmVocabularyFolder,
-    onDeleteVocabularyFolder: (RealmVocabularyFolder) -> Unit,
-    onGoToVocabularyFolderDetail: (RealmVocabularyFolder) -> Unit,
+fun CreatedImageFolderItem(
+    imageFolder: ImageFolder,
+    onDeleteImageFolder: (ImageFolder) -> Unit,
+    onGoToImageFolderDetail: (ImageFolder) -> Unit,
+    onOpenBottomSheet: () -> Unit,
 ) {
     var expanded by remember {
         mutableStateOf(false)
     }
-
-    val selectedImageFolderList = remember {
-        mutableStateListOf<ImageFolder>()
-    }
-
-    var showBottomSheet by remember { mutableStateOf(false) }
-
 
     val items = listOf(
         SelectItem(
             title = "Xem",
             icon = R.drawable.ic_view,
             onClick = {
-                onGoToVocabularyFolderDetail(vocabularyFolder)
+                onGoToImageFolderDetail(imageFolder)
+                expanded = false
             },
             tint = Color(0xff616AE5)
         ),
@@ -62,22 +56,18 @@ fun CreatedVocabularyFolderItem(
             title = "Xóa",
             icon = R.drawable.ic_delete,
             onClick = {
-                onDeleteVocabularyFolder(vocabularyFolder)
+                onDeleteImageFolder(imageFolder)
+                expanded = false
             },
             tint = Color(0xffEA1616)
         ),
-
-
-        )
-
-//    Scaffold { contentPadding ->
+    )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-//                .padding(contentPadding)
             .clickable {
-                onGoToVocabularyFolderDetail(vocabularyFolder)
+                onGoToImageFolderDetail(imageFolder)
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -92,7 +82,7 @@ fun CreatedVocabularyFolderItem(
 
             Spacer(modifier = Modifier.width(20.dp))
             Text(
-                text = vocabularyFolder.name,
+                text = imageFolder.name,
                 fontSize = 17.sp,
             )
         }
@@ -106,7 +96,13 @@ fun CreatedVocabularyFolderItem(
                 Icon(painter = painterResource(R.drawable.ic_kebab_menu), contentDescription = null)
             }
 
+            PopUpMenu(
+                items = items,
+                onDismissPopUpMenuRequest = { expanded = false },
+                expanded = expanded
+            )
         }
 
     }
+//    }
 }

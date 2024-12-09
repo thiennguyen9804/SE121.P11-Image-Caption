@@ -1,7 +1,6 @@
-package com.example.se121p11new.presentation.camera_screen
+package com.example.se121p11new.presentation.camera_group_screen.camera_screen
 
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
@@ -18,14 +17,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +29,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import com.example.se121p11new.presentation.camera_screen.components.CameraPreview
-import com.example.se121p11new.presentation.camera_screen.components.CaptureButton
+import com.example.se121p11new.presentation.camera_group_screen.camera_screen.components.CameraPreview
+import com.example.se121p11new.presentation.camera_group_screen.camera_screen.components.CaptureButton
 
 @Composable
 fun CameraScreen(

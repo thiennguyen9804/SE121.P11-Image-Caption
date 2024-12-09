@@ -19,6 +19,7 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.UpdatedResults
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -86,54 +87,98 @@ class VocabularyRepositoryImpl @Inject constructor(
         } catch(e: HttpException) {
             when(e.code()) {
                 404 -> {
-                    remoteImageDataSource.generateVietnameseText(engVocab).collectLatest {
-                        when(it) {
-                            is Resource.Error -> send(Resource.Error(message = it.message!!))
-                            is Resource.Loading -> send(Resource.Loading())
-                            is Resource.Success -> {
-                                withContext(Dispatchers.IO) {
-                                    val definition = RealmDefinition().apply {
-                                        definition = it.data!!
-                                        examples = realmListOf()
-                                    }
-                                    val partOfSpeech = RealmPartOfSpeech().apply {
-                                        partOfSpeech = "từ vựng"
-                                        definitions = realmListOf(definition)
-                                    }
-                                    val cacheValue = RealmVocabulary().apply {
-                                        this@apply.engVocab = engVocab
-                                        ipa = ""
-                                        partOfSpeeches = realmListOf(partOfSpeech)
-                                        phrasalVerbs = realmListOf()
-
-                                    }
-                                    localVocabularyDataSource.addVocabularyToCache(cacheValue)
-                                }
-
-                                val res = DomainVocabulary(
-                                    idString = "",
-                                    engVocab = engVocab,
-                                    ipa = "",
-                                    partOfSpeeches = listOf(
-                                        PartOfSpeech(
-                                            partOfSpeech = "từ vựng",
-                                            definitions = listOf(
-                                                Definition(
-                                                    definition = it.data!!,
-                                                    examples = emptyList()
-                                                )
-                                            )
-                                        )
-                                    ),
-
-                                    phrasalVerbs = emptyList(),
-                                    vocabularyList = emptyList()
-
-                                )
-                                send(Resource.Success(res))
-                            }
+                    val respond = async { remoteImageDataSource.generateVietnameseText(engVocab) }.await()
+                    withContext(Dispatchers.IO) {
+                        val definition = RealmDefinition().apply {
+                            definition = respond
+                            examples = realmListOf()
                         }
+                        val partOfSpeech = RealmPartOfSpeech().apply {
+                            partOfSpeech = "từ vựng"
+                            definitions = realmListOf(definition)
+                        }
+                        val cacheValue = RealmVocabulary().apply {
+                            this@apply.engVocab = engVocab
+                            ipa = ""
+                            partOfSpeeches = realmListOf(partOfSpeech)
+                            phrasalVerbs = realmListOf()
+
+                        }
+                        localVocabularyDataSource.addVocabularyToCache(cacheValue)
                     }
+                    val res = DomainVocabulary(
+                        idString = "",
+                        engVocab = engVocab,
+                        ipa = "",
+                        partOfSpeeches = listOf(
+                            PartOfSpeech(
+                                partOfSpeech = "từ vựng",
+                                definitions = listOf(
+                                    Definition(
+                                        definition = respond,
+                                        examples = emptyList()
+                                    )
+                                )
+                            )
+                        ),
+
+                        phrasalVerbs = emptyList(),
+                        vocabularyList = emptyList()
+
+                    )
+                    send(Resource.Success(res))
+
+
+
+
+//                    remoteImageDataSource.generateVietnameseText(engVocab).collectLatest {
+//                        when(it) {
+//                            is Resource.Error -> send(Resource.Error(message = it.message!!))
+//                            is Resource.Loading -> send(Resource.Loading())
+//                            is Resource.Success -> {
+//                                withContext(Dispatchers.IO) {
+//                                    val definition = RealmDefinition().apply {
+//                                        definition = it.data!!
+//                                        examples = realmListOf()
+//                                    }
+//                                    val partOfSpeech = RealmPartOfSpeech().apply {
+//                                        partOfSpeech = "từ vựng"
+//                                        definitions = realmListOf(definition)
+//                                    }
+//                                    val cacheValue = RealmVocabulary().apply {
+//                                        this@apply.engVocab = engVocab
+//                                        ipa = ""
+//                                        partOfSpeeches = realmListOf(partOfSpeech)
+//                                        phrasalVerbs = realmListOf()
+//
+//                                    }
+//                                    localVocabularyDataSource.addVocabularyToCache(cacheValue)
+//                                }
+//
+//                                val res = DomainVocabulary(
+//                                    idString = "",
+//                                    engVocab = engVocab,
+//                                    ipa = "",
+//                                    partOfSpeeches = listOf(
+//                                        PartOfSpeech(
+//                                            partOfSpeech = "từ vựng",
+//                                            definitions = listOf(
+//                                                Definition(
+//                                                    definition = it.data!!,
+//                                                    examples = emptyList()
+//                                                )
+//                                            )
+//                                        )
+//                                    ),
+//
+//                                    phrasalVerbs = emptyList(),
+//                                    vocabularyList = emptyList()
+//
+//                                )
+//                                send(Resource.Success(res))
+//                            }
+//                        }
+//                    }
                 }
                 else -> {
                     send(Resource.Error(e.message!!))

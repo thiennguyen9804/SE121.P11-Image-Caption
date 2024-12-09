@@ -1,4 +1,4 @@
-package com.example.se121p11new.core.presentation.components
+package com.example.se121p11new.presentation.vocabulary_folder_group_screen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,19 +24,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.se121p11new.data.local.realm_object.ImageFolder
+import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImageFolderBottomSheet(
-    folderList: List<ImageFolder>,
-    imageFolderList: List<ImageFolder>,
-    modifier: Modifier = Modifier,
-    onCreateNewImageFolder: () -> Unit,
-    onAddImageToFolder: (ImageFolder) -> Unit,
-    onRemoveImageOutOfFolder: (ImageFolder) -> Unit,
+fun VocabularyFolderBottomSheet(
+    onDismiss: () -> Unit,
+    onCreateNewVocabularyFolder: () -> Unit,
+    folderList: List<RealmVocabularyFolder>,
+    vocabularyFolderList: List<RealmVocabularyFolder>,
+    onAddVocabularyToFolder: (RealmVocabularyFolder) -> Unit,
+    onRemoveVocabularyOutOfFolder: (RealmVocabularyFolder) -> Unit,
     showBottomSheet: Boolean,
-    onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
@@ -59,9 +58,9 @@ fun ImageFolderBottomSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = "Lưu hình ảnh vào...", color = Color(0xff9A00F7))
+                Text(text = "Lưu từ vựng vào...", color = Color(0xff9A00F7))
                 TextButton(
-                    onClick = { onCreateNewImageFolder() }
+                    onClick = { onCreateNewVocabularyFolder() }
                 ) {
                     Text(text = "Thư mục mới")
                 }
@@ -79,21 +78,20 @@ fun ImageFolderBottomSheet(
                 ) {
                     folderList.forEach { folder ->
                         var checked by remember {
-                            mutableStateOf(imageFolderList.contains(folder))
+                            mutableStateOf(vocabularyFolderList.contains(folder))
                         }
-                        ImageFolderBottomSheetItem(
+                        VocabularyFolderSheetItem(
                             checked = checked,
                             onCheckedChange = {
                                 if(checked) {
-                                    onRemoveImageOutOfFolder(folder)
+                                    onRemoveVocabularyOutOfFolder(folder)
                                 } else {
-                                    onAddImageToFolder(folder)
+                                    onAddVocabularyToFolder(folder)
                                 }
                                 checked = it
                             },
-                            imageFolder = folder,
-//                            onAddImageToFolder = onAddImageToFolder,
-//                            onRemoveImageOutOfFolder = onRemoveImageOutOfFolder,
+                            vocabularyFolder = folder,
+
                         )
                     }
                 }

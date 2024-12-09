@@ -31,7 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
-import com.example.se121p11new.core.presentation.components.SavedVocabularyItem
+import com.example.se121p11new.core.presentation.utils.toIdString
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.components.SavedVocabularyItem
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
 
@@ -48,7 +49,7 @@ fun AllSavedVocabularyScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding( horizontal = 15.dp)
     ) {
         Row(
             modifier = Modifier
@@ -129,7 +130,10 @@ fun AllSavedVocabularyScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(vocabularyList) { vocabulary ->
+                items(
+                    vocabularyList,
+                    key = { vocab -> vocab._id.toIdString() }
+                ) { vocabulary ->
                     SavedVocabularyItem(
                         vocabulary = vocabulary,
                         onClick = onVocabularyClick,

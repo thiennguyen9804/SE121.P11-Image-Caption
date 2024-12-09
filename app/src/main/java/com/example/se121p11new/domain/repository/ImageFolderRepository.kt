@@ -12,4 +12,5 @@ interface ImageFolderRepository {
     suspend fun getImageFolderById(id: ObjectId): Flow<ResultsChange<ImageFolder>>
     suspend fun addImageToFolder(image: Image, folder: ImageFolder)
     suspend fun removeImageOutOfFolder(image: Image, folder: ImageFolder)
+    suspend fun deleteFolder(folder: ImageFolder)
 }

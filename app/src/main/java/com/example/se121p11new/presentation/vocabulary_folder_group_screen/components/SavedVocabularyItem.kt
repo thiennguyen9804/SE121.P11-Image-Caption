@@ -1,4 +1,4 @@
-package com.example.se121p11new.core.presentation.components
+package com.example.se121p11new.presentation.vocabulary_folder_group_screen.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,11 +26,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
+import com.example.se121p11new.core.presentation.components.PopUpMenu
 import com.example.se121p11new.core.presentation.utils.SelectItem
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
-import com.example.se121p11new.data.remote.dto.DomainVocabulary
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
-import com.example.se121p11new.domain.data.DomainVocabularyFolder
 
 @Composable
 fun SavedVocabularyItem(

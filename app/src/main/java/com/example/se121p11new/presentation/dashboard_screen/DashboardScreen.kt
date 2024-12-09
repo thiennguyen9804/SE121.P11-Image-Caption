@@ -34,8 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.CircularAvatar
 import com.example.se121p11new.data.local.realm_object.Image
-import com.example.se121p11new.core.presentation.components.CapturedImageItem
-import com.example.se121p11new.core.presentation.utils.SelectItem
+import com.example.se121p11new.presentation.image_folder_group_screen.components.CapturedImageItem
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.presentation.dashboard_screen.components.SavedVocabularyItem
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -50,13 +49,14 @@ fun DashboardScreen(
     allImageFolder: List<ImageFolder>,
     onAddImageToFolder: (Image, ImageFolder) -> Unit, // khi bấm checkbox để thêm hình ảnh vào thư mục
     onRemoveImageOutOfFolder: (Image, ImageFolder) -> Unit,
+    onGotoVocabularyFolder: () -> Unit,
 ) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding( horizontal = 15.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Row(
@@ -160,7 +160,7 @@ fun DashboardScreen(
                 Row(
                     modifier = Modifier
                         .clickable {
-
+                            onGotoVocabularyFolder()
                         }
                 ) {
                     Text(
@@ -200,7 +200,8 @@ private fun DashboardScreenPreview() {
             onDeleteImage = {},
             allImageFolder = emptyList(),
             onRemoveImageOutOfFolder = {_, _ ->},
-            onAddImageToFolder = {_, _ ->}
+            onAddImageToFolder = {_, _ ->},
+            onGotoVocabularyFolder = {}
         )
     }
 }

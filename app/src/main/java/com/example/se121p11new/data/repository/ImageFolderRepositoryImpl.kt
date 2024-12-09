@@ -32,4 +32,8 @@ class ImageFolderRepositoryImpl @Inject constructor(
     override suspend fun removeImageOutOfFolder(image: Image, folder: ImageFolder) {
         localImageFolderDataSource.removeImageOutOfFolder(image, folder)
     }
+
+    override suspend fun deleteFolder(folder: ImageFolder) {
+        localImageFolderDataSource.deleteFolder(folder)
+    }
 }

@@ -1,32 +1,40 @@
 package com.example.se121p11new
 
-import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,22 +43,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.se121p11new.core.presentation.utils.AllSavedVocabularyScreenRoute
-import com.example.se121p11new.core.presentation.utils.CameraScreenRoute
-import com.example.se121p11new.core.presentation.utils.CapturedImagePreviewScreenRoute
+import com.example.se121p11new.core.presentation.utils.CameraGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
-import com.example.se121p11new.core.presentation.utils.ImageFolderDashboardScreenRoute
-import com.example.se121p11new.core.presentation.utils.ImageFolderDetailScreenRoute
-import com.example.se121p11new.core.presentation.utils.ImageFolderScreenRoute
+import com.example.se121p11new.core.presentation.utils.ImageFolderGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
-import com.example.se121p11new.core.presentation.utils.StringFromTime
 import com.example.se121p11new.core.presentation.utils.VocabularyDetailScreenRoute
-import com.example.se121p11new.core.presentation.utils.VocabularyFolderDashboardScreenRoute
-import com.example.se121p11new.core.presentation.utils.VocabularyFolderDetailScreenRoute
-import com.example.se121p11new.core.presentation.utils.VocabularyFolderScreenRoute
+import com.example.se121p11new.core.presentation.utils.VocabularyFolderGroupScreenRoute
+import com.example.se121p11new.core.presentation.utils.bottomNavItems
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
@@ -60,29 +62,17 @@ import com.example.se121p11new.presentation.auth_group_screen.auth_client.Google
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.TwitterAuthUiClient
 import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
 import com.example.se121p11new.presentation.auth_group_screen.sign_up_screen.SignUpScreen
-import com.example.se121p11new.presentation.camera_screen.CameraScreen
-import com.example.se121p11new.presentation.captured_image_preview_screen.CapturedImagePreviewScreen
+import com.example.se121p11new.presentation.camera_group_screen.cameraGroupScreen
+import com.example.se121p11new.presentation.camera_group_screen.camera_screen.CAMERAX_PERMISSIONS
+import com.example.se121p11new.presentation.camera_group_screen.camera_screen.hasRequiredPermissions
 import com.example.se121p11new.presentation.dashboard_screen.DashboardScreen
 import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
-import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_dashboard_screen.ImageFolderDashboardScreen
-import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_dashboard_screen.ImageFolderDashboardViewModel
-import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen.ImageFolderDetailScreen
-import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen.ImageFolderDetailViewModel
-import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen.ImageFolderScreen
-import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen.ImageFolderViewModel
+import com.example.se121p11new.presentation.image_folder_group_screen.imageFolderGroupScreen
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailViewModel
-import com.example.se121p11new.presentation.vocabulary_detail_screen.vocab
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.all_saved_vocabulary_screen.AllSavedVocabularyScreen
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.all_saved_vocabulary_screen.AllSavedVocabularyViewModel
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_dashboard_screen.VocabularyFolderDashboardScreen
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_dashboard_screen.VocabularyFolderDashboardViewModel
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_detail_screen.VocabularyFolderDetailScreen
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_detail_screen.VocabularyFolderDetailViewModel
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_screen.VocabularyFolderScreen
-import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_screen.VocabularyFolderViewModel
+import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabularyFolderGroupScreen
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -93,8 +83,6 @@ import com.google.android.gms.auth.api.identity.Identity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
-import java.io.File
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -119,19 +107,29 @@ class MainActivity : ComponentActivity() {
 
     private var providerType = ""
 
-    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
+//    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!hasRequiredPermissions()) {
+        if (!hasRequiredPermissions(applicationContext)) {
             ActivityCompat.requestPermissions(
                 this, CAMERAX_PERMISSIONS, 0
             )
         }
         setContent {
-            this.enableEdgeToEdge()
+            this.enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.light(
+                    android.graphics.Color.WHITE,
+                    android.graphics.Color.BLACK
+                ),
+            )
+
             SE121P11NewTheme {
+                var selectedItemIndex by rememberSaveable {
+                    mutableIntStateOf(0)
+                }
+
                 val controller = remember {
                     LifecycleCameraController(applicationContext).apply {
                         setEnabledUseCases(
@@ -139,535 +137,248 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-
                 navController = rememberNavController()
 
-                NavHost(
-                    navController = navController,
-                    startDestination = VocabularyFolderDashboardScreenRoute
-                ) {
-                    composable<LoginScreenRoute> {
-                        val authViewModel = hiltViewModel<AuthViewModel>()
-                        val userState by authViewModel.userState.collectAsStateWithLifecycle()
-                        val googleLauncher = getGoogleLauncher(
-                            scope = lifecycleScope,
-                            googleAuthClient = googleAuthClient,
-                            onSignInResult = authViewModel::onSignInResult
-                        )
-                        val callbackManager = remember {
-                            CallbackManager.Factory.create()
-                        }
-                        val facebookLauncher = getFacebookLauncher(
-                            onSignInResult = authViewModel::onSignInResult,
-                            scope = lifecycleScope,
-                            callbackManager = callbackManager,
-                            context = applicationContext,
-                            facebookAuthClient = facebookAuthClient
-                        )
-
-                        LaunchedEffect(key1 = userState.isSignInSuccessful) {
-                            if (userState.isSignInSuccessful) {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Sign in success",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                authViewModel.resetState()
-                            }
-                        }
-
-                        LaunchedEffect(key1 = Unit) {
-                            if (authClient.getSignInUser() != null) {
-                                navController.navigate("profile")
-                            }
-                        }
-
-                        LoginScreen(
-                            navigateToSignUp = {
-                                navController.navigate(SignUpScreenRoute)
-                            },
-                            onSignInWithGoogleClick = {
-                                this@MainActivity.providerType = googleAuthClient.providerType
-                                lifecycleScope.launch {
-                                    val signInIntentSender = googleAuthClient.buildIntentSender()
-                                    googleLauncher.launch(
-                                        IntentSenderRequest.Builder(
-                                            signInIntentSender ?: return@launch
-                                        ).build()
-                                    )
-                                }
-                            },
-                            onSignInWithFacebookClick = {
-                                this@MainActivity.providerType = facebookAuthClient.providerType
-                                facebookLauncher.launch(listOf("public_profile"))
-                            },
-                            onSignInWithTwitterClick = {
-                                this@MainActivity.providerType = twitterAuthUiClient.providerType
-                                lifecycleScope.launch {
-                                    val signInResult = twitterAuthUiClient.signInWithPendingResult()
-                                    authViewModel.onSignInResult(signInResult)
-                                }
-                            },
-                            onSignInAnonymouslyClick = {},
-                            onSignInClick = {}
-                        )
+                Scaffold(
+                    containerColor = Color.White,
+                    bottomBar = {
+//                        NavigationBar(
+//                            containerColor = Color.White,
+//                            contentColor = Color.Black,
+//                        ) {
+//                            bottomNavItems.forEachIndexed { index, item ->
+//                                NavigationBarItem(
+//                                    colors = NavigationBarItemDefaults.colors().copy(
+//                                        selectedIconColor = Color(0xff9A00F7),
+//                                        unselectedIconColor = Color.Black,
+//                                        selectedIndicatorColor = Color.Transparent
+//                                    ),
+//                                    selected = selectedItemIndex == index,
+//                                    onClick = {
+//                                        selectedItemIndex = index
+//                                        if (index == 2) {
+//                                            navController.navigate(CameraGroupScreenRoute)
+//                                        }
+//                                        println(CameraGroupScreenRoute.toString())
+//                                    },
+//                                    icon = {
+//                                        Icon(
+//                                            imageVector = if (selectedItemIndex == index)
+//                                                item.selectedIcon else item.unselectedIcon,
+//                                            contentDescription = null
+//                                        )
+//                                    }
+//                                )
+//                            }
+//                        }
                     }
+                ) { contentPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = DashboardScreenRoute,
+                        modifier = Modifier.padding(contentPadding)
+                    ) {
+                        composable<LoginScreenRoute> {
+                            val authViewModel = hiltViewModel<AuthViewModel>()
+                            val userState by authViewModel.userState.collectAsStateWithLifecycle()
+                            val googleLauncher = getGoogleLauncher(
+                                scope = lifecycleScope,
+                                googleAuthClient = googleAuthClient,
+                                onSignInResult = authViewModel::onSignInResult
+                            )
+                            val callbackManager = remember {
+                                CallbackManager.Factory.create()
+                            }
+                            val facebookLauncher = getFacebookLauncher(
+                                onSignInResult = authViewModel::onSignInResult,
+                                scope = lifecycleScope,
+                                callbackManager = callbackManager,
+                                context = applicationContext,
+                                facebookAuthClient = facebookAuthClient
+                            )
 
-                    composable<SignUpScreenRoute> {
-                        SignUpScreen(
-                            navigateToLogin = {
-                                navController.navigate(LoginScreenRoute)
-                            },
-                            signUp = {}
-                        )
-                    }
+                            LaunchedEffect(key1 = userState.isSignInSuccessful) {
+                                if (userState.isSignInSuccessful) {
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Sign in success",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    authViewModel.resetState()
+                                }
+                            }
 
-                    composable<CameraScreenRoute> {
-                        CameraScreen(
-                            controller = controller,
-                            takePhoto = {
-                                takePhoto(
-                                    controller,
-                                    imageSavedHandler = { uri, imageName, captureTime ->
-                                        navController.navigate(
-                                            CapturedImagePreviewScreenRoute(
-                                                uriString = uri.toString(),
-                                                imageName = imageName,
-                                                captureTime = captureTime,
-                                            )
+                            LaunchedEffect(key1 = Unit) {
+                                if (authClient.getSignInUser() != null) {
+                                    navController.navigate("profile")
+                                }
+                            }
+
+                            LoginScreen(
+                                navigateToSignUp = {
+                                    navController.navigate(SignUpScreenRoute)
+                                },
+                                onSignInWithGoogleClick = {
+                                    this@MainActivity.providerType = googleAuthClient.providerType
+                                    lifecycleScope.launch {
+                                        val signInIntentSender =
+                                            googleAuthClient.buildIntentSender()
+                                        googleLauncher.launch(
+                                            IntentSenderRequest.Builder(
+                                                signInIntentSender ?: return@launch
+                                            ).build()
                                         )
                                     }
-                                )
-                            }
-                        )
-                    }
-
-                    composable<CapturedImagePreviewScreenRoute> {
-                        val args = it.toRoute<CapturedImagePreviewScreenRoute>()
-                        CapturedImagePreviewScreen(
-                            uriString = args.uriString,
-                            onBack = {
-                                navController.popBackStack()
-                            },
-                            onSubmit = {
-                                navController.navigate(
-                                    ImageCaptioningScreenRoute(
-                                        uriString = args.uriString,
-                                        imageName = args.imageName,
-                                        captureTime = args.captureTime,
-                                    )
-                                ) {
-                                    popUpTo<CapturedImagePreviewScreenRoute> {
-                                        inclusive = true
+                                },
+                                onSignInWithFacebookClick = {
+                                    this@MainActivity.providerType = facebookAuthClient.providerType
+                                    facebookLauncher.launch(listOf("public_profile"))
+                                },
+                                onSignInWithTwitterClick = {
+                                    this@MainActivity.providerType =
+                                        twitterAuthUiClient.providerType
+                                    lifecycleScope.launch {
+                                        val signInResult =
+                                            twitterAuthUiClient.signInWithPendingResult()
+                                        authViewModel.onSignInResult(signInResult)
                                     }
-                                }
-                            }
-                        )
-                    }
+                                },
+                                onSignInAnonymouslyClick = {},
+                                onSignInClick = {}
+                            )
+                        }
 
-                    composable<ImageCaptioningScreenRoute> {
-                        imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
-                        val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
-                        val args = it.toRoute<ImageCaptioningScreenRoute>()
-                        lateinit var englishText: Resource<String>
-                        lateinit var vietnameseText: Resource<String>
-                        if (args.englishText == "" && args.vietnameseText == "") {
-                            imageCaptioningViewModel.apiTurnOn = true
+                        composable<SignUpScreenRoute> {
+                            SignUpScreen(
+                                navigateToLogin = {
+                                    navController.navigate(LoginScreenRoute)
+                                },
+                                signUp = {}
+                            )
+                        }
+
+                        cameraGroupScreen(
+                            applicationContext = applicationContext,
+                            controller = controller,
+                            navController = navController
+                        )
+
+                        imageFolderGroupScreen(
+                            navController = navController
+                        )
+
+                        composable<ImageCaptioningScreenRoute> {
+                            val imageCaptioningViewModel = hiltViewModel<ImageCaptioningViewModel>()
+                            val vocabularyDetailViewModel =
+                                hiltViewModel<VocabularyDetailViewModel>()
+                            val args = it.toRoute<ImageCaptioningScreenRoute>()
+                            val imageUri = Uri.parse(args.uriString)
+                            imageCaptioningViewModel.setMyImageUri(imageUri)
                             LaunchedEffect(key1 = Unit) {
+                                imageCaptioningViewModel.getRealmImage()
                                 val bitmap = getBitmapFromUri(
                                     uri = Uri.parse(args.uriString),
                                     applicationContext = applicationContext
                                 )
-                                imageCaptioningViewModel.imageName = args.imageName
-                                imageCaptioningViewModel.imageUri = args.uriString
-                                imageCaptioningViewModel.captureTime = args.captureTime
-                                if(imageCaptioningViewModel.apiTurnOn) {
-                                    imageCaptioningViewModel.generateText(bitmap)
-                                }
+                                imageCaptioningViewModel.setMyBitmap(bitmap)
+                                imageCaptioningViewModel.getImageByUri()
                             }
-                            englishText =
-                                imageCaptioningViewModel.generatedEnglishText.collectAsState().value
-                            vietnameseText =
-                                imageCaptioningViewModel.generatedVietnameseText.collectAsState().value
+                            val englishText by
+                                imageCaptioningViewModel.generatedEnglishText.collectAsStateWithLifecycle()
+                            val vietnameseText by
+                                imageCaptioningViewModel.generatedVietnameseText.collectAsStateWithLifecycle()
+                            val imageName by
+                                imageCaptioningViewModel.imageName.collectAsStateWithLifecycle()
+                            val captureTime by
+                                imageCaptioningViewModel.captureTime.collectAsStateWithLifecycle()
 
-                        } else {
-                            imageCaptioningViewModel.apiTurnOn = false
-                            englishText = Resource.Success(args.englishText)
-                            vietnameseText = Resource.Success(args.vietnameseText)
-                        }
-
-                        ImageCaptioningScreen(
-                            uri = args.uriString,
-                            englishText = englishText,
-                            vietnameseText = vietnameseText,
-                            imageName = args.imageName,
-                            capturedTime = args.captureTime,
-                            onGoToVocabularyDetail = { engVocab ->
-                                navController.navigate(
-                                    VocabularyDetailScreenRoute(
-                                        engVocab = engVocab
+                            ImageCaptioningScreen(
+                                uri = args.uriString,
+                                englishText = englishText,
+                                vietnameseText = vietnameseText,
+                                imageName = imageName,
+                                capturedTime = captureTime,
+                                onGoToVocabularyDetail = { engVocab ->
+                                    navController.navigate(
+                                        VocabularyDetailScreenRoute(
+                                            engVocab = engVocab
+                                        )
                                     )
-                                )
-                            },
-                            onBack = {
-                                vocabularyDetailViewModel.clearCache()
-                                navController.popBackStack()
-                            },
-                            onSaveVocabulary = { engVocab ->
-                                imageCaptioningViewModel.saveVocabularyLocally(engVocab)
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Đã lưu từ vựng!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            onDeleteVocabulary = { engVocab ->
-                                imageCaptioningViewModel.deleteVocabularyLocally(engVocab)
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Đã xóa từ vựng!",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                            },
-                        )
-                    }
-
-                    composable<DashboardScreenRoute> {
-                        val dashboardViewModel = hiltViewModel<DashboardViewModel>()
-                        val images by dashboardViewModel.images.collectAsStateWithLifecycle()
-                        val imageFolderList by dashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
-                        LaunchedEffect(key1 = Unit) {
-                            println("image $images")
-                        }
-                        DashboardScreen(
-                            images = images,
-                            onClick = { image ->
-                                navController.navigate(
-                                    ImageCaptioningScreenRoute(
-                                        uriString = image.pictureUri,
-                                        englishText = image.englishText,
-                                        vietnameseText = image.vietnameseText,
-                                        imageName = image.imageName,
-                                        captureTime = image.captureTime
-                                    )
-                                )
-                            },
-                            allImageFolder = imageFolderList,
-                            onDeleteImage = {
-                                dashboardViewModel.deleteImage(it)
-                            },
-                            onGoToImageFolder = {
-                                navController.navigate(ImageFolderDashboardScreenRoute)
-                            },
-
-                            onAddImageToFolder = { image, imageFolder ->
-                                dashboardViewModel.addImageToFolder(image, imageFolder)
-                            },
-                            onRemoveImageOutOfFolder = { image, imageFolder ->
-                                dashboardViewModel.removeImageOutOfFolder(
-                                    image,
-                                    imageFolder
-                                )
-                            },
-                        )
-                    }
-
-                    composable<ImageFolderDashboardScreenRoute> {
-                        val imageFolderDashboardViewModel =
-                            hiltViewModel<ImageFolderDashboardViewModel>()
-                        val images by imageFolderDashboardViewModel.images.collectAsStateWithLifecycle()
-                        val imageFolderList by imageFolderDashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
-                        ImageFolderDashboardScreen(
-                            onChangeFolder = {},
-                            onImageClick = { image ->
-                                navController.navigate(
-                                    ImageCaptioningScreenRoute(
-                                        uriString = image.pictureUri,
-                                        englishText = image.englishText,
-                                        vietnameseText = image.vietnameseText,
-                                        imageName = image.imageName,
-                                        captureTime = image.captureTime,
-                                    )
-                                )
-                            },
-                            onDeleteImage = {
-                                imageFolderDashboardViewModel.deleteImage(it)
-                            },
-                            onFolderCreate = {
-                                imageFolderDashboardViewModel.createFolder(it)
-                            },
-                            onGoToAllImageFolder = {
-                                navController.navigate(ImageFolderScreenRoute)
-                            },
-                            images = images,
-                            folderList = imageFolderList,
-                            onAddImageToFolder = { image, imageFolder ->
-                                imageFolderDashboardViewModel.addImageToFolder(image, imageFolder)
-                            },
-                            onRemoveImageOutOfFolder = { image, imageFolder ->
-                                imageFolderDashboardViewModel.removeImageOutOfFolder(
-                                    image,
-                                    imageFolder
-                                )
-                            },
-                        )
-                    }
-
-                    composable<ImageFolderScreenRoute> {
-                        val imageFolderViewModel = hiltViewModel<ImageFolderViewModel>()
-                        val folders by imageFolderViewModel.imageFolders.collectAsStateWithLifecycle()
-                        ImageFolderScreen(
-                            onChangeFolder = {},
-                            onFolderClick = { imageFolder ->
-                                navController.navigate(
-                                    ImageFolderDetailScreenRoute(
-                                        imageFolder._id
-                                            .toString()
-                                            .substringAfter("(")
-                                            .substringBefore(")")
-                                    )
-                                )
-                            },
-                            onFolderDelete = {},
-                            onFolderCreate = {
-                                imageFolderViewModel.createFolder(it)
-                            },
-                            folders = folders,
-                        )
-                    }
-
-                    composable<ImageFolderDetailScreenRoute> {
-                        val args = it.toRoute<ImageFolderDetailScreenRoute>()
-                        val imageFolderDetailViewModel = hiltViewModel<ImageFolderDetailViewModel>()
-                        val imageFolderList by imageFolderDetailViewModel.imageFolderList.collectAsStateWithLifecycle()
-                        val folderId = ObjectId(args.folderId)
-                        LaunchedEffect(key1 = Unit) {
-                            println("id ${args.folderId}")
-                            imageFolderDetailViewModel.getImageFolderId(folderId)
-                        }
-                        val imageFolder by imageFolderDetailViewModel.imageFolder.collectAsStateWithLifecycle()
-
-                        ImageFolderDetailScreen(
-                            imageFolder = imageFolder,
-                            onImageClick = { image ->
-                                navController.navigate(
-                                    ImageCaptioningScreenRoute(
-                                        uriString = image.pictureUri,
-                                        englishText = image.englishText,
-                                        vietnameseText = image.vietnameseText,
-                                        imageName = image.imageName,
-                                        captureTime = image.captureTime,
-                                    )
-                                )
-                            },
-                            onDeleteImage = { image ->
-                                imageFolderDetailViewModel.deleteImage(image)
-                            },
-
-                            onAddImageToFolder = { image, addedImageFolder ->
-                                imageFolderDetailViewModel.addImageToFolder(image, addedImageFolder)
-                            },
-                            onRemoveImageOutOfFolder = { image, removedImageFolder ->
-                                imageFolderDetailViewModel.removeImageOutOfFolder(
-                                    image,
-                                    removedImageFolder
-                                )
-                            },
-                            allFolder = imageFolderList
-
-                        )
-                    }
-
-                    composable<VocabularyDetailScreenRoute> {
-                        val args = it.toRoute<VocabularyDetailScreenRoute>()
-                        val vocabularyDetailViewModel = hiltViewModel<VocabularyDetailViewModel>()
-                        LaunchedEffect(key1 = Unit) {
-                            vocabularyDetailViewModel.getVocabulary(
-                                args.engVocab.lowercase(Locale.ENGLISH)
-                                    .replace(Regex("\\p{Punct}"), "")
+                                },
+                                onBack = {
+                                    vocabularyDetailViewModel.clearCache()
+                                    navController.popBackStack()
+                                },
+                                onSaveVocabulary = { engVocab ->
+                                    imageCaptioningViewModel.saveVocabularyLocally(engVocab)
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Đã lưu từ vựng!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onDeleteVocabulary = { engVocab ->
+                                    imageCaptioningViewModel.deleteVocabularyLocally(engVocab)
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Đã xóa từ vựng!",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                },
                             )
                         }
-                        val vocabulary by vocabularyDetailViewModel.vocabulary.collectAsStateWithLifecycle()
-                        VocabularyDetailScreen(
-                            engWord = args.engVocab.lowercase(Locale.ENGLISH)
-                                .replace(Regex("\\p{Punct}"), ""),
-                            vocabulary = vocabulary
-                        )
-                    }
 
-                    composable<VocabularyFolderDashboardScreenRoute> {
-                        val vocabularyFolderDashboardViewModel =
-                            hiltViewModel<VocabularyFolderDashboardViewModel>()
-                        VocabularyFolderDashboardScreen(
-                            onFolderCreate = {
-                                vocabularyFolderDashboardViewModel.createFolder(it)
-                            },
-                            onGoToVocabularyFolder = {
-                                navController.navigate(VocabularyFolderScreenRoute)
-                            },
+                        vocabularyFolderGroupScreen(navController = navController)
 
-                            onGoToAllSavedVocabulary = {
-                                navController.navigate(AllSavedVocabularyScreenRoute)
-                            }
-                        )
-                    }
-
-                    composable<VocabularyFolderScreenRoute> {
-                        val vocabularyFolderViewModel = hiltViewModel<VocabularyFolderViewModel>()
-                        val vocabularyFolderList by vocabularyFolderViewModel.vocabularyFolders.collectAsStateWithLifecycle()
-                        VocabularyFolderScreen(
-                            onFolderCreate = {
-                                vocabularyFolderViewModel.createFolder(it)
-                            },
-                            vocabularyFolderList = vocabularyFolderList,
-                            onFolderDelete = {},
-                            onFolderClick = { folder ->
-                                navController.navigate(
-                                    VocabularyFolderDetailScreenRoute(
-                                        folderId = folder._id
-                                            .toString()
-                                            .substringAfter("(")
-                                            .substringBefore(")")
+                        composable<DashboardScreenRoute> {
+                            val dashboardViewModel = hiltViewModel<DashboardViewModel>()
+                            val images by dashboardViewModel.images.collectAsStateWithLifecycle()
+                            val imageFolderList by dashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
+                            DashboardScreen(
+                                images = images,
+                                onClick = { image ->
+                                    navController.navigate(
+                                        ImageCaptioningScreenRoute(
+                                            uriString = image.pictureUri,
+                                        )
                                     )
-                                )
-//                                val a = folder._id
-//                                    .toString()
-//                                    .substringAfter("(")
-//                                    .substringBefore(")")
-//                                println(folder)
-                            },
-                        )
-                    }
+                                },
+                                allImageFolder = imageFolderList,
+                                onDeleteImage = dashboardViewModel::deleteImage,
+                                onGoToImageFolder = {
+                                    navController.navigate(ImageFolderGroupScreenRoute)
+                                },
+                                onGotoVocabularyFolder = {
+                                    navController.navigate(VocabularyFolderGroupScreenRoute)
+                                },
 
-                    composable<VocabularyFolderDetailScreenRoute> {
-                        val args = it.toRoute<VocabularyFolderDetailScreenRoute>()
-                        val vocabularyFolderDetailViewModel =
-                            hiltViewModel<VocabularyFolderDetailViewModel>()
-                        val folderId = ObjectId(args.folderId)
-                        LaunchedEffect(key1 = Unit) {
-                            println("id ${args.folderId}")
-                            vocabularyFolderDetailViewModel.getVocabularyFolderId(folderId)
+                                onAddImageToFolder = dashboardViewModel::addImageToFolder,
+                                onRemoveImageOutOfFolder = dashboardViewModel::removeImageOutOfFolder,
+                            )
                         }
-                        val vocabularyFolderList by vocabularyFolderDetailViewModel.vocabularyFolderList.collectAsStateWithLifecycle()
-                        val vocabularyFolder by vocabularyFolderDetailViewModel.vocabularyFolder.collectAsStateWithLifecycle()
-                        println(vocabularyFolder.vocabularyList.size)
-
-
-                        VocabularyFolderDetailScreen(
-                            vocabularyFolder = vocabularyFolder,
-                            onVocabularyClick = { vocabulary ->
-                                navController.navigate(
-                                    VocabularyDetailScreenRoute(
-                                        engVocab = vocabulary.engVocab
-                                    )
-                                )
-                            },
-                            onDeleteVocabulary = { vocabulary ->
-                                vocabularyFolderDetailViewModel.deleteVocabulary(vocabulary)
-                            },
-                            onAddVocabularyToFolder = { _vocabulary, _vocabularyFolder ->
-                                vocabularyFolderDetailViewModel.addVocabularyToFolder(_vocabulary, _vocabularyFolder)
-                            },
-                            onRemoveVocabularyOutOfFolder = { _vocabulary, _vocabularyFolder ->
-                                vocabularyFolderDetailViewModel.removeVocabularyOutOfFolder(_vocabulary, _vocabularyFolder)
-                            },
-                            allFolder = vocabularyFolderList
-                        )
+                        //
+                        composable<VocabularyDetailScreenRoute> {
+                            val args = it.toRoute<VocabularyDetailScreenRoute>()
+                            val vocabularyDetailViewModel =
+                                hiltViewModel<VocabularyDetailViewModel>()
+                            val engVocab = args.engVocab.lowercase(Locale.ENGLISH)
+                                .replace(Regex("\\p{Punct}"), "")
+                            LaunchedEffect(key1 = Unit) {
+                                vocabularyDetailViewModel.getVocabulary(engVocab)
+                            }
+                            val vocabulary by vocabularyDetailViewModel.vocabulary.collectAsStateWithLifecycle()
+                            VocabularyDetailScreen(
+                                engWord = engVocab,
+                                vocabulary = vocabulary
+                            )
+                        }
                     }
-
-                    composable<AllSavedVocabularyScreenRoute> {
-                        val allSavedVocabularyViewModel = hiltViewModel<AllSavedVocabularyViewModel>()
-                        val allVocabularies by allSavedVocabularyViewModel.vocabularyList.collectAsStateWithLifecycle()
-                        val allFolders by allSavedVocabularyViewModel.vocabularyFolderList.collectAsStateWithLifecycle()
-                        AllSavedVocabularyScreen(
-                            vocabularyList = allVocabularies,
-                            onVocabularyClick = { vocabulary ->
-                                navController.navigate(
-                                    VocabularyDetailScreenRoute(
-                                        engVocab = vocabulary.engVocab
-                                    )
-                                )},
-                            onDeleteVocabulary = { vocabulary ->
-                                allSavedVocabularyViewModel.deleteVocabulary(vocabulary)
-                            },
-                            allFolder = allFolders,
-                            onAddVocabularyToFolder = { _vocabulary, _vocabularyFolder ->
-                                allSavedVocabularyViewModel.addVocabularyToFolder(_vocabulary, _vocabularyFolder)
-                            },
-                            onRemoveVocabularyOutOfFolder = { _vocabulary, _vocabularyFolder ->
-                                allSavedVocabularyViewModel.removeVocabularyOutOfFolder(_vocabulary, _vocabularyFolder)
-                            },
-                        )
-                    }
-
                 }
+
             }
         }
     }
 
-    private fun hasRequiredPermissions(): Boolean {
-        return CAMERAX_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(
-                applicationContext,
-                it
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun takePhoto(
-        controller: LifecycleCameraController,
-        imageSavedHandler: (Uri, String, String) -> Unit
-    ) {
-        if (!hasRequiredPermissions()) {
-            return
-        }
-
-        val metadata = ImageCapture.Metadata().apply {
-            isReversedHorizontal =
-                (controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA)
-        }
-
-        val imageName = StringFromTime.buildPictureName()
-        val capturedTime = StringFromTime.buildDateTimeString()
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(
-                File(filesDir, imageName)
-            )
-            .setMetadata(metadata)
-            .build()
-
-        controller.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(applicationContext),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    imageSavedHandler(outputFileResults.savedUri!!, imageName, capturedTime)
-                    Toast.makeText(
-                        applicationContext,
-                        "Succeed!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Something went wrong!!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        )
-    }
-
-    companion object {
-        private val CAMERAX_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-        )
-    }
 }
 
 @Composable

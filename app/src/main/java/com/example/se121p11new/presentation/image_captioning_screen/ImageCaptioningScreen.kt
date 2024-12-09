@@ -65,8 +65,8 @@ fun ImageCaptioningScreen(
     uri: Any,
     englishText: Resource<String>,
     vietnameseText: Resource<String>,
-    imageName: String,
-    capturedTime: String,
+    imageName: Resource<String>,
+    capturedTime: Resource<String>,
     onGoToVocabularyDetail: (String) -> Unit,
     onDeleteVocabulary: (String) -> Unit,
     onSaveVocabulary: (String) -> Unit,
@@ -130,9 +130,14 @@ fun ImageCaptioningScreen(
                 placeholder = painterResource(R.drawable.kiana_and_captain)
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.image_name_text) + ": ", fontWeight = FontWeight.Bold)
-                Text(imageName)
+                when(imageName) {
+                    is Resource.Error -> {}
+                    is Resource.Loading -> {}
+                    is Resource.Success -> Text(imageName.data!!)
+                }
+
             }
             Spacer(modifier = Modifier.height(10.dp))
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -140,7 +145,11 @@ fun ImageCaptioningScreen(
                     stringResource(R.string.capture_time_text) + ": ",
                     fontWeight = FontWeight.Bold
                 )
-                Text(capturedTime, fontSize = 13.sp)
+                when(capturedTime) {
+                    is Resource.Error -> {}
+                    is Resource.Loading -> {}
+                    is Resource.Success -> Text(capturedTime.data!!)
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Text(
@@ -268,12 +277,12 @@ private fun ImageCaptioningScreenPreview() {
 //            bitmap = Resource.Success(ImageBitmap.imageResource(R.drawable.kiana_and_captain).asAndroidBitmap()),
 //            englishText = Resource.Loading(),
             uri = Uri.parse(
-                "android.resource://com.example.se121p11new/drawable/kiana_and_captain"
+                "file:///data/user/0/com.example.se121p11new/files/1733558560621.jpg"
             ),
             vietnameseText = Resource.Success("Xin chào, đây là Kiana"),
             englishText = Resource.Success("Hello, this is Kiana"),
-            imageName = "PTR-061124.",
-            capturedTime = "16:53, Thứ tư, ngày 06 tháng 11, 2024.",
+            imageName = Resource.Success("PTR-061124."),
+            capturedTime = Resource.Success("16:53, Thứ tư, ngày 06 tháng 11, 2024."),
             onGoToVocabularyDetail = {},
             onBack = {},
             onDeleteVocabulary = {},

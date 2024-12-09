@@ -48,7 +48,7 @@ fun VocabularyFolderDashboardScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(vertical = 30.dp, horizontal = 15.dp)
+            .padding( horizontal = 15.dp)
         //            .verticalScroll(rememberScrollState())
     ) {
         if (openDialog) {

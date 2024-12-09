@@ -20,7 +20,7 @@ object StringFromTime {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun buildDateTimeString(): String {
+    fun buildCaptureTime(): String {
         val currentTime = today
         val time = currentTime.time
         val hour = time.hour.toString().padStart(2, '0')

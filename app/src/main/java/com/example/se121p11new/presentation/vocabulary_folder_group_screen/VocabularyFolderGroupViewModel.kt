@@ -1,4 +1,4 @@
-package com.example.se121p11new.presentation.vocabulary_folder_group_screen.all_saved_vocabulary_screen
+package com.example.se121p11new.presentation.vocabulary_folder_group_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,15 +16,16 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
 @HiltViewModel
-class AllSavedVocabularyViewModel @Inject constructor(
-    private val vocabularyRepository: VocabularyRepository,
-    private val vocabularyFolderRepository: VocabularyFolderRepository
+class VocabularyFolderGroupViewModel @Inject constructor(
+    private val vocabularyFolderRepository: VocabularyFolderRepository,
+    private val vocabularyRepository: VocabularyRepository
 ) : ViewModel() {
-    private val _vocabularyFolderList = MutableStateFlow<List<RealmVocabularyFolder>>(emptyList())
-    val vocabularyFolderList = _vocabularyFolderList
+    private val _vocabularyFolders = MutableStateFlow<List<RealmVocabularyFolder>>(emptyList())
+    val vocabularyFolders = _vocabularyFolders
         .onStart { getAllVocabularyFolder() }
         .stateIn(
             viewModelScope,
@@ -39,12 +40,22 @@ class AllSavedVocabularyViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
+    private var _vocabularyFolder = MutableStateFlow(RealmVocabularyFolder())
+    val vocabularyFolder = _vocabularyFolder.asStateFlow()
+
+    fun getVocabularyFolderById(id: ObjectId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            vocabularyFolderRepository.getVocabularyFolderById(id).collectLatest {
+                _vocabularyFolder.value = it.list.toList().first()
+            }
+        }
+    }
 
     private fun getAllVocabularyFolder() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 vocabularyFolderRepository.getAllFoldersLocally().collectLatest {
-                    _vocabularyFolderList.value = it.list.toList()
+                    _vocabularyFolders.value = it.list.toList()
                 }
             }
         }
@@ -59,6 +70,19 @@ class AllSavedVocabularyViewModel @Inject constructor(
             }
         }
     }
+
+    fun createFolder(name: String) {
+        val folder = RealmVocabularyFolder().apply {
+            this.name = name
+        }
+
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                vocabularyFolderRepository.addFolder(folder)
+            }
+        }
+    }
+
     fun addVocabularyToFolder(vocabulary: RealmVocabulary, folder: RealmVocabularyFolder) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -73,25 +97,22 @@ class AllSavedVocabularyViewModel @Inject constructor(
         }
     }
 
-    fun deleteVocabulary(vocabulary: RealmVocabulary) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                vocabularyRepository.deleteVocabularyLocally(vocabulary)
-            }
-        }
-    }
-
     fun removeVocabularyOutOfFolder(vocabulary: RealmVocabulary, folder: RealmVocabularyFolder) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if(vocabulary.vocabularyList.contains(folder)) {
                     vocabularyFolderRepository.
-                    removeVocabularyOutOfFolder(
-                        vocabulary,
-                        folder
-                    )
+                    removeVocabularyOutOfFolder(vocabulary, folder)
 
                 }
+            }
+        }
+    }
+
+    fun deleteVocabulary(vocabulary: RealmVocabulary) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                vocabularyRepository.deleteVocabularyLocally(vocabulary)
             }
         }
     }
