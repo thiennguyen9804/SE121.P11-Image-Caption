@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -23,6 +24,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +43,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.se121p11new.core.presentation.utils.CameraGroupScreenRoute
@@ -54,6 +57,8 @@ import com.example.se121p11new.core.presentation.utils.VocabularyDetailScreenRou
 import com.example.se121p11new.core.presentation.utils.VocabularyFolderGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.bottomNavItems
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
+import com.example.se121p11new.core.presentation.utils.rememberAppState
+import com.example.se121p11new.core.presentation.utils.routeToIndexes
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthClient
@@ -107,6 +112,7 @@ class MainActivity : ComponentActivity() {
 
     private var providerType = ""
 
+    private val TAG = "NavigationBar"
 //    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -117,6 +123,7 @@ class MainActivity : ComponentActivity() {
                 this, CAMERAX_PERMISSIONS, 0
             )
         }
+        Log.d(TAG, routeToIndexes.toString())
         setContent {
             this.enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.light(
@@ -137,40 +144,59 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-                navController = rememberNavController()
 
+                navController = rememberNavController()
+                navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                    selectedItemIndex = routeToIndexes[destination.route] ?: 0
+//                    Log.d(TAG, destination.route ?: "ERROR: NO ROUTE!!!")
+//                    Log.d(TAG, routeToIndexes[destination.route].toString())
+                }
+                val appState = rememberAppState(navController)
+
+//                Log.d(TAG, appState.shouldShowBottomBar.toString())
                 Scaffold(
                     containerColor = Color.White,
                     bottomBar = {
-//                        NavigationBar(
-//                            containerColor = Color.White,
-//                            contentColor = Color.Black,
-//                        ) {
-//                            bottomNavItems.forEachIndexed { index, item ->
-//                                NavigationBarItem(
-//                                    colors = NavigationBarItemDefaults.colors().copy(
-//                                        selectedIconColor = Color(0xff9A00F7),
-//                                        unselectedIconColor = Color.Black,
-//                                        selectedIndicatorColor = Color.Transparent
-//                                    ),
-//                                    selected = selectedItemIndex == index,
-//                                    onClick = {
-//                                        selectedItemIndex = index
-//                                        if (index == 2) {
-//                                            navController.navigate(CameraGroupScreenRoute)
-//                                        }
-//                                        println(CameraGroupScreenRoute.toString())
-//                                    },
-//                                    icon = {
-//                                        Icon(
-//                                            imageVector = if (selectedItemIndex == index)
-//                                                item.selectedIcon else item.unselectedIcon,
-//                                            contentDescription = null
-//                                        )
-//                                    }
-//                                )
-//                            }
-//                        }
+                        if(appState.shouldShowBottomBar) {
+                            NavigationBar(
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                            ) {
+                                bottomNavItems.forEachIndexed { index, item ->
+                                    NavigationBarItem(
+                                        colors = NavigationBarItemDefaults.colors().copy(
+//                                            selectedIconColor = Color(0xff9A00F7),
+//                                            unselectedIconColor = Color.Black,
+                                            selectedIndicatorColor = Color.Transparent
+                                        ),
+                                        selected = selectedItemIndex == index,
+                                        onClick = {
+                                            if(selectedItemIndex == index) {
+                                                return@NavigationBarItem
+                                            }
+
+                                            navController.popBackStack(item.route, inclusive = true)
+//                                            selectedItemIndex = index
+                                            navController.navigate(item.route) {
+                                                launchSingleTop
+                                            }
+//                                            Log.d(TAG,  "current route: " + navController.currentDestination?.route.toString())
+//                                            Log.d(TAG, "previous route " + navController.currentBackStackEntry?.destination?.route.toString())
+
+                                        },
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (selectedItemIndex == index)
+                                                    item.selectedIcon else item.unselectedIcon,
+                                                contentDescription = null,
+                                                tint = if (selectedItemIndex != index)
+                                                    Color.Black else Color(0xff9A00F7)
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 ) { contentPadding ->
                     NavHost(
@@ -264,7 +290,8 @@ class MainActivity : ComponentActivity() {
                         )
 
                         imageFolderGroupScreen(
-                            navController = navController
+                            navController = navController,
+                            onBack = {}
                         )
 
                         composable<ImageCaptioningScreenRoute> {

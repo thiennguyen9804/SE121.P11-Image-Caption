@@ -1,5 +1,6 @@
 package com.example.se121p11new.presentation.image_folder_group_screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,15 +21,18 @@ import com.example.se121p11new.presentation.image_folder_group_screen.all_captur
 import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_dashboard_screen.ImageFolderDashboardScreen
 import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_detail_screen.ImageFolderDetailScreen
 import com.example.se121p11new.presentation.image_folder_group_screen.image_folder_screen.ImageFolderScreen
+import com.google.gson.annotations.Until
 import org.mongodb.kbson.ObjectId
 
 fun NavGraphBuilder.imageFolderGroupScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    onBack: () -> Unit
 ) {
     navigation<ImageFolderGroupScreenRoute>(
         startDestination = ImageFolderDashboardScreenRoute
     ) {
         composable<ImageFolderDashboardScreenRoute> {
+//            BackHandler(onBack = onBack)
             val sharedViewModel = it.sharedViewModel<ImageFolderGroupViewModel>(navController)
             val images by sharedViewModel.images.collectAsStateWithLifecycle()
             val allImageFolder by sharedViewModel.imageFolderList.collectAsStateWithLifecycle()

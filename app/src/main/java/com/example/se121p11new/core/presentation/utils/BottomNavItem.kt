@@ -16,28 +16,32 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class BottomNavItem(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
+    val route: Any
 )
 
 val bottomNavItems = listOf(
     BottomNavItem(
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
+        route = DashboardScreenRoute
     ),
     BottomNavItem(
         selectedIcon = Icons.Filled.Image,
-        unselectedIcon = Icons.Outlined.Image
+        unselectedIcon = Icons.Outlined.Image,
+        route = ImageFolderDashboardScreenRoute
     ),
     BottomNavItem(
         selectedIcon = Icons.Filled.Camera,
-        unselectedIcon = Icons.Outlined.Camera
+        unselectedIcon = Icons.Outlined.Camera,
+        route = CameraScreenRoute
     ),
     BottomNavItem(
         selectedIcon = Icons.AutoMirrored.Filled.LibraryBooks,
-        unselectedIcon = Icons.AutoMirrored.Outlined.LibraryBooks
+        unselectedIcon = Icons.AutoMirrored.Outlined.LibraryBooks,
+        route = VocabularyFolderDashboardScreenRoute
     ),
-    BottomNavItem(
-        selectedIcon = Icons.Filled.Image,
-        unselectedIcon = Icons.Outlined.Image
-    ),
-
 )
+
+val routeToIndexes = bottomNavItems.mapIndexed { index, item ->
+    item.route::class.toString().substringAfter("class ") to index
+}.toMap()
