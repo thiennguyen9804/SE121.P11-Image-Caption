@@ -25,25 +25,18 @@ class ImageRepositoryImpl @Inject constructor(
         return localImageDataSource.getImageByUri(uri)
     }
 
-//    override suspend fun getImageByUri(uri: Uri): Flow<ResultsChange<Image>> = flow {
-//        getImageByUriLocally(uri).collectLatest {
-//            if(!it.list.isEmpty()) {
-//                emit(it)
-//                return@collectLatest
-//            }
-//        }
-//    }
+
 
     override suspend fun generateEnglishText(image: Bitmap): String {
-//        return remoteImageDataSource.generateEnglishText(image)
-        delay(3000)
-        return "Hello"
+        return remoteImageDataSource.generateEnglishText(image)
+//        delay(3000)
+//        return "Hello"
     }
 
     override suspend fun generateVietnameseText(englishText: String): String {
-//        return remoteImageDataSource.generateVietnameseText(englishText)
-        delay(3000)
-        return "Xin chào"
+        return remoteImageDataSource.generateVietnameseText(englishText)
+//        delay(3000)
+//        return "Xin chào"
     }
 
     override suspend fun addImageLocally(newImage: Image) {

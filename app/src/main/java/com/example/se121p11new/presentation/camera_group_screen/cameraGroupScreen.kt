@@ -6,6 +6,13 @@ import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.net.toUri
 import androidx.navigation.NavGraphBuilder
@@ -33,7 +40,21 @@ fun NavGraphBuilder.cameraGroupScreen(
     navigation<CameraGroupScreenRoute>(
         startDestination = CameraScreenRoute
     ) {
-        composable<CameraScreenRoute> {
+        composable<CameraScreenRoute>(
+            enterTransition = {
+                slideIntoContainer(
+                    animationSpec = tween(500, easing = LinearEasing),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    animationSpec = tween(500, easing = LinearEasing),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right
+
+                )
+            }
+        ) {
             val sharedViewModel = it.sharedViewModel<CameraGroupViewModel>(navController)
             CameraScreen(
                 controller = controller,

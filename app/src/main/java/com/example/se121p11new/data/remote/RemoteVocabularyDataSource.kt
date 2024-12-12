@@ -1,8 +1,10 @@
 package com.example.se121p11new.data.remote
 
+import android.util.Log
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.example.se121p11new.data.remote.dto.VocabularyDto
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -10,21 +12,31 @@ import javax.inject.Inject
 class RemoteVocabularyDataSource @Inject constructor (
     private val api: VocabularyApi
 ) {
-    fun getVocabularyByEngVocab(engVocab: String) = flow<Resource<VocabularyDto>> {
+    private val TAG = "RemoteVocabularyDataSource"
+
+    fun getVocabularyByEngVocab(engVocab: String) = flow {
+        Log.d(TAG, engVocab)
+        val req = engVocab.lowercase()
         try {
-            emit(Resource.Success(api.getVocabularyByWord(engVocab)))
+            val res = api.getVocabularyByWord(req)
+            emit(res)
         } catch(e: HttpException) {
             when(e.code()) {
                 404 -> {
+                    Log.d(TAG, "cannot found vocab from remote api")
                     throw e
                 }
                 in 500..509 -> {
-                    emit(Resource.Error("Hiện server không thể tiếp nhận yêu cầu, vui lòng thử lại sau"))
+                    throw Exception("Server hiện không thể đáp ứng, thử lại sau")
                 }
                 else -> {
-                    emit(Resource.Error("Gặp lỗi!!! Vui lòng thử lại sau"))
+                    throw Exception("Gặp lỗi!!! Vui lòng thử lại sau")
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

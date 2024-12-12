@@ -13,13 +13,15 @@ import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.StringFromTime
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
-import com.example.se121p11new.data.remote.dto.DomainVocabulary
+//import com.example.se121p11new.data.remote.dto.DomainVocabulary
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import com.example.se121p11new.presentation.dashboard_screen.image
+//import com.example.se121p11new.presentation.vocabulary_detail_screen.vocab
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -70,8 +72,6 @@ class ImageCaptioningViewModel @Inject constructor(
         }
     }
 
-//    var imageName = StringFromTime.buildPictureName()
-//        private set
 
     fun setMyImageUri(newImageUri: Uri) {
         imageUri = newImageUri
@@ -81,49 +81,6 @@ class ImageCaptioningViewModel @Inject constructor(
     fun setMyBitmap(newBitmap: Bitmap) {
         bitmap = newBitmap
     }
-
-//    private fun generateEngText(bitmap: Bitmap) {
-//        viewModelScope.launch {
-//            imageRepository.generateEnglishText(bitmap).collectLatest { eng ->
-//                when (eng) {
-//                    is Resource.Error -> {}
-//                    is Resource.Loading -> {}
-//                    is Resource.Success -> {
-//                        val value = eng.data!!
-//                        _generatedEnglishText.value = Resource.Success(value)
-//                        if(_generatedVietnameseText.value is Resource.Loading) {
-//                            generateVieText(value)
-//                        }
-//                        realmImage!!.englishText = value
-//
-//                        imageRepository.addImageLocally(realmImage!!)
-//                    }
-//                }
-//
-//            }
-//        }
-//
-//    }
-
-//        private fun generateVieText(engText: String) {
-//            viewModelScope.launch {
-//                imageRepository.generateVietnameseText(engText).collectLatest { vie ->
-//                    when (vie) {
-//                        is Resource.Error -> {}
-//                        is Resource.Loading -> {}
-//                        is Resource.Success -> {
-//                            val decodedVieText =
-//                                HtmlCompat.fromHtml(vie.data!!, HtmlCompat.FROM_HTML_MODE_LEGACY)
-//                                    .toString()
-//                            _generatedVietnameseText.value = Resource.Success(decodedVieText)
-//                            realmImage!!.vietnameseText = decodedVieText
-//                            delay(5000)
-//                            imageRepository.addImageLocally(realmImage!!)
-//                        }
-//                    }
-//                }
-//            }
-//        }
 
     fun getImageByUri() {
         _imageName.value = Resource.Success(realmImage!!.imageName)
@@ -141,62 +98,62 @@ class ImageCaptioningViewModel @Inject constructor(
                 _generatedEnglishText.value = Resource.Success(realmImage!!.englishText)
                 val vieText = async { imageRepository.generateVietnameseText(engText) }.await()
                 _generatedVietnameseText.value = Resource.Success(vieText)
-    //                realmImage!!.vietnameseText = vieText
-    //                imageRepository.addImageLocally(realmImage!!)
                 imageRepository.updateVietnameseText(realmImage!!, vieText)
             }
         } else if (realmImage!!.englishText == "" && realmImage!!.vietnameseText == "") {
-//                if(_generatedEnglishText.value is Resource.Success) {
-//                    generateVieText(_generatedEnglishText.value.data!!)
-//                }
-
             viewModelScope.launch {
                 val engText = async { imageRepository.generateEnglishText(bitmap) }.await()
-//                realmImage!!.englishText = engText
-//                imageRepository.addImageLocally(realmImage!!)
                 imageRepository.updateEnglishText(realmImage!!, engText)
                 _generatedEnglishText.value = Resource.Success(engText)
                 val vieText = async { imageRepository.generateVietnameseText(engText) }.await()
                 _generatedVietnameseText.value = Resource.Success(vieText)
-//                realmImage!!.vietnameseText = vieText
-//                imageRepository.addImageLocally(realmImage!!)
                 imageRepository.updateVietnameseText(realmImage!!, vieText)
-
             }
-
-
         }
     }
 
     fun saveVocabularyLocally(engVocab: String) {
+
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest {
-                    when (it) {
-                        is Resource.Error -> {}
-                        is Resource.Loading -> {}
-                        is Resource.Success -> {
-                            vocabularyRepository.addVocabulary(it.data!!.toRealmVocabulary())
-                        }
-                    }
-                }
+//            withContext(Dispatchers.IO) {
+//                vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest {
+//                    when (it) {
+//                        is Resource.Error -> {}
+//                        is Resource.Loading -> {}
+//                        is Resource.Success -> {
+//                            vocabularyRepository.addVocabulary(it.data!!.toRealmVocabulary())
+//                        }
+//                    }
+//                }
+//
+//            }
+            val toBeSavedVocab = RealmVocabulary().apply {
+                this.engVocab = engVocab
+                this.ipa = ""
+                this.partOfSpeeches = realmListOf()
+                this.phrasalVerbs = realmListOf()
+            }
+
+            vocabularyRepository.addVocabulary(toBeSavedVocab)
+            vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest {
+                vocabularyRepository.updateVocabulary(engVocab, it)
             }
         }
     }
 
     fun deleteVocabularyLocally(engVocab: String) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                vocabularyRepository.getVocabularyByEngVocabLocally(engVocab).collectLatest {
-                    when (it) {
-                        is Resource.Error -> {}
-                        is Resource.Loading -> {}
-                        is Resource.Success -> {
-                            vocabularyRepository.deleteVocabularyLocally(it.data!!.toRealmVocabulary())
-                        }
-                    }
-                }
-            }
+//            withContext(Dispatchers.IO) {
+//                vocabularyRepository.getVocabularyByEngVocabLocally(engVocab).collectLatest {
+//                    when (it) {
+//                        is Resource.Error -> {}
+//                        is Resource.Loading -> {}
+//                        is Resource.Success -> {
+//                            vocabularyRepository.deleteVocabularyLocally(it.data!!.toRealmVocabulary())
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 }

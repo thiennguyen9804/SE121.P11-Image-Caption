@@ -20,35 +20,10 @@ import javax.inject.Inject
 class LocalImageDataSource @Inject constructor(
     private val realm: Realm
 ) {
-    // upsert function
     suspend fun addImage(newImage: Image) {
         val image = realm.writeBlocking {
             copyToRealm(newImage, UpdatePolicy.ALL)
         }.asFlow()
-//        return image
-//        realm.write {
-//            val image = query<Image>("_id == $0", newImage._id).find().firstOrNull()
-////            if(image != null) {
-////            }
-//            if(image != null) {
-//                copyToRealm(Image().apply {
-//                    _id = image._id
-//                    imageName = newImage.imageName
-//                    pictureUri = newImage.pictureUri
-//                    captureTime = newImage.captureTime
-//                    englishText = newImage.englishText
-//                    vietnameseText = newImage.vietnameseText
-//                })
-//            } else {
-//                copyToRealm(Image().apply {
-//                    imageName = newImage.imageName
-//                    pictureUri = newImage.pictureUri
-//                    captureTime = newImage.captureTime
-//                    englishText = newImage.englishText
-//                    vietnameseText = newImage.vietnameseText
-//                })
-//            }
-//        }
     }
 
     fun getAllImages(): Flow<ResultsChange<Image>> {

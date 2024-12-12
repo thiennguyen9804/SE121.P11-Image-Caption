@@ -7,7 +7,7 @@ import com.example.se121p11new.data.remote.dto.RealmDefinition
 import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
 import com.example.se121p11new.data.remote.dto.RealmPhrasalVerb
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
-import com.example.se121p11new.domain.data.Vocabulary
+//import com.example.se121p11new.domain.data.Vocabulary
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.RealmConfiguration
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class VocabularyDetailViewModel @Inject constructor(
     private val vocabularyRepository: VocabularyRepository
 ) : ViewModel() {
-    private val _vocabulary: MutableStateFlow<Resource<Vocabulary>> = MutableStateFlow(Resource.Loading())
+    private val _vocabulary: MutableStateFlow<Resource<RealmVocabulary>> = MutableStateFlow(Resource.Loading())
     val vocabulary = _vocabulary.asStateFlow()
 
     fun clearCache() {
@@ -40,7 +40,7 @@ class VocabularyDetailViewModel @Inject constructor(
                 println("vocab repo: searching for eng vocab...")
                 vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest { value ->
                     println("vocab repo: value found!!!")
-                    _vocabulary.value = value
+                    _vocabulary.value = Resource.Success(value)
                 }
             }
         }

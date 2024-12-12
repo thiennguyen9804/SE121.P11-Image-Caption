@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import io.realm.kotlin.ext.toRealmList
 
 typealias RealmVocabulary = com.example.se121p11new.data.local.realm_object.Vocabulary
-typealias DomainVocabulary = com.example.se121p11new.domain.data.Vocabulary
+//typealias DomainVocabulary = com.example.se121p11new.domain.data.Vocabulary
 
 data class VocabularyDto(
     @SerializedName("engVocab")
@@ -24,12 +24,12 @@ data class VocabularyDto(
         this.phrasalVerbs = this@VocabularyDto.phrasalVerbs.map { it.toRealmPhrasalVerb() }.toRealmList()
     }
 
-    fun toDomainVocabulary() = DomainVocabulary(
-        idString = "",
-        engVocab = this.engVocab,
-        ipa = this.ipa,
-        partOfSpeeches = this.partOfSpeeches.map { it.toDomainPartOfSpeech() },
-        phrasalVerbs = this.phrasalVerbs.map { it.toDomainPhrasalVerb() },
-        vocabularyList = emptyList()
-    )
+//    fun toDomainVocabulary() = DomainVocabulary(
+//        idString = "",
+//        engVocab = this.engVocab,
+//        ipa = this.ipa,
+//        partOfSpeeches = this.partOfSpeeches.map { it.toDomainPartOfSpeech() },
+//        phrasalVerbs = this.phrasalVerbs.map { it.toDomainPhrasalVerb() },
+//        vocabularyList = emptyList()
+//    )
 }

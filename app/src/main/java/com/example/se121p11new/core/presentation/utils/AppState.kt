@@ -17,17 +17,15 @@ import androidx.navigation.compose.rememberNavController
 class AppState(
     private val navController: NavHostController
 ) {
-
-    fun navigateToRoute(route: Any) {
-        navController.navigate(route) {
-            launchSingleTop
-        }
-
-
-    }
-
+    private val noDisplayBottomBar = listOf(
+        CameraScreenRoute::class.toString().substringAfter("class "),
+        ImageCaptioningScreenRoute::class.toString().substringAfter("class ")
+    )
+    private val noDisplayTopBar = listOf(CameraScreenRoute::class.toString().substringAfter("class "))
     val shouldShowBottomBar: Boolean
-        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route != CameraScreenRoute::class.toString().substringAfter("class ")
+        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route !in noDisplayBottomBar
+    val shouldShowTopBar: Boolean
+        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route !in noDisplayTopBar
 }
 
 @SuppressLint("ComposableNaming")

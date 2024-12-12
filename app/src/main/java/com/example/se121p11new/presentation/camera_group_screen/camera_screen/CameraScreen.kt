@@ -39,9 +39,9 @@ fun CameraScreen(
 ) {
     // TODO chuyển launch effect ra ngoài sub graph
     val context = LocalContext.current as ComponentActivity
-    LaunchedEffect(key1 = true) {
-        context.enableEdgeToEdge()
-    }
+//    LaunchedEffect(key1 = true) {
+//        context.enableEdgeToEdge()
+//    }
 
     Box(
         modifier = Modifier

@@ -1,7 +1,7 @@
 package com.example.se121p11new.data.local.realm_object
 
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
-import com.example.se121p11new.domain.data.DomainVocabularyFolder
+//import com.example.se121p11new.domain.data.DomainVocabularyFolder
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmList

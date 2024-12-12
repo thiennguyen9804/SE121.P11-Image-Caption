@@ -9,11 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.example.se121p11new.domain.data.PartOfSpeech
+import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
+//import com.example.se121p11new.domain.data.PartOfSpeech
 
 @Composable
 fun PartOfSpeechText(
-    partOfSpeech: PartOfSpeech,
+    partOfSpeech: RealmPartOfSpeech,
     modifier: Modifier = Modifier
 ) {
     Column(

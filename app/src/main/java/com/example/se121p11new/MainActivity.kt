@@ -17,13 +17,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,6 +66,7 @@ import com.example.se121p11new.core.presentation.utils.bottomNavItems
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
 import com.example.se121p11new.core.presentation.utils.rememberAppState
 import com.example.se121p11new.core.presentation.utils.routeToIndexes
+import com.example.se121p11new.core.presentation.utils.setStatusBarColor
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthClient
@@ -115,6 +123,7 @@ class MainActivity : ComponentActivity() {
     private val TAG = "NavigationBar"
 //    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,11 +134,11 @@ class MainActivity : ComponentActivity() {
         }
         Log.d(TAG, routeToIndexes.toString())
         setContent {
-            this.enableEdgeToEdge(
+            enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.light(
-                    android.graphics.Color.WHITE,
-                    android.graphics.Color.BLACK
-                ),
+                    scrim = android.graphics.Color.WHITE,
+                    darkScrim = android.graphics.Color.BLACK
+                )
             )
 
             SE121P11NewTheme {
@@ -145,28 +154,27 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+
                 navController = rememberNavController()
                 navController.addOnDestinationChangedListener { controller, destination, arguments ->
-                    selectedItemIndex = routeToIndexes[destination.route] ?: 0
-//                    Log.d(TAG, destination.route ?: "ERROR: NO ROUTE!!!")
-//                    Log.d(TAG, routeToIndexes[destination.route].toString())
+                    selectedItemIndex = routeToIndexes[destination.route] ?: selectedItemIndex
                 }
                 val appState = rememberAppState(navController)
 
 //                Log.d(TAG, appState.shouldShowBottomBar.toString())
                 Scaffold(
                     containerColor = Color.White,
+                    contentColor = Color.Black,
                     bottomBar = {
                         if(appState.shouldShowBottomBar) {
                             NavigationBar(
+                                modifier = Modifier.height(50.dp),
                                 containerColor = Color.White,
                                 contentColor = Color.Black,
                             ) {
                                 bottomNavItems.forEachIndexed { index, item ->
                                     NavigationBarItem(
                                         colors = NavigationBarItemDefaults.colors().copy(
-//                                            selectedIconColor = Color(0xff9A00F7),
-//                                            unselectedIconColor = Color.Black,
                                             selectedIndicatorColor = Color.Transparent
                                         ),
                                         selected = selectedItemIndex == index,
@@ -176,13 +184,9 @@ class MainActivity : ComponentActivity() {
                                             }
 
                                             navController.popBackStack(item.route, inclusive = true)
-//                                            selectedItemIndex = index
                                             navController.navigate(item.route) {
                                                 launchSingleTop
                                             }
-//                                            Log.d(TAG,  "current route: " + navController.currentDestination?.route.toString())
-//                                            Log.d(TAG, "previous route " + navController.currentBackStackEntry?.destination?.route.toString())
-
                                         },
                                         icon = {
                                             Icon(
@@ -202,7 +206,8 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         startDestination = DashboardScreenRoute,
-                        modifier = Modifier.padding(contentPadding)
+                        modifier = if(appState.shouldShowTopBar) Modifier.padding(contentPadding) else Modifier.padding(top = 0.dp)
+
                     ) {
                         composable<LoginScreenRoute> {
                             val authViewModel = hiltViewModel<AuthViewModel>()
@@ -357,7 +362,7 @@ class MainActivity : ComponentActivity() {
 
                         vocabularyFolderGroupScreen(navController = navController)
 
-                        composable<DashboardScreenRoute> {
+                        composable<DashboardScreenRoute>() {
                             val dashboardViewModel = hiltViewModel<DashboardViewModel>()
                             val images by dashboardViewModel.images.collectAsStateWithLifecycle()
                             val imageFolderList by dashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
@@ -389,7 +394,7 @@ class MainActivity : ComponentActivity() {
                             val vocabularyDetailViewModel =
                                 hiltViewModel<VocabularyDetailViewModel>()
                             val engVocab = args.engVocab.lowercase(Locale.ENGLISH)
-                                .replace(Regex("\\p{Punct}"), "")
+                                .replace(Regex("\\p{Punct}"), "").lowercase()
                             LaunchedEffect(key1 = Unit) {
                                 vocabularyDetailViewModel.getVocabulary(engVocab)
                             }

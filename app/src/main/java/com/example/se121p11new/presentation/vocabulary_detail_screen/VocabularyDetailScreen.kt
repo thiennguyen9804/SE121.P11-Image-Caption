@@ -29,10 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.se121p11new.core.presentation.utils.Resource
-import com.example.se121p11new.domain.data.Definition
-import com.example.se121p11new.domain.data.PartOfSpeech
-import com.example.se121p11new.domain.data.PhrasalVerb
-import com.example.se121p11new.domain.data.Vocabulary
+import com.example.se121p11new.data.remote.dto.RealmVocabulary
+//import com.example.se121p11new.domain.data.Definition
+//import com.example.se121p11new.domain.data.PartOfSpeech
+//import com.example.se121p11new.domain.data.PhrasalVerb
+//import com.example.se121p11new.domain.data.Vocabulary
 import com.example.se121p11new.presentation.vocabulary_detail_screen.components.PartOfSpeechText
 import com.example.se121p11new.presentation.vocabulary_detail_screen.components.PhrasalVerbText
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
@@ -40,7 +41,7 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 @Composable
 fun VocabularyDetailScreen(
     engWord: String,
-    vocabulary: Resource<Vocabulary>
+    vocabulary: Resource<RealmVocabulary>
 ) {
     val context = LocalContext.current
     Column(
@@ -116,48 +117,48 @@ private fun VocabularyDetailScreenLoadingPreview() {
     }
 }
 
-@Preview
-@Composable
-private fun VocabularyDetailScreenSuccessPreview() {
-    SE121P11NewTheme {
-        VocabularyDetailScreen(
-            engWord = vocab.engVocab,
-            vocabulary = Resource.Success(vocab)
-        )
-    }
-}
+//@Preview
+//@Composable
+//private fun VocabularyDetailScreenSuccessPreview() {
+//    SE121P11NewTheme {
+//        VocabularyDetailScreen(
+//            engWord = vocab.engVocab,
+//            vocabulary = Resource.Success(vocab)
+//        )
+//    }
+//}
 
-internal val vocab = Vocabulary(
-    "",
-    "learn",
-    "/lə:n/",
-    partOfSpeeches = listOf(
-        PartOfSpeech(
-            partOfSpeech = "ngoại động từ learnt  /lə:nt/",
-            definitions = listOf(
-                Definition(
-                    "nghe thất, được nghe, được biết",
-                    listOf(
-                        "to learn a piece of news from someone: biết tin qua ai"
-                    )
-                ),
-                Definition(
-                    "học, học tập, nghiên cứu",
-                    emptyList()
-                )
-            )
-        ),
-    ),
-    phrasalVerbs = listOf(
-        PhrasalVerb(
-            phrasalVerb = "I am (have) yet to learn",
-            definitions = listOf(
-                Definition(
-                    "tôi chưa biết như thế nào, để còn xem đã",
-                    emptyList()
-                )
-            )
-        )
-    ),
-    vocabularyList = emptyList()
-)
+//internal val vocab = Vocabulary(
+//    "",
+//    "learn",
+//    "/lə:n/",
+//    partOfSpeeches = listOf(
+//        PartOfSpeech(
+//            partOfSpeech = "ngoại động từ learnt  /lə:nt/",
+//            definitions = listOf(
+//                Definition(
+//                    "nghe thất, được nghe, được biết",
+//                    listOf(
+//                        "to learn a piece of news from someone: biết tin qua ai"
+//                    )
+//                ),
+//                Definition(
+//                    "học, học tập, nghiên cứu",
+//                    emptyList()
+//                )
+//            )
+//        ),
+//    ),
+//    phrasalVerbs = listOf(
+//        PhrasalVerb(
+//            phrasalVerb = "I am (have) yet to learn",
+//            definitions = listOf(
+//                Definition(
+//                    "tôi chưa biết như thế nào, để còn xem đã",
+//                    emptyList()
+//                )
+//            )
+//        )
+//    ),
+//    vocabularyList = emptyList()
+//)

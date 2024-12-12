@@ -9,12 +9,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.example.se121p11new.core.presentation.utils.AllSavedVocabularyScreenRoute
+import com.example.se121p11new.core.presentation.utils.VocabularyDetailScreenRoute
 import com.example.se121p11new.core.presentation.utils.VocabularyFolderDashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.VocabularyFolderDetailScreenRoute
 import com.example.se121p11new.core.presentation.utils.VocabularyFolderGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.VocabularyFolderScreenRoute
 import com.example.se121p11new.core.presentation.utils.sharedViewModel
 import com.example.se121p11new.core.presentation.utils.toIdString
+import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
 import com.example.se121p11new.presentation.vocabulary_folder_group_screen.all_saved_vocabulary_screen.AllSavedVocabularyScreen
 import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_dashboard_screen.VocabularyFolderDashboardScreen
 import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabulary_folder_detail_screen.VocabularyFolderDetailScreen
@@ -63,9 +65,9 @@ fun NavGraphBuilder.vocabularyFolderGroupScreen(
             val allVocabularies by sharedViewModel.vocabularyList.collectAsStateWithLifecycle()
             AllSavedVocabularyScreen(
                 vocabularyList = allVocabularies,
-                onVocabularyClick = { folder ->
+                onVocabularyClick = { vocab ->
                     navController.navigate(
-                        VocabularyFolderDetailScreenRoute(folder._id.toIdString())
+                        VocabularyDetailScreenRoute(vocab.engVocab)
                     )
                 },
                 onDeleteVocabulary = sharedViewModel::deleteVocabulary,

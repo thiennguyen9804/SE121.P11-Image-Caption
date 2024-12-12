@@ -87,9 +87,6 @@ fun ImageCaptioningScreen(
     }
 
     val context = LocalContext.current as ComponentActivity
-    LaunchedEffect(key1 = true) {
-        context.enableEdgeToEdge()
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()

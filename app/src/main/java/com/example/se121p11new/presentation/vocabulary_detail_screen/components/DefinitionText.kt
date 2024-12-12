@@ -18,11 +18,12 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.se121p11new.domain.data.Definition
+import com.example.se121p11new.data.remote.dto.RealmDefinition
+//import com.example.se121p11new.domain.data.Definition
 
 @Composable
 fun DefinitionText(
-    definition: Definition,
+    definition: RealmDefinition,
     modifier: Modifier = Modifier
 ) {
     Column(
