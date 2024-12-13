@@ -24,6 +24,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -55,138 +56,66 @@ class VocabularyRepositoryImpl @Inject constructor(
     override suspend fun getVocabularyByEngVocabLocally(
         engVocab: String
     ): Flow<RealmVocabulary?> = channelFlow {
-        localVocabularyDataSource.getVocabularyByEngVocabFromCache(engVocab).map { value ->
-            val res = value.list.toList().firstOrNull()
-            if(res != null) {
-                send(res)
-            } else {
-                localVocabularyDataSource.getVocabularyByEngVocabLocally(engVocab).map { value2 ->
-                    val res2 = value2.list.toList().firstOrNull()
-                    send(res2)
-                }
-            }
-        }.flowOn(Dispatchers.IO)
+//        localVocabularyDataSource.getVocabularyByEngVocabFromCache(engVocab).collectLatest { value ->
+//            val res = value.list.toList().firstOrNull()
+//            Log.d(TAG, "found vocab from local cache: ${res?.engVocab}")
+//            if(res != null) {
+//                send(res)
+//            } else {
+//                localVocabularyDataSource.getVocabularyByEngVocabLocally(engVocab).collectLatest { value2 ->
+//                    val res2 = value2.list.toList().firstOrNull()
+//                    Log.d(TAG, "found vocab from local db: ${res2?.engVocab}")
+//                    send(res2)
+//                }
+//            }
+//        }
+
+        val cachedResult = localVocabularyDataSource.getVocabularyByEngVocabFromCache(engVocab).firstOrNull()?.list?.firstOrNull()
+        if (cachedResult != null) {
+            send(cachedResult) // Gửi giá trị từ cache
+            return@channelFlow
+        }
+
+        // Lấy từ database nếu cache không có
+        val dbResult = localVocabularyDataSource.getVocabularyByEngVocabLocally(engVocab).firstOrNull()?.list?.firstOrNull()
+        send(dbResult) // Gửi giá trị từ database
     }
 
-    override suspend fun deleteVocabularyLocally(vocabulary: Vocabulary) {
-        localVocabularyDataSource.deleteVocabularyLocally(vocabulary)
+    private fun mapVocabTranslateToRealm(engVocab: String): RealmVocabulary {
+        val definition = RealmDefinition().apply {
+            definition = engVocab
+            examples = realmListOf()
+        }
+        val partOfSpeech = RealmPartOfSpeech().apply {
+            partOfSpeech = "từ vựng"
+            definitions = realmListOf(definition)
+        }
+        val realmValue = RealmVocabulary().apply {
+            this@apply.engVocab = engVocab
+            ipa = ""
+            partOfSpeeches = realmListOf(partOfSpeech)
+            phrasalVerbs = realmListOf()
+
+        }
+
+        return realmValue
     }
 
-
-    override suspend fun getVocabularyByEngVocab(
-        engVocab: String,
-    ): Flow<RealmVocabulary> = channelFlow {
+    override suspend fun getVocabularyByEngVocabRemotely(engVocab: String): Flow<RealmVocabulary> = channelFlow {
         try {
-            getVocabularyByEngVocabLocally(engVocab).collect {
-                if(it != null) {
-                    send(it)
-                } else {
-                    return@collect
-                }
-            }
-            remoteVocabularyDataSource.getVocabularyByEngVocab(engVocab).map {
-                it.toRealmVocabulary()
-            }.collectLatest {
-                Log.d(TAG, "found vocab from remote api")
-                send(it)
+            remoteVocabularyDataSource.getVocabularyByEngVocab(engVocab).map { vocab ->
+                vocab.toRealmVocabulary()
+            }.collectLatest { vocab ->
+                send(vocab)
             }
         } catch(e: HttpException) {
             when(e.code()) {
                 404 -> {
                     Log.d(TAG, "cannot found vocab from remote api, calling trans api")
                     val respond = async { remoteImageDataSource.generateVietnameseText(engVocab) }.await()
-                    val definition = RealmDefinition().apply {
-                        definition = respond
-                        examples = realmListOf()
-                    }
-                    val partOfSpeech = RealmPartOfSpeech().apply {
-                        partOfSpeech = "từ vựng"
-                        definitions = realmListOf(definition)
-                    }
-                    val cacheValue = RealmVocabulary().apply {
-                        this@apply.engVocab = engVocab
-                        ipa = ""
-                        partOfSpeeches = realmListOf(partOfSpeech)
-                        phrasalVerbs = realmListOf()
-
-                    }
+                    val cacheValue = mapVocabTranslateToRealm(respond)
                     localVocabularyDataSource.addVocabularyToCache(cacheValue)
-//                    withContext(Dispatchers.IO) {
-//
-//                    }
-//                    val res = DomainVocabulary(
-//                        idString = "",
-//                        engVocab = engVocab,
-//                        ipa = "",
-//                        partOfSpeeches = listOf(
-//                            PartOfSpeech(
-//                                partOfSpeech = "từ vựng",
-//                                definitions = listOf(
-//                                    Definition(
-//                                        definition = respond,
-//                                        examples = emptyList()
-//                                    )
-//                                )
-//                            )
-//                        ),
-//
-//                        phrasalVerbs = emptyList(),
-//                        vocabularyList = emptyList()
-//
-//                    )
                     send(cacheValue)
-
-
-
-
-//                    remoteImageDataSource.generateVietnameseText(engVocab).collectLatest {
-//                        when(it) {
-//                            is Resource.Error -> send(Resource.Error(message = it.message!!))
-//                            is Resource.Loading -> send(Resource.Loading())
-//                            is Resource.Success -> {
-//                                withContext(Dispatchers.IO) {
-//                                    val definition = RealmDefinition().apply {
-//                                        definition = it.data!!
-//                                        examples = realmListOf()
-//                                    }
-//                                    val partOfSpeech = RealmPartOfSpeech().apply {
-//                                        partOfSpeech = "từ vựng"
-//                                        definitions = realmListOf(definition)
-//                                    }
-//                                    val cacheValue = RealmVocabulary().apply {
-//                                        this@apply.engVocab = engVocab
-//                                        ipa = ""
-//                                        partOfSpeeches = realmListOf(partOfSpeech)
-//                                        phrasalVerbs = realmListOf()
-//
-//                                    }
-//                                    localVocabularyDataSource.addVocabularyToCache(cacheValue)
-//                                }
-//
-//                                val res = DomainVocabulary(
-//                                    idString = "",
-//                                    engVocab = engVocab,
-//                                    ipa = "",
-//                                    partOfSpeeches = listOf(
-//                                        PartOfSpeech(
-//                                            partOfSpeech = "từ vựng",
-//                                            definitions = listOf(
-//                                                Definition(
-//                                                    definition = it.data!!,
-//                                                    examples = emptyList()
-//                                                )
-//                                            )
-//                                        )
-//                                    ),
-//
-//                                    phrasalVerbs = emptyList(),
-//                                    vocabularyList = emptyList()
-//
-//                                )
-//                                send(Resource.Success(res))
-//                            }
-//                        }
-//                    }
                 }
                 else -> {
                     throw e
@@ -196,6 +125,24 @@ class VocabularyRepositoryImpl @Inject constructor(
             throw e
         } catch(e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    override suspend fun deleteVocabularyLocally(vocabulary: Vocabulary) {
+        localVocabularyDataSource.deleteVocabularyLocally(vocabulary)
+    }
+
+    override suspend fun getVocabularyByEngVocab(
+        engVocab: String,
+    ): Flow<RealmVocabulary> = channelFlow  {
+        getVocabularyByEngVocabLocally(engVocab).distinctUntilChanged().collectLatest {
+            if(it != null) {
+                send(it)
+            } else {
+                getVocabularyByEngVocabRemotely(engVocab).collectLatest { vocab ->
+                    send(vocab)
+                }
+            }
         }
     }
 

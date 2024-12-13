@@ -113,20 +113,7 @@ class ImageCaptioningViewModel @Inject constructor(
     }
 
     fun saveVocabularyLocally(engVocab: String) {
-
         viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest {
-//                    when (it) {
-//                        is Resource.Error -> {}
-//                        is Resource.Loading -> {}
-//                        is Resource.Success -> {
-//                            vocabularyRepository.addVocabulary(it.data!!.toRealmVocabulary())
-//                        }
-//                    }
-//                }
-//
-//            }
             val toBeSavedVocab = RealmVocabulary().apply {
                 this.engVocab = engVocab
                 this.ipa = ""
@@ -135,7 +122,7 @@ class ImageCaptioningViewModel @Inject constructor(
             }
 
             vocabularyRepository.addVocabulary(toBeSavedVocab)
-            vocabularyRepository.getVocabularyByEngVocab(engVocab).collectLatest {
+            vocabularyRepository.getVocabularyByEngVocabRemotely(engVocab).collectLatest {
                 vocabularyRepository.updateVocabulary(engVocab, it)
             }
         }

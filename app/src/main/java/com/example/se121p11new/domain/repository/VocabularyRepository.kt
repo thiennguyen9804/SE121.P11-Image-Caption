@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.Flow
 interface VocabularyRepository {
     suspend fun addVocabulary(newVocabulary: Vocabulary)
     suspend fun getAllVocabularies(): Flow<List<RealmVocabulary>>
-
     suspend fun getAllVocabulariesAndReturnRealmObject(): Flow<ResultsChange<RealmVocabulary>>
     suspend fun getVocabularyByEngVocabLocally(engVocab: String): Flow<RealmVocabulary?>
+    suspend fun getVocabularyByEngVocabRemotely(engVocab: String): Flow<RealmVocabulary>
     suspend fun deleteVocabularyLocally(vocabulary: Vocabulary)
     suspend fun getVocabularyByEngVocab(engVocab: String): Flow<RealmVocabulary>
     suspend fun clearCache()

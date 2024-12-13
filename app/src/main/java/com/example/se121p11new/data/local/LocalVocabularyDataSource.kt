@@ -21,16 +21,23 @@ class LocalVocabularyDataSource @Inject constructor(
             deleteAll()
         }
     }
-    suspend fun addVocabularyToCache(newVocabulary: Vocabulary) =
-        cache.write {
-            copyToRealm(newVocabulary, UpdatePolicy.ALL)
-        }.asFlow().flowOn(Dispatchers.IO)
+    suspend fun addVocabularyToCache(newVocabulary: Vocabulary) {
+        withContext(Dispatchers.IO) {
+            cache.write {
+                val temp = query<Vocabulary>("engVocab == $0", newVocabulary.engVocab).first().find()
+                if (temp != null) {
+                    return@write
+                }
+                copyToRealm(newVocabulary, UpdatePolicy.ALL)
+            }
+        }
+    }
 
     fun getVocabularyByEngVocabFromCache(engVocab: String) =
-        cache.query<Vocabulary>("engVocab == $0", engVocab).asFlow()
+        cache.query<Vocabulary>("engVocab == $0", engVocab).asFlow().flowOn(Dispatchers.IO)
 
     fun getVocabularyByEngVocabLocally(engVocab: String) =
-        realm.query<Vocabulary>("engVocab == $0", engVocab).asFlow()
+        realm.query<Vocabulary>("engVocab == $0", engVocab).asFlow().flowOn(Dispatchers.IO)
 
     suspend fun addVocabulary(newVocabulary: Vocabulary) {
         withContext(Dispatchers.IO) {
@@ -52,16 +59,10 @@ class LocalVocabularyDataSource @Inject constructor(
                 findLatest(oldVocabulary)!!.partOfSpeeches = newVocabulary.partOfSpeeches
                 findLatest(oldVocabulary)!!.phrasalVerbs = newVocabulary.phrasalVerbs
             }
-//            oldVocabulary.ipa = newVocabulary.ipa
-//            oldVocabulary.partOfSpeeches = newVocabulary.partOfSpeeches
-//            oldVocabulary.phrasalVerbs = newVocabulary.phrasalVerbs
         }
     }
 
     fun getAllVocabularies() = realm.query<Vocabulary>().asFlow()
-
-    fun getVocabularyByEngVocab(engVocab: String) =
-        realm.query<Vocabulary>("engVocab == $0", engVocab).asFlow()
 
     suspend fun deleteVocabularyLocally(vocabulary: Vocabulary) {
         realm.write {
