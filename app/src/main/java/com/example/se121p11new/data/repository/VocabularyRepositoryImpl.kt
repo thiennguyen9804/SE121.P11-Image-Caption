@@ -48,6 +48,12 @@ class VocabularyRepositoryImpl @Inject constructor(
             value.list.toList()
         }.flowOn(Dispatchers.IO)
 
+    override fun getFirstNSavedVocabularies(n: Int): Flow<List<RealmVocabulary>> {
+        return localVocabularyDataSource.getFirstNSavedVocabularies(n).map {
+            it.list.toList()
+        }
+    }
+
     @Deprecated("to be removed before long")
     override suspend fun getAllVocabulariesAndReturnRealmObject(): Flow<ResultsChange<Vocabulary>> {
         return localVocabularyDataSource.getAllVocabularies()

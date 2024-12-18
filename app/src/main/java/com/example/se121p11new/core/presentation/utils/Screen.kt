@@ -90,3 +90,9 @@ object AllSavedVocabularyScreenRoute
 
 @Serializable
 object AllCapturedImagesScreenRoute
+
+@Serializable
+object AuthGroupScreenRoute
+
+@Serializable
+object ProfileScreenRoute

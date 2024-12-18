@@ -1,5 +1,6 @@
 package com.example.se121p11new.presentation.auth_group_screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.google.firebase.auth.AuthCredential
@@ -14,10 +15,12 @@ TODO auth viewmodel sẽ trở thành shared viewmodel cho auth group trong tư�
 */
 @HiltViewModel
 class AuthViewModel @Inject constructor() : ViewModel() {
+    private val TAG = "AuthViewModel"
     private val _userState = MutableStateFlow(SignInState())
     val userState = _userState.asStateFlow()
 
     fun onSignInResult(result: Resource<UserData>) {
+        Log.d(TAG, result.data?.username.toString())
         _userState.update { it.copy(
             isSignInSuccessful = result.data != null,
             signInError = result.message

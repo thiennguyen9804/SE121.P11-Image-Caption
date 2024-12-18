@@ -6,6 +6,7 @@ import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
+import com.example.se121p11new.domain.repository.VocabularyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
-    private val imageFolderRepository: ImageFolderRepository
+    private val imageFolderRepository: ImageFolderRepository,
+    private val vocabularyRepository: VocabularyRepository,
 ) : ViewModel() {
     private val _imageFolderList = MutableStateFlow<List<ImageFolder>>(emptyList())
     val images = imageRepository
@@ -29,6 +31,14 @@ class DashboardViewModel @Inject constructor(
         .map {
             it.list.toList()
         }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
+
+    val vocabularies = vocabularyRepository
+        .getFirstNSavedVocabularies(4)
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

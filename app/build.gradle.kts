@@ -105,13 +105,15 @@ dependencies {
 //    Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    implementation(libs.okhttp)
 
 //    Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.vertexai)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.firestore)
 
 //    ML Kit Translation
     implementation(libs.translate)

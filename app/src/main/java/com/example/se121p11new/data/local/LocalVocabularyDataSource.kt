@@ -64,6 +64,8 @@ class LocalVocabularyDataSource @Inject constructor(
 
     fun getAllVocabularies() = realm.query<Vocabulary>().asFlow()
 
+    fun getFirstNSavedVocabularies(n: Int) = realm.query<Vocabulary>().limit(n).asFlow().flowOn(Dispatchers.IO)
+
     suspend fun deleteVocabularyLocally(vocabulary: Vocabulary) {
         realm.write {
             val res = findLatest(vocabulary) ?: return@write

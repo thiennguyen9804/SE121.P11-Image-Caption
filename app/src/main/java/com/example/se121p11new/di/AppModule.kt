@@ -31,6 +31,9 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.translate.Translate
 import com.google.cloud.translate.TranslateOptions
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.vertexAI
 import dagger.Module
@@ -202,4 +205,12 @@ object AppModule {
         return VocabularyFolderRepositoryImpl(localVocabularyFolderDataSource)
 
     }
+
+    @Provides
+    @Singleton
+    fun provideFirestore(): FirebaseFirestore = Firebase.firestore
+
+    @Provides
+    @Singleton
+    fun provideCloudStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 }

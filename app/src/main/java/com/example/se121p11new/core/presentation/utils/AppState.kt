@@ -19,7 +19,8 @@ class AppState(
 ) {
     private val noDisplayBottomBar = listOf(
         CameraScreenRoute::class.toString().substringAfter("class "),
-        ImageCaptioningScreenRoute::class.toString().substringAfter("class ")
+        ImageCaptioningScreenRoute::class.toString().substringAfter("class "),
+        LoginScreenRoute::class.toString().substringAfter("class "),
     )
     private val noDisplayTopBar = listOf(CameraScreenRoute::class.toString().substringAfter("class "))
     val shouldShowBottomBar: Boolean

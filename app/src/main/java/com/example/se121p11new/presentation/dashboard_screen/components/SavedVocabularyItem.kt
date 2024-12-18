@@ -1,6 +1,7 @@
 package com.example.se121p11new.presentation.dashboard_screen.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,10 +19,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.se121p11new.data.local.realm_object.Vocabulary
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
-fun SavedVocabularyItem() {
+fun SavedVocabularyItem(
+    engVocab: String,
+    vieVocab: String = "",
+    onVocabularyClick: (String) -> Unit
+) {
     Row(
         modifier = Modifier
             .padding(vertical = 10.dp)
@@ -34,13 +40,13 @@ fun SavedVocabularyItem() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row {
-            Text("Expressive", color = Color(0xff9A00F7))
-            Text(" : Ấn tượng")
+            Text(engVocab, color = Color(0xff9A00F7))
+            if(vieVocab.isNotEmpty()) Text(" : $vieVocab")
         }
 
         IconButton(
             onClick = {
-
+                onVocabularyClick(engVocab);
             },
         ) {
             Icon(
@@ -55,6 +61,10 @@ fun SavedVocabularyItem() {
 @Composable
 private fun SavedVocabularyItemPreview() {
     SE121P11NewTheme {
-        SavedVocabularyItem()
+        SavedVocabularyItem(
+            engVocab = "Expressive",
+            vieVocab = "Ấn tượng",
+            onVocabularyClick = {}
+        )
     }
 }

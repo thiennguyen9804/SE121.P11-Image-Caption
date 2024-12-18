@@ -17,27 +17,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -50,13 +43,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.se121p11new.core.presentation.utils.CameraGroupScreenRoute
+import com.example.se121p11new.core.presentation.utils.AuthGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageFolderGroupScreenRoute
+import com.example.se121p11new.core.presentation.utils.ProfileScreenRoute
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
@@ -66,7 +60,6 @@ import com.example.se121p11new.core.presentation.utils.bottomNavItems
 import com.example.se121p11new.core.presentation.utils.getBitmapFromUri
 import com.example.se121p11new.core.presentation.utils.rememberAppState
 import com.example.se121p11new.core.presentation.utils.routeToIndexes
-import com.example.se121p11new.core.presentation.utils.setStatusBarColor
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthClient
@@ -83,6 +76,8 @@ import com.example.se121p11new.presentation.dashboard_screen.DashboardViewModel
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningScreen
 import com.example.se121p11new.presentation.image_captioning_screen.ImageCaptioningViewModel
 import com.example.se121p11new.presentation.image_folder_group_screen.imageFolderGroupScreen
+import com.example.se121p11new.presentation.profile_screen.ProfileScreen
+import com.example.se121p11new.presentation.profile_screen.ProfileViewModel
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailScreen
 import com.example.se121p11new.presentation.vocabulary_detail_screen.VocabularyDetailViewModel
 import com.example.se121p11new.presentation.vocabulary_folder_group_screen.vocabularyFolderGroupScreen
@@ -120,7 +115,7 @@ class MainActivity : ComponentActivity() {
 
     private var providerType = ""
 
-    private val TAG = "NavigationBar"
+    private val TAG = "MainActivity"
 //    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -160,7 +155,7 @@ class MainActivity : ComponentActivity() {
                     selectedItemIndex = routeToIndexes[destination.route] ?: selectedItemIndex
                 }
                 val appState = rememberAppState(navController)
-
+                val authViewModel = hiltViewModel<AuthViewModel>()
 //                Log.d(TAG, appState.shouldShowBottomBar.toString())
                 Scaffold(
                     containerColor = Color.White,
@@ -205,86 +200,133 @@ class MainActivity : ComponentActivity() {
                 ) { contentPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = DashboardScreenRoute,
-                        modifier = if(appState.shouldShowTopBar) Modifier.padding(contentPadding) else Modifier.padding(top = 0.dp)
-
+                        startDestination = AuthGroupScreenRoute,
+                        modifier = if(appState.shouldShowTopBar)
+                            Modifier.padding(contentPadding)
+                        else
+                            Modifier.padding(top = 0.dp)
                     ) {
-                        composable<LoginScreenRoute> {
-                            val authViewModel = hiltViewModel<AuthViewModel>()
-                            val userState by authViewModel.userState.collectAsStateWithLifecycle()
-                            val googleLauncher = getGoogleLauncher(
-                                scope = lifecycleScope,
-                                googleAuthClient = googleAuthClient,
-                                onSignInResult = authViewModel::onSignInResult
-                            )
-                            val callbackManager = remember {
-                                CallbackManager.Factory.create()
-                            }
-                            val facebookLauncher = getFacebookLauncher(
-                                onSignInResult = authViewModel::onSignInResult,
-                                scope = lifecycleScope,
-                                callbackManager = callbackManager,
-                                context = applicationContext,
-                                facebookAuthClient = facebookAuthClient
-                            )
-
-                            LaunchedEffect(key1 = userState.isSignInSuccessful) {
-                                if (userState.isSignInSuccessful) {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "Sign in success",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    authViewModel.resetState()
+                        navigation<AuthGroupScreenRoute>(
+                            startDestination = LoginScreenRoute
+                        ) {
+                            composable<LoginScreenRoute> {
+//                                val authViewModel = it.sharedViewModel<AuthViewModel>(navController = navController)
+                                val userState by authViewModel.userState.collectAsStateWithLifecycle()
+                                val googleLauncher = getGoogleLauncher(
+                                    scope = lifecycleScope,
+                                    googleAuthClient = googleAuthClient,
+                                    onSignInResult = authViewModel::onSignInResult
+                                )
+                                val callbackManager = remember {
+                                    CallbackManager.Factory.create()
                                 }
-                            }
 
-                            LaunchedEffect(key1 = Unit) {
-                                if (authClient.getSignInUser() != null) {
-                                    navController.navigate("profile")
+                                val facebookLauncher = getFacebookLauncher(
+                                    onSignInResult = authViewModel::onSignInResult,
+                                    scope = lifecycleScope,
+                                    callbackManager = callbackManager,
+                                    context = applicationContext,
+                                    facebookAuthClient = facebookAuthClient
+                                )
+
+                                LaunchedEffect(key1 = userState.isSignInSuccessful) {
+                                    Log.d(TAG, "is sign in success: ${userState.isSignInSuccessful}")
+                                    if (userState.isSignInSuccessful) {
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Sign in success",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        navController.navigate(DashboardScreenRoute)
+                                        authViewModel.resetState()
+                                    }
                                 }
+
+                                LaunchedEffect(key1 = Unit) {
+                                    Log.d(TAG, "auth client is not null: ${authClient.getSignInUser() != null}")
+                                    if (authClient.getSignInUser() != null) {
+                                        Log.d(TAG, authClient.getSignInUser().toString())
+                                        navController.navigate(DashboardScreenRoute)
+                                    }
+                                }
+
+                                LoginScreen(
+                                    navigateToSignUp = {
+                                        navController.navigate(SignUpScreenRoute)
+                                    },
+                                    onSignInWithGoogleClick = {
+                                        this@MainActivity.providerType = googleAuthClient.providerType
+                                        lifecycleScope.launch {
+                                            val signInIntentSender =
+                                                googleAuthClient.buildIntentSender()
+                                            googleLauncher.launch(
+                                                IntentSenderRequest.Builder(
+                                                    signInIntentSender ?: return@launch
+                                                ).build()
+                                            )
+                                        }
+                                    },
+                                    onSignInWithFacebookClick = {
+                                        this@MainActivity.providerType = facebookAuthClient.providerType
+                                        facebookLauncher.launch(listOf("public_profile"))
+                                    },
+                                    onSignInWithTwitterClick = {
+                                        this@MainActivity.providerType =
+                                            twitterAuthUiClient.providerType
+                                        lifecycleScope.launch {
+                                            val signInResult =
+                                                twitterAuthUiClient.signInWithPendingResult()
+                                            authViewModel.onSignInResult(signInResult)
+                                        }
+                                    },
+                                    onSignInAnonymouslyClick = {},
+                                    onSignInClick = {}
+                                )
                             }
 
-                            LoginScreen(
-                                navigateToSignUp = {
-                                    navController.navigate(SignUpScreenRoute)
-                                },
-                                onSignInWithGoogleClick = {
-                                    this@MainActivity.providerType = googleAuthClient.providerType
-                                    lifecycleScope.launch {
-                                        val signInIntentSender =
-                                            googleAuthClient.buildIntentSender()
-                                        googleLauncher.launch(
-                                            IntentSenderRequest.Builder(
-                                                signInIntentSender ?: return@launch
-                                            ).build()
-                                        )
-                                    }
-                                },
-                                onSignInWithFacebookClick = {
-                                    this@MainActivity.providerType = facebookAuthClient.providerType
-                                    facebookLauncher.launch(listOf("public_profile"))
-                                },
-                                onSignInWithTwitterClick = {
-                                    this@MainActivity.providerType =
-                                        twitterAuthUiClient.providerType
-                                    lifecycleScope.launch {
-                                        val signInResult =
-                                            twitterAuthUiClient.signInWithPendingResult()
-                                        authViewModel.onSignInResult(signInResult)
-                                    }
-                                },
-                                onSignInAnonymouslyClick = {},
-                                onSignInClick = {}
-                            )
+                            composable<SignUpScreenRoute> {
+//                                val authViewModel = it.sharedViewModel<AuthViewModel>(navController = navController)
+
+                                SignUpScreen(
+                                    navigateToLogin = {
+                                        navController.navigate(LoginScreenRoute)
+                                    },
+                                    signUp = {}
+                                )
+                            }
                         }
 
-                        composable<SignUpScreenRoute> {
-                            SignUpScreen(
-                                navigateToLogin = {
-                                    navController.navigate(LoginScreenRoute)
+                        composable<ProfileScreenRoute> {
+                            LaunchedEffect(key1 = Unit) {
+                                Log.d("ProfileScreenRoute", "user: ${authClient.getSignInUser()}")
+                            }
+                            val userData = authClient.getSignInUser()
+                            val scope = rememberCoroutineScope()
+                            val profileViewModel = hiltViewModel<ProfileViewModel>()
+                            ProfileScreen(
+                                onLogoutClick = {
+                                    scope.launch {
+                                        when(this@MainActivity.providerType) {
+                                            googleAuthClient.providerType -> {
+                                                googleAuthClient.signOut()
+                                            }
+                                            facebookAuthClient.providerType -> {
+                                                facebookAuthClient.signOut()
+                                            }
+                                            else -> {
+                                                authClient.signOut()
+                                            }
+                                        }
+
+                                        navController.navigate(AuthGroupScreenRoute) {
+                                            popUpTo<AuthGroupScreenRoute>()
+                                        }
+                                    }
                                 },
-                                signUp = {}
+                                userData = userData ?: UserData("", "", ""),
+                                onUploadToCloud = {
+                                    profileViewModel.uploadToCloud(userData?.userId ?: "")
+                                }
                             )
                         }
 
@@ -366,6 +408,9 @@ class MainActivity : ComponentActivity() {
                             val dashboardViewModel = hiltViewModel<DashboardViewModel>()
                             val images by dashboardViewModel.images.collectAsStateWithLifecycle()
                             val imageFolderList by dashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
+                            val vocabularies by dashboardViewModel.vocabularies.collectAsStateWithLifecycle()
+//                            val (_, userName, avatarUrl) = authClient.getSignInUser() ?: UserData("", "", "")
+
                             DashboardScreen(
                                 images = images,
                                 onClick = { image ->
@@ -383,12 +428,19 @@ class MainActivity : ComponentActivity() {
                                 onGotoVocabularyFolder = {
                                     navController.navigate(VocabularyFolderGroupScreenRoute)
                                 },
-
+                                vocabularies = vocabularies,
                                 onAddImageToFolder = dashboardViewModel::addImageToFolder,
                                 onRemoveImageOutOfFolder = dashboardViewModel::removeImageOutOfFolder,
+                                onVocabularyClick = { engVocab ->
+                                    navController.navigate(
+                                        VocabularyDetailScreenRoute(engVocab)
+                                    )
+                                },
+//                                userData = ,
+//                                avatarUrl = avatarUrl ?: ""
                             )
                         }
-                        //
+
                         composable<VocabularyDetailScreenRoute> {
                             val args = it.toRoute<VocabularyDetailScreenRoute>()
                             val vocabularyDetailViewModel =

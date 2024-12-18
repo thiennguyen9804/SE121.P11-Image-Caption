@@ -3,10 +3,12 @@ package com.example.se121p11new.core.presentation.utils
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Image
@@ -40,6 +42,12 @@ val bottomNavItems = listOf(
         unselectedIcon = Icons.AutoMirrored.Outlined.LibraryBooks,
         route = VocabularyFolderDashboardScreenRoute
     ),
+    BottomNavItem(
+        selectedIcon = Icons.Default.AccountCircle,
+        unselectedIcon = Icons.Outlined.AccountCircle,
+        route = ProfileScreenRoute
+    ),
+
 )
 
 val routeToIndexes = bottomNavItems.mapIndexed { index, item ->

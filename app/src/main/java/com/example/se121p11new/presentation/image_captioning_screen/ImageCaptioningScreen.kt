@@ -139,7 +139,7 @@ fun ImageCaptioningScreen(
             Spacer(modifier = Modifier.height(10.dp))
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    stringResource(R.string.capture_time_text) + ": ",
+                    stringResource( R.string.capture_time_text) + ": ",
                     fontWeight = FontWeight.Bold
                 )
                 when(capturedTime) {

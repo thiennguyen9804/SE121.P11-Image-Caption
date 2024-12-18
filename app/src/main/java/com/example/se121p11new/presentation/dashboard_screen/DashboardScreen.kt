@@ -1,5 +1,6 @@
 package com.example.se121p11new.presentation.dashboard_screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,13 +37,14 @@ import com.example.se121p11new.core.presentation.components.CircularAvatar
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.presentation.image_folder_group_screen.components.CapturedImageItem
 import com.example.se121p11new.data.local.realm_object.ImageFolder
+import com.example.se121p11new.data.local.realm_object.Vocabulary
+import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.dashboard_screen.components.SavedVocabularyItem
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
 fun DashboardScreen(
     images: List<Image>,
-    modifier: Modifier = Modifier,
     onClick: (Image) -> Unit,
     onDeleteImage: (Image) -> Unit,
     onGoToImageFolder: () -> Unit,
@@ -50,8 +52,12 @@ fun DashboardScreen(
     onAddImageToFolder: (Image, ImageFolder) -> Unit, // khi bấm checkbox để thêm hình ảnh vào thư mục
     onRemoveImageOutOfFolder: (Image, ImageFolder) -> Unit,
     onGotoVocabularyFolder: () -> Unit,
+    vocabularies: List<Vocabulary>,
+    onVocabularyClick: (String) -> Unit,
+    userData: UserData = UserData("", "", "")
 ) {
 
+    val TAG = "DashboardScreen"
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +81,8 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.width(10.dp))
 
             CircularAvatar(
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier.size(50.dp),
+                avatarUrl = userData.profilePictureUrl ?: ""
             )
         }
         Spacer(modifier = Modifier.height(15.dp))
@@ -177,13 +184,33 @@ fun DashboardScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(4) { item ->
-                    SavedVocabularyItem()
+            if(vocabularies.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = stringResource(R.string.no_saved_vocabulary_text),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(vocabularies) { item ->
+//                        val vieText = item?.partOfSpeeches?.get(0)?.definitions?.get(0)?.definition ?: ""
+                        val vieText = try {
+                            item.partOfSpeeches[0].definitions[0].definition
+                        } catch (e: Exception) {
+                            ""
+                        }
 
+                        SavedVocabularyItem(
+                            engVocab = item.engVocab,
+                            vieVocab = vieText,
+                            onVocabularyClick = onVocabularyClick
+                        )
+                    }
+
+                }
             }
         }
     }
@@ -201,7 +228,10 @@ private fun DashboardScreenPreview() {
             allImageFolder = emptyList(),
             onRemoveImageOutOfFolder = {_, _ ->},
             onAddImageToFolder = {_, _ ->},
-            onGotoVocabularyFolder = {}
+            onGotoVocabularyFolder = {},
+            vocabularies = emptyList(),
+            onVocabularyClick = {},
+            userData = UserData("", "", "")
         )
     }
 }
