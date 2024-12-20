@@ -41,19 +41,19 @@ fun NavGraphBuilder.cameraGroupScreen(
         startDestination = CameraScreenRoute
     ) {
         composable<CameraScreenRoute>(
-            enterTransition = {
-                slideIntoContainer(
-                    animationSpec = tween(500, easing = LinearEasing),
-                    towards = AnimatedContentTransitionScope.SlideDirection.Up
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    animationSpec = tween(500, easing = LinearEasing),
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right
-
-                )
-            }
+//            enterTransition = {
+//                slideIntoContainer(
+//                    animationSpec = tween(500, easing = LinearEasing),
+//                    towards = AnimatedContentTransitionScope.SlideDirection.Up
+//                )
+//            },
+//            exitTransition = {
+//                slideOutOfContainer(
+//                    animationSpec = tween(500, easing = LinearEasing),
+//                    towards = AnimatedContentTransitionScope.SlideDirection.Right
+//
+//                )
+//            }
         ) {
             val sharedViewModel = it.sharedViewModel<CameraGroupViewModel>(navController)
             CameraScreen(

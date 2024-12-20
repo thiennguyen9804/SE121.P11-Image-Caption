@@ -23,7 +23,7 @@ class CameraGroupViewModel @Inject constructor() : ViewModel() {
             file.outputStream().use { outputStream ->
                 bitmap.compress(
                     Bitmap.CompressFormat.JPEG,
-                    80,
+                    50,
                     outputStream,
                 )
             }

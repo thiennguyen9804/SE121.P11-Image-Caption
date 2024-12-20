@@ -8,6 +8,10 @@ import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
 import com.example.se121p11new.data.remote.RemoteImageDataSource
 import com.example.se121p11new.domain.repository.ImageRepository
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import io.realm.kotlin.notifications.ObjectChange
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.delay
@@ -21,11 +25,10 @@ class ImageRepositoryImpl @Inject constructor(
     private val remoteImageDataSource: RemoteImageDataSource,
     private val localImageDataSource: LocalImageDataSource,
 ) : ImageRepository {
+
     override suspend fun getImageByUriLocally(uri: Uri): Flow<ResultsChange<Image>> {
         return localImageDataSource.getImageByUri(uri)
     }
-
-
 
     override suspend fun generateEnglishText(image: Bitmap): String {
         return remoteImageDataSource.generateEnglishText(image)
@@ -61,6 +64,22 @@ class ImageRepositoryImpl @Inject constructor(
 
     override suspend fun updateEnglishText(image: RealmImage, newEnglishText: String) {
         localImageDataSource.updateEnglishText(image, newEnglishText)
+    }
+
+    override suspend fun uploadFileToCloud(
+        userId: String,
+        path: String,
+        onCompleteListener: OnCompleteListener<Uri>
+    ) {
+        remoteImageDataSource.uploadFileToCloud(userId, path, onCompleteListener)
+    }
+
+
+    override suspend fun uploadImageToCloud(
+        userId: String,
+        image: HashMap<String, String>
+    ) {
+        remoteImageDataSource.uploadImageToCloud(userId, image)
     }
 
 

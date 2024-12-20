@@ -27,13 +27,10 @@ import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.example.se121p11new.domain.repository.VocabularyFolderRepository
 import com.example.se121p11new.domain.repository.VocabularyRepository
-import com.google.auth.oauth2.GoogleCredentials
-import com.google.cloud.translate.Translate
-import com.google.cloud.translate.TranslateOptions
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
-import com.google.firebase.storage.FirebaseStorage
+//import com.google.firebase.firestore.FirebaseFirestore
+//import com.google.firebase.firestore.firestore
+//import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.vertexAI
 import dagger.Module
@@ -66,8 +63,8 @@ object AppModule {
     @Singleton
     fun provideRemoteImageDataSource(
         generativeModel: GenerativeModel,
-        translate: Translate
-    ): RemoteImageDataSource = RemoteImageDataSource(generativeModel, translate)
+//        translate: Translate
+    ): RemoteImageDataSource = RemoteImageDataSource(generativeModel)
 
 
     @Provides
@@ -108,17 +105,17 @@ object AppModule {
     )
 
 
-    @Provides
-    @Singleton
-    fun provideTranslate(
-        @ApplicationContext context: Context
-    ): Translate =
-        context.resources.openRawResource(R.raw.credentials).use { `is` ->
-            val myCredentials = GoogleCredentials.fromStream(`is`)
-            val translateOptions =
-                TranslateOptions.newBuilder().setCredentials(myCredentials).build()
-            translateOptions.service
-        }
+//    @Provides
+//    @Singleton
+//    fun provideTranslate(
+//        @ApplicationContext context: Context
+//    ): Translate =
+//        context.resources.openRawResource(R.raw.credentials).use { `is` ->
+//            val myCredentials = GoogleCredentials.fromStream(`is`)
+//            val translateOptions =
+//                TranslateOptions.newBuilder().setCredentials(myCredentials).build()
+//            translateOptions.service
+//        }
 
     @Provides
     @Singleton
@@ -206,11 +203,11 @@ object AppModule {
 
     }
 
-    @Provides
-    @Singleton
-    fun provideFirestore(): FirebaseFirestore = Firebase.firestore
-
-    @Provides
-    @Singleton
-    fun provideCloudStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+//    @Provides
+//    @Singleton
+//    fun provideFirestore(): FirebaseFirestore = Firebase.firestore
+//
+//    @Provides
+//    @Singleton
+//    fun provideCloudStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 }

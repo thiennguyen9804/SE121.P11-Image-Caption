@@ -21,6 +21,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,12 +54,16 @@ fun ProfileScreen(
             onClick = {
                 onLogoutClick()
             },
-            modifier = Modifier.align(Alignment.TopEnd)
+            modifier = Modifier.align(Alignment.TopEnd),
+            colors = IconButtonDefaults.iconButtonColors().copy(
+                containerColor = Color(0xFF7E57C2),
+                contentColor = Color.White
+            )
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Logout",
-                tint = Color(0xFF7E57C2) // Màu tím
+//                tint = Color(0xFF7E57C2) // Màu tím
             )
         }
         Column(

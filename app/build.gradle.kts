@@ -45,16 +45,25 @@ android {
         compose = true
     }
 
-    packaging {
-        resources {
-            excludes += "META-INF/INDEX.LIST"
-        }
-    }
+//    packaging {
+//        resources {
+//            excludes += "META-INF/*"
+////            excludes += "META-INF/INDEX.LIST"
+//        }
+//    }
+
+//    configurations {
+//        all {
+//            exclude(group = "com.google.android.gms", module = "play-services-measurement-impl")
+//            exclude(group = "com.google.android.gms", module = "play-services-measurement")
+//        }
+//    }
 }
 
 androidComponents {
     onVariants(selector().withBuildType("release")) {
-        it.packaging.resources.excludes.add("META-INF/INDEX.LIST")
+        it.packaging.resources.excludes.add("META-INF/*")
+//        it.packaging.resources.excludes.add("META-INF/INDEX.LIST")
     }
 }
 
@@ -70,7 +79,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.play.services.auth)
     testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter.v560)
+    testImplementation(libs.junit.jupiter)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -112,8 +121,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.vertexai)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage)
-    implementation(libs.firebase.firestore)
+//    implementation(libs.firebase.firestore)
 
 //    ML Kit Translation
     implementation(libs.translate)
@@ -122,11 +132,11 @@ dependencies {
     implementation(libs.facebook.login)
 
 //    GCP Translation
-    implementation(libs.google.cloud.translate) {
-        exclude(group = "org.apache.httpcomponents")
-        exclude(group = "org.json", module = "json")
-    }
-    annotationProcessor(libs.google.cloud.translate)
+//    implementation(libs.google.cloud.translate) {
+//        exclude(group = "org.apache.httpcomponents")
+//        exclude(group = "org.json", module = "json")
+//    }
+//    kapt(libs.google.cloud.translate)
 
 //    Realm Db
     implementation(libs.library.base)
@@ -142,6 +152,9 @@ dependencies {
 
 //    Kotlinx DateTime
     implementation(libs.kotlinx.datetime)
+
+//    Kotlin BOM
+//    implementation(platform(libs.kotlin.bom))
 
 }
 

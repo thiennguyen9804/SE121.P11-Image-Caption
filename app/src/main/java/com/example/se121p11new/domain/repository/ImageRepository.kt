@@ -5,6 +5,8 @@ import android.net.Uri
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnSuccessListener
 import io.realm.kotlin.notifications.ObjectChange
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.flow.Flow
@@ -20,4 +22,7 @@ interface ImageRepository {
     suspend fun deleteImageLocally(image: Image)
     suspend fun updateVietnameseText(image: RealmImage, newVietnameseText: String)
     suspend fun updateEnglishText(image: RealmImage, newEnglishText: String)
+    suspend fun uploadFileToCloud(userId: String, path: String, onCompleteListener: OnCompleteListener<Uri>)
+    suspend fun uploadImageToCloud(userId: String, image: HashMap<String, String>)
+
 }
