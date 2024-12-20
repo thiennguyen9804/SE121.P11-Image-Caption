@@ -13,4 +13,5 @@ interface ImageFolderRepository {
     suspend fun addImageToFolder(image: Image, folder: ImageFolder)
     suspend fun removeImageOutOfFolder(image: Image, folder: ImageFolder)
     suspend fun deleteFolder(folder: ImageFolder)
+    suspend fun uploadImageFolderToCloud(userId: String, imageFolder: HashMap<String, Any>)
 }

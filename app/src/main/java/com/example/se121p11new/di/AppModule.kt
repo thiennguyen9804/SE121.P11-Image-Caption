@@ -13,6 +13,7 @@ import com.example.se121p11new.data.local.realm_object.RealmImageFolder
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
 import com.example.se121p11new.data.local.realm_object.Vocabulary
 import com.example.se121p11new.data.remote.RemoteImageDataSource
+import com.example.se121p11new.data.remote.RemoteImageFolderDataSource
 import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
 import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.example.se121p11new.data.remote.dto.RealmDefinition
@@ -183,9 +184,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideImageFolderRepository(
-        localImageFolderDataSource: LocalImageFolderDataSource
+        localImageFolderDataSource: LocalImageFolderDataSource,
+        remoteImageFolderDataSource: RemoteImageFolderDataSource
     ): ImageFolderRepository {
-        return ImageFolderRepositoryImpl(localImageFolderDataSource)
+        return ImageFolderRepositoryImpl(localImageFolderDataSource, remoteImageFolderDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoteImageFolderDataSource(): RemoteImageFolderDataSource {
+        return RemoteImageFolderDataSource()
     }
 
     @Provides
