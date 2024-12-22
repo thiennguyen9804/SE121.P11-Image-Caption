@@ -15,4 +15,5 @@ interface VocabularyFolderRepository {
     suspend fun getVocabularyFolderById(id: ObjectId): Flow<ResultsChange<RealmVocabularyFolder>>
     suspend fun addVocabularyToFolder(vocabulary: RealmVocabulary, folder: RealmVocabularyFolder)
     suspend fun removeVocabularyOutOfFolder(vocabulary: RealmVocabulary, folder: RealmVocabularyFolder)
+    suspend fun uploadVocabularyFolder(userId: String, vocabularyFolder: HashMap<String, Any>)
 }

@@ -1,15 +1,17 @@
 package com.example.se121p11new.presentation.profile_screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.se121p11new.core.utils.toFirebaseImage
-import com.example.se121p11new.core.utils.toFirebaseImageFolder
+import com.example.se121p11new.core.utils.toMap
+import com.example.se121p11new.data.remote.dto.RealmVocabulary
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.example.se121p11new.domain.repository.VocabularyFolderRepository
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,24 +25,42 @@ class ProfileViewModel @Inject constructor(
     private val vocabularyRepository: VocabularyRepository,
     private val vocabularyFolderRepository: VocabularyFolderRepository,
 ) : ViewModel() {
-
     private val TAG = "ProfileViewModel"
     fun uploadToCloud(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-//            uploadImageToCloud(userId)
-//            uploadImageFolderToCloud(userId)
-            uploadVocabulary(userId)
+            async { uploadImageToCloud(userId)}.await()
+            async {uploadImageFolderToCloud(userId)}.await()
+            async {uploadVocabulary(userId)}.await()
+            async {uploadVocabularyFolder(userId)}.await()
+        }
+    }
+
+    private suspend fun uploadVocabularyFolder(userId: String) {
+        vocabularyFolderRepository.getAllFoldersLocally().map {
+            it.list.toList().map { folder ->
+                folder.toMap()
+            }
+        }.collect { allFolder ->
+            allFolder.forEach { folder ->
+                vocabularyFolderRepository.uploadVocabularyFolder(userId, folder)
+            }
         }
     }
 
     private suspend fun uploadVocabulary(userId: String) {
-
+        vocabularyRepository.getAllVocabularies().map {
+            it.map(RealmVocabulary::toMap)
+        }.collect {
+            it.forEach { item ->
+                vocabularyRepository.uploadVocabulary(userId, item)
+            }
+        }
     }
 
     private suspend fun uploadImageFolderToCloud(userId: String) {
         imageFolderRepository.getAllFoldersLocally().map {
             it.list.toList().map { imageFolder ->
-                imageFolder.toFirebaseImageFolder()
+                imageFolder.toMap()
             }
         }.collect { allImageFolder ->
             allImageFolder.forEach { imageFolder ->
@@ -52,7 +72,7 @@ class ProfileViewModel @Inject constructor(
     private suspend fun uploadImageToCloud(userId: String) {
         imageRepository.getAllImagesLocally().map {
             it.list.toList().map { image ->
-                image.toFirebaseImage()
+                image.toMap()
             }
         }.collect { allImage ->
             allImage.forEach {

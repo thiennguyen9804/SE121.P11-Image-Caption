@@ -3,6 +3,7 @@ package com.example.se121p11new.data.repository
 import com.example.se121p11new.data.local.LocalVocabularyFolderDataSource
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
 import com.example.se121p11new.data.local.realm_object.VocabularyFolder
+import com.example.se121p11new.data.remote.RemoteVocabularyFolderDataSource
 //import com.example.se121p11new.data.remote.dto.DomainVocabulary
 import com.example.se121p11new.data.remote.dto.RealmVocabulary
 //import com.example.se121p11new.domain.data.DomainVocabularyFolder
@@ -13,7 +14,8 @@ import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
 class VocabularyFolderRepositoryImpl @Inject constructor(
-    private val localVocabularyFolderDataSource: LocalVocabularyFolderDataSource
+    private val localVocabularyFolderDataSource: LocalVocabularyFolderDataSource,
+    private val remoteVocabularyFolderDataSource: RemoteVocabularyFolderDataSource,
 ) : VocabularyFolderRepository {
     override suspend fun getAllFoldersLocally(): Flow<ResultsChange<VocabularyFolder>> {
         return localVocabularyFolderDataSource.getAllImageFolder()
@@ -39,6 +41,13 @@ class VocabularyFolderRepositoryImpl @Inject constructor(
         folder: RealmVocabularyFolder
     ) {
         localVocabularyFolderDataSource.removeVocabularyOutOfFolder(vocabulary, folder)
+    }
+
+    override suspend fun uploadVocabularyFolder(
+        userId: String,
+        vocabularyFolder: HashMap<String, Any>
+    ) {
+        remoteVocabularyFolderDataSource.uploadVocabularyFolderToCloud(userId, vocabularyFolder)
     }
 
 

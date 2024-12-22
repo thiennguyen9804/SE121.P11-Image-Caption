@@ -20,4 +20,5 @@ interface VocabularyRepository {
     suspend fun getVocabularyByEngVocab(engVocab: String): Flow<RealmVocabulary>
     suspend fun clearCache()
     suspend fun updateVocabulary(engVocab: String, newVocabulary: Vocabulary)
+    suspend fun uploadVocabulary(userId: String, vocabulary: HashMap<String, Any>)
 }

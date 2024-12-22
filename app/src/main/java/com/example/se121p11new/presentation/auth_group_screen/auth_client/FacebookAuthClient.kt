@@ -9,6 +9,7 @@ import com.facebook.login.LoginManager
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
 class FacebookAuthClient : AuthClient() {
@@ -18,11 +19,19 @@ class FacebookAuthClient : AuthClient() {
         val signInResult = super.signInFromCredential(credential)
         val user = auth.currentUser
         Log.d(TAG, user!!.displayName.toString())
-        val url = buildPictureUrl(user.photoUrl.toString())
-        val profileUpdates = userProfileChangeRequest {
-            photoUri = Uri.parse(url)
+        if(!user.photoUrl.toString().contains("access_token")) {
+            try {
+                val url = buildPictureUrl(user.photoUrl.toString())
+                val profileUpdates = userProfileChangeRequest {
+                    photoUri = Uri.parse(url)
+                }
+                user.updateProfile(profileUpdates)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
-        user.updateProfile(profileUpdates).await()
         return signInResult
     }
 

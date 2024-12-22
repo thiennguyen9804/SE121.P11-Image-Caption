@@ -123,6 +123,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage)
+    implementation(libs.play.services.identity.credentials)
+
 //    implementation(libs.firebase.firestore)
 
 //    ML Kit Translation

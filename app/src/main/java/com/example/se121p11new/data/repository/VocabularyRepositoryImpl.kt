@@ -152,13 +152,16 @@ class VocabularyRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun clearCache() {
         localVocabularyDataSource.clearCache()
     }
 
     override suspend fun updateVocabulary(engVocab: String, newVocabulary: Vocabulary) {
         localVocabularyDataSource.updateVocabulary(engVocab, newVocabulary)
+    }
+
+    override suspend fun uploadVocabulary(userId: String, vocabulary: HashMap<String, Any>) {
+        remoteVocabularyDataSource.uploadVocabulary(userId, vocabulary)
     }
 
 

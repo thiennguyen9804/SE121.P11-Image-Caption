@@ -15,6 +15,7 @@ import com.example.se121p11new.data.local.realm_object.Vocabulary
 import com.example.se121p11new.data.remote.RemoteImageDataSource
 import com.example.se121p11new.data.remote.RemoteImageFolderDataSource
 import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
+import com.example.se121p11new.data.remote.RemoteVocabularyFolderDataSource
 import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.example.se121p11new.data.remote.dto.RealmDefinition
 import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
@@ -205,10 +206,17 @@ object AppModule {
     @Provides
     @Singleton
     fun provideVocabularyFolderRepository(
-        localVocabularyFolderDataSource: LocalVocabularyFolderDataSource
+        localVocabularyFolderDataSource: LocalVocabularyFolderDataSource,
+        remoteVocabularyFolderDataSource: RemoteVocabularyFolderDataSource
     ): VocabularyFolderRepository {
-        return VocabularyFolderRepositoryImpl(localVocabularyFolderDataSource)
+        return VocabularyFolderRepositoryImpl(localVocabularyFolderDataSource, remoteVocabularyFolderDataSource)
 
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoteVocabularyFolderDataSource(): RemoteVocabularyFolderDataSource {
+        return RemoteVocabularyFolderDataSource()
     }
 
 //    @Provides
