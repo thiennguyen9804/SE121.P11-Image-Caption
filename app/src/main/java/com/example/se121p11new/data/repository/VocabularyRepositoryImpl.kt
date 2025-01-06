@@ -1,11 +1,10 @@
 package com.example.se121p11new.data.repository
 
 import android.util.Log
-import com.example.se121p11new.core.presentation.utils.Resource
-import com.example.se121p11new.data.local.LocalVocabularyDataSource
+import com.example.se121p11new.data.source.LocalVocabularyDataSource
 import com.example.se121p11new.data.local.realm_object.Vocabulary
-import com.example.se121p11new.data.remote.RemoteImageDataSource
-import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
+import com.example.se121p11new.data.source.RemoteImageDataSource
+import com.example.se121p11new.data.source.RemoteVocabularyDataSource
 //import com.example.se121p11new.data.remote.dto.DomainVocabulary
 import com.example.se121p11new.data.remote.dto.RealmDefinition
 import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
@@ -15,9 +14,7 @@ import com.example.se121p11new.data.remote.dto.RealmVocabulary
 //import com.example.se121p11new.domain.data.PartOfSpeech
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.notifications.InitialResults
 import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.notifications.UpdatedResults
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -26,10 +23,8 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import javax.inject.Inject
 
@@ -101,7 +96,6 @@ class VocabularyRepositoryImpl @Inject constructor(
             ipa = ""
             partOfSpeeches = realmListOf(partOfSpeech)
             phrasalVerbs = realmListOf()
-
         }
 
         return realmValue

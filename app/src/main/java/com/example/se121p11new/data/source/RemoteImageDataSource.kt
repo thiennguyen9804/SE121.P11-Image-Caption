@@ -1,30 +1,29 @@
-package com.example.se121p11new.data.remote
+package com.example.se121p11new.data.source
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import com.example.se121p11new.core.data.PromptConstants
-import com.example.se121p11new.core.presentation.utils.Resource
-import com.facebook.internal.WebDialog
+import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 //import com.google.cloud.translate.Translate
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.type.content
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import java.io.File
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class RemoteImageDataSource @Inject constructor(
     private val generativeModel: GenerativeModel,
+    private val api: VocabularyApi,
 //    private val translate: Translate
 ) {
+    private val TAG = "RemoteImageDataSource"
     private val fireStoreDb: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     suspend fun generateEnglishText(bitmap: Bitmap): String {
@@ -41,16 +40,27 @@ class RemoteImageDataSource @Inject constructor(
     }
 
     suspend fun generateVietnameseText(englishText: String): String {
-//        return withContext(Dispatchers.IO) {
-//            val translated = translate.translate(
-//                englishText,
-//                Translate.TranslateOption.targetLanguage("vi"),
-//                Translate.TranslateOption.model("base")
-//            )
-//            return@withContext translated.translatedText!!
-//        }
-        delay(500)
-        return "Kiểm thử"
+        try {
+//            delay(3000)
+//            Log.d(TAG, englishText)
+//            return "Kiểm thử"
+            val response = api.translate(englishText)
+            val result = response.result
+            Log.d(TAG, "translate result: $result")
+            return result
+        } catch(e: HttpException) {
+            Log.e(TAG, e.code().toString())
+            return ""
+        } catch(e: CancellationException) {
+            throw e
+        } catch(e: Exception) {
+
+            e.printStackTrace()
+        }
+
+        return "Đang xây dựng!!!"
+//        delay(500)
+//        return "Kiểm thử"
     }
 
     suspend fun uploadFileToCloud(

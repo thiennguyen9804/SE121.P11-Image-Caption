@@ -1,10 +1,10 @@
 package com.example.se121p11new.data.repository
 
-import com.example.se121p11new.data.local.LocalImageFolderDataSource
+import com.example.se121p11new.data.source.LocalImageFolderDataSource
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.ImageFolder
 import com.example.se121p11new.data.local.realm_object.RealmImageFolder
-import com.example.se121p11new.data.remote.RemoteImageFolderDataSource
+import com.example.se121p11new.data.source.RemoteImageFolderDataSource
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.flow.Flow

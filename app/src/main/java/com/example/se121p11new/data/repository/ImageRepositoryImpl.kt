@@ -2,23 +2,14 @@ package com.example.se121p11new.data.repository
 
 import android.graphics.Bitmap
 import android.net.Uri
-import com.example.se121p11new.core.presentation.utils.Resource
-import com.example.se121p11new.data.local.LocalImageDataSource
+import com.example.se121p11new.data.source.LocalImageDataSource
 import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
-import com.example.se121p11new.data.remote.RemoteImageDataSource
+import com.example.se121p11new.data.source.RemoteImageDataSource
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import io.realm.kotlin.notifications.ObjectChange
 import io.realm.kotlin.notifications.ResultsChange
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject constructor(

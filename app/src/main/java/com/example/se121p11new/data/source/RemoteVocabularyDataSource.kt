@@ -1,9 +1,7 @@
-package com.example.se121p11new.data.remote
+package com.example.se121p11new.data.source
 
 import android.util.Log
-import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.data.remote.api.VocabularyApi
-import com.example.se121p11new.data.remote.dto.VocabularyDto
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +41,8 @@ class RemoteVocabularyDataSource @Inject constructor (
             e.printStackTrace()
         }
     }
+
+
 
     suspend fun uploadVocabulary(userId: String, vocabulary: HashMap<String, Any>) {
         withContext(Dispatchers.IO) {

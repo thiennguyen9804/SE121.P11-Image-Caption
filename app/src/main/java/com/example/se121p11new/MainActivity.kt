@@ -157,7 +157,6 @@ class MainActivity : ComponentActivity() {
                 }
                 val appState = rememberAppState(navController)
                 val authViewModel = hiltViewModel<AuthViewModel>()
-//                Log.d(TAG, appState.shouldShowBottomBar.toString())
                 Scaffold(
                     containerColor = Color.White,
                     contentColor = Color.Black,
@@ -211,7 +210,6 @@ class MainActivity : ComponentActivity() {
                             startDestination = LoginScreenRoute
                         ) {
                             composable<LoginScreenRoute> {
-//                                val authViewModel = it.sharedViewModel<AuthViewModel>(navController = navController)
                                 val userState by authViewModel.userState.collectAsStateWithLifecycle()
                                 val googleLauncher = getGoogleLauncher(
                                     scope = lifecycleScope,

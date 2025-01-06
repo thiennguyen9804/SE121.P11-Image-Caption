@@ -1,21 +1,12 @@
 package com.example.se121p11new.di
 
-import android.content.Context
-import com.example.se121p11new.R
+//import com.google.firebase.firestore.FirebaseFirestore
+//import com.google.firebase.firestore.firestore
+//import com.google.firebase.storage.FirebaseStorage
 import com.example.se121p11new.core.data.AppConstants
-import com.example.se121p11new.data.local.LocalImageDataSource
-import com.example.se121p11new.data.local.LocalImageFolderDataSource
-import com.example.se121p11new.data.local.LocalVocabularyDataSource
-import com.example.se121p11new.data.local.LocalVocabularyFolderDataSource
-import com.example.se121p11new.data.local.realm_object.Image
 import com.example.se121p11new.data.local.realm_object.RealmImage
 import com.example.se121p11new.data.local.realm_object.RealmImageFolder
 import com.example.se121p11new.data.local.realm_object.RealmVocabularyFolder
-import com.example.se121p11new.data.local.realm_object.Vocabulary
-import com.example.se121p11new.data.remote.RemoteImageDataSource
-import com.example.se121p11new.data.remote.RemoteImageFolderDataSource
-import com.example.se121p11new.data.remote.RemoteVocabularyDataSource
-import com.example.se121p11new.data.remote.RemoteVocabularyFolderDataSource
 import com.example.se121p11new.data.remote.api.VocabularyApi
 import com.example.se121p11new.data.remote.dto.RealmDefinition
 import com.example.se121p11new.data.remote.dto.RealmPartOfSpeech
@@ -25,20 +16,25 @@ import com.example.se121p11new.data.repository.ImageFolderRepositoryImpl
 import com.example.se121p11new.data.repository.ImageRepositoryImpl
 import com.example.se121p11new.data.repository.VocabularyFolderRepositoryImpl
 import com.example.se121p11new.data.repository.VocabularyRepositoryImpl
+import com.example.se121p11new.data.source.LocalImageDataSource
+import com.example.se121p11new.data.source.LocalImageFolderDataSource
+import com.example.se121p11new.data.source.LocalVocabularyDataSource
+import com.example.se121p11new.data.source.LocalVocabularyFolderDataSource
+import com.example.se121p11new.data.source.RemoteImageDataSource
+import com.example.se121p11new.data.source.RemoteImageFolderDataSource
+import com.example.se121p11new.data.source.RemoteVocabularyDataSource
+import com.example.se121p11new.data.source.RemoteVocabularyFolderDataSource
 import com.example.se121p11new.domain.repository.ImageFolderRepository
 import com.example.se121p11new.domain.repository.ImageRepository
 import com.example.se121p11new.domain.repository.VocabularyFolderRepository
 import com.example.se121p11new.domain.repository.VocabularyRepository
 import com.google.firebase.Firebase
-//import com.google.firebase.firestore.FirebaseFirestore
-//import com.google.firebase.firestore.firestore
-//import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.vertexai.GenerativeModel
 import com.google.firebase.vertexai.vertexAI
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
@@ -48,6 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -65,8 +62,9 @@ object AppModule {
     @Singleton
     fun provideRemoteImageDataSource(
         generativeModel: GenerativeModel,
+        api: VocabularyApi
 //        translate: Translate
-    ): RemoteImageDataSource = RemoteImageDataSource(generativeModel)
+    ): RemoteImageDataSource = RemoteImageDataSource(generativeModel, api)
 
 
     @Provides
@@ -168,9 +166,12 @@ object AppModule {
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build()
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
         return Retrofit.Builder()
-            .baseUrl(AppConstants.VOCABULARY_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(AppConstants.API)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(client)
             .build()
             .create(VocabularyApi::class.java)
