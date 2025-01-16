@@ -6,4 +6,5 @@ object AppConstants {
     const val API = "https://se121-p11-backend.onrender.com/"
     const val VOCABULARY_URL = "${API}/vocabulary"
     const val TRANSLATE_URL = "${API}/translate"
+    const val DEFAULT_AVATAR = "https://firebasestorage.googleapis.com/v0/b/se121p11.firebasestorage.app/o/util%2Fempty_avatar.png?alt=media&token=6f33a058-ae55-4aea-a5fd-e4957f4f4cb0"
 }

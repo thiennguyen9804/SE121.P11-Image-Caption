@@ -19,7 +19,6 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -48,6 +47,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.se121p11new.core.presentation.utils.AuthGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.DashboardScreenRoute
+import com.example.se121p11new.core.presentation.utils.ForgetPasswordEmailEnterScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageCaptioningScreenRoute
 import com.example.se121p11new.core.presentation.utils.ImageFolderGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.ProfileScreenRoute
@@ -63,9 +63,11 @@ import com.example.se121p11new.core.presentation.utils.routeToIndexes
 import com.example.se121p11new.presentation.auth_group_screen.AuthViewModel
 import com.example.se121p11new.presentation.auth_group_screen.UserData
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.AuthClient
+import com.example.se121p11new.presentation.auth_group_screen.auth_client.EmailAuthClient
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.FacebookAuthClient
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.GoogleAuthClient
 import com.example.se121p11new.presentation.auth_group_screen.auth_client.TwitterAuthUiClient
+import com.example.se121p11new.presentation.auth_group_screen.forget_password_email_enter_screen.ForgetPasswordEmailEnterScreen
 import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
 import com.example.se121p11new.presentation.auth_group_screen.sign_up_screen.SignUpScreen
 import com.example.se121p11new.presentation.camera_group_screen.cameraGroupScreen
@@ -111,6 +113,10 @@ class MainActivity : ComponentActivity() {
         TwitterAuthUiClient(this)
     }
 
+    private val emailAuthClient by lazy {
+        EmailAuthClient()
+    }
+
     private var authClient = AuthClient()
 
     private var providerType = ""
@@ -118,7 +124,6 @@ class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
 //    private lateinit var imageCaptioningViewModel: ImageCaptioningViewModel
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,7 +157,7 @@ class MainActivity : ComponentActivity() {
 
 
                 navController = rememberNavController()
-                navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                navController.addOnDestinationChangedListener { _, destination, _ ->
                     selectedItemIndex = routeToIndexes[destination.route] ?: selectedItemIndex
                 }
                 val appState = rememberAppState(navController)
@@ -279,18 +284,76 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     onSignInAnonymouslyClick = {},
-                                    onSignInClick = {}
+                                    onSignInClick = { email, password ->
+                                        lifecycleScope.launch {
+                                            val signInResult =
+                                                emailAuthClient.signInWithEmail(email, password)
+                                            authViewModel.onSignInResult(signInResult)
+                                        }
+                                    },
+                                    onForgetPasswordClick = {
+                                        navController.navigate(ForgetPasswordEmailEnterScreenRoute) {
+                                            popUpToRouteObject
+                                        }
+                                    }
                                 )
                             }
 
                             composable<SignUpScreenRoute> {
+                                val userState by authViewModel.userState.collectAsStateWithLifecycle()
 //                                val authViewModel = it.sharedViewModel<AuthViewModel>(navController = navController)
+                                LaunchedEffect(key1 = userState.isSignInSuccessful) {
+                                    Log.d(TAG, "is sign up success: ${userState.isSignInSuccessful}")
+                                    if (userState.isSignInSuccessful) {
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Sign up success",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        navController.navigate(DashboardScreenRoute)
+                                        authViewModel.resetState()
+                                    }
+                                }
 
+                                LaunchedEffect(key1 = Unit) {
+                                    Log.d(TAG, "auth client is not null: ${authClient.getSignInUser() != null}")
+                                    if (authClient.getSignInUser() != null) {
+                                        Log.d(TAG, authClient.getSignInUser().toString())
+                                        navController.navigate(DashboardScreenRoute)
+                                    }
+                                }
                                 SignUpScreen(
                                     navigateToLogin = {
-                                        navController.navigate(LoginScreenRoute)
+                                        navController.navigate(LoginScreenRoute) {
+                                            popUpToRouteObject
+                                        }
                                     },
-                                    signUp = {}
+                                    signUp = { email, password, username ->
+                                        lifecycleScope.launch {
+                                            val signUpResult =
+                                                emailAuthClient.signUp(email, password, username)
+                                            authViewModel.onSignInResult(signUpResult)
+                                        }
+                                    }
+                                )
+                            }
+
+                            composable<ForgetPasswordEmailEnterScreenRoute> {
+                                ForgetPasswordEmailEnterScreen(
+                                    onResetPasswordClick = { email ->
+                                        authClient.sendPasswordResetEmail(
+                                            onCompleteListener = { task ->
+                                                if (task.isSuccessful) {
+                                                    Toast.makeText(
+                                                        applicationContext,
+                                                        "Đã gửi email thành công!!!",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
+                                            },
+                                            email = email
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -409,7 +472,7 @@ class MainActivity : ComponentActivity() {
                             val imageFolderList by dashboardViewModel.imageFolderList.collectAsStateWithLifecycle()
                             val vocabularies by dashboardViewModel.vocabularies.collectAsStateWithLifecycle()
 //                            val (_, userName, avatarUrl) = authClient.getSignInUser() ?: UserData("", "", "")
-
+                            val userData = authClient.getSignInUser()
                             DashboardScreen(
                                 images = images,
                                 onClick = { image ->
@@ -435,7 +498,7 @@ class MainActivity : ComponentActivity() {
                                         VocabularyDetailScreenRoute(engVocab)
                                     )
                                 },
-//                                userData = ,
+                                userData = userData!!,
 //                                avatarUrl = avatarUrl ?: ""
                             )
                         }

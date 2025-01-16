@@ -96,3 +96,6 @@ object AuthGroupScreenRoute
 
 @Serializable
 object ProfileScreenRoute
+
+@Serializable
+object ForgetPasswordEmailEnterScreenRoute

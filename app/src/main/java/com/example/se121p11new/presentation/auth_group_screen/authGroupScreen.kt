@@ -1,26 +1,10 @@
 package com.example.se121p11new.presentation.auth_group_screen
 
-import android.widget.Toast
-import androidx.activity.result.IntentSenderRequest
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.se121p11new.core.presentation.utils.AuthGroupScreenRoute
 import com.example.se121p11new.core.presentation.utils.LoginScreenRoute
-import com.example.se121p11new.core.presentation.utils.SignUpScreenRoute
-import com.example.se121p11new.getFacebookLauncher
-import com.example.se121p11new.getGoogleLauncher
-import com.example.se121p11new.presentation.auth_group_screen.login_screen.LoginScreen
-import com.facebook.CallbackManager
-import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.authGroupScreen(
     navController: NavHostController,

@@ -2,9 +2,6 @@
 
 package com.example.se121p11new.presentation.auth_group_screen.login_screen
 
-import android.app.Activity.RESULT_OK
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +18,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -47,13 +46,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import com.example.se121p11new.R
 import com.example.se121p11new.core.presentation.components.AuthScreenImage
 import com.example.se121p11new.core.presentation.components.SignInWithButton
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
-import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -62,9 +58,10 @@ fun LoginScreen(
     onSignInWithFacebookClick: () -> Unit,
     onSignInWithTwitterClick: () -> Unit,
     onSignInAnonymouslyClick: () -> Unit,
-    onSignInClick: () -> Unit
+    onSignInClick: (email: String, password: String) -> Unit,
+    onForgetPasswordClick: () -> Unit,
 ) {
-    var loginName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var checked by remember { mutableStateOf(false) }
 
@@ -117,10 +114,10 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
-                value = loginName,
-                onValueChange = { loginName = it },
+                value = email,
+                onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = {Text(stringResource(R.string.sign_in_name_text))},
+                label = {Text("Email")},
             )
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
@@ -134,25 +131,44 @@ fun LoginScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(0.dp)
+                    .padding(0.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
-                    Checkbox(
-                        checked = checked,
-                        onCheckedChange = {
-                            checked = it
-                        }
+                Row {
+                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = {
+                                checked = it
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = stringResource(R.string.remember_me_text),
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                    text = stringResource(R.string.remember_me_text),
-                    fontWeight = FontWeight.SemiBold
-                )
+
+                TextButton(
+                    onClick = onForgetPasswordClick,
+                    colors = ButtonDefaults.textButtonColors().copy(
+                        contentColor = Color(0xff651A93)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.forget_password_text),
+
+                    )
+                }
+
             }
             Spacer(modifier = Modifier.height(15.dp))
             Button(
-                onClick = onSignInClick,
+                onClick = {
+                    onSignInClick(email, password)
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xff616AE5)
                 )
@@ -208,7 +224,8 @@ private fun LoginScreenPreview() {
             onSignInWithFacebookClick = { },
             onSignInWithTwitterClick = { },
             onSignInAnonymouslyClick = { },
-            onSignInClick = { },
+            onSignInClick = { _, _ -> },
+            onForgetPasswordClick = {}
         )
     }
 }

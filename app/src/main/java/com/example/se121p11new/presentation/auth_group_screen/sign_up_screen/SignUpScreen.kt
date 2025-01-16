@@ -1,5 +1,6 @@
 package com.example.se121p11new.presentation.auth_group_screen.sign_up_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -25,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -42,8 +46,10 @@ import com.example.se121p11new.ui.theme.SE121P11NewTheme
 @Composable
 fun SignUpScreen(
     navigateToLogin: () -> Unit,
-    signUp: () -> Unit
+    signUp: (email: String, password: String, username: String, ) -> Unit
 ) {
+    val context = LocalContext.current
+    var email by remember { mutableStateOf("") }
     var loginName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
@@ -63,7 +69,8 @@ fun SignUpScreen(
                     topEnd = 25.dp,
                 ))
                 .background(Color.White)
-                .padding(horizontal = 20.dp, vertical = 30.dp),
+                .padding(horizontal = 20.dp, vertical = 30.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -94,6 +101,13 @@ fun SignUpScreen(
             }
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = {Text("Email")},
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedTextField(
                 value = loginName,
                 onValueChange = { loginName = it },
                 modifier = Modifier.fillMaxWidth(),
@@ -118,7 +132,30 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(15.dp))
             Spacer(modifier = Modifier.height(15.dp))
             Button(
-                onClick = { signUp() },
+                onClick = {
+                    if(email.isEmpty() || loginName.isEmpty() || password.isEmpty() || passwordConfirm.isEmpty()) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.all_fields_must_be_filled),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if(password != passwordConfirm) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.two_passwords_must_be_the_same),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+
+                    signUp(email, password, loginName)
+//                    email = ""
+//                    loginName = ""
+//                    password = ""
+//                    passwordConfirm = ""
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xff616AE5)
                 )
@@ -165,13 +202,12 @@ fun SignUpScreen(
 }
 
 @Preview
-@Preview
 @Composable
 private fun SignUpScreenPreview() {
     SE121P11NewTheme {
         SignUpScreen(
             navigateToLogin = { },
-            signUp = { },
+            signUp = { _, _, _ -> },
         )
     }
 }

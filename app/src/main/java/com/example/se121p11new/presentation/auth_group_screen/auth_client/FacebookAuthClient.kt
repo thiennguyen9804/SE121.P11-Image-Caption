@@ -14,6 +14,7 @@ import kotlinx.coroutines.tasks.await
 
 class FacebookAuthClient : AuthClient() {
     private val TAG = "FacebookAuthClient"
+
     suspend fun handleFacebookAccessToken(token: AccessToken): Resource<UserData> {
         val credential = FacebookAuthProvider.getCredential(token.token)
         val signInResult = super.signInFromCredential(credential)

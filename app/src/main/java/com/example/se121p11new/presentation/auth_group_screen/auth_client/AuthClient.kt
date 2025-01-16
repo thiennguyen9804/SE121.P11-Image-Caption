@@ -1,8 +1,10 @@
 package com.example.se121p11new.presentation.auth_group_screen.auth_client
 
 //import com.example.se121p11new.presentation.SignInResult
+import android.util.Log
 import com.example.se121p11new.core.presentation.utils.Resource
 import com.example.se121p11new.presentation.auth_group_screen.UserData
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.auth
@@ -13,6 +15,10 @@ open class AuthClient {
     protected val auth = Firebase.auth
     open var providerType: String = "None"
     open var credential: AuthCredential? = null
+
+    init {
+        auth.setLanguageCode("vi")
+    }
 
     open suspend fun signOut() {
         auth.signOut()
@@ -49,5 +55,13 @@ open class AuthClient {
                 message = e.message ?: "Unknown error"
             )
         }
+    }
+
+    fun sendPasswordResetEmail(
+        email: String,
+        onCompleteListener: (task: Task<Void>) -> Unit
+    ) {
+        auth.sendPasswordResetEmail(email).addOnCompleteListener(onCompleteListener)
+
     }
 }

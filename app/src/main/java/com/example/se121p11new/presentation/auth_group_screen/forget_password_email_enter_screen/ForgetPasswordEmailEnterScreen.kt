@@ -51,7 +51,9 @@ import com.example.se121p11new.core.presentation.components.SignInWithButton
 import com.example.se121p11new.ui.theme.SE121P11NewTheme
 
 @Composable
-fun ForgetPasswordEmailEnterScreen() {
+fun ForgetPasswordEmailEnterScreen(
+    onResetPasswordClick: (email: String) -> Unit
+) {
     var email by remember { mutableStateOf("") }
     Box(modifier = Modifier.fillMaxSize()) {
         AuthScreenImage()
@@ -122,11 +124,12 @@ fun ForgetPasswordEmailEnterScreen() {
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = {Text(stringResource(R.string.email_text))},
-                visualTransformation = PasswordVisualTransformation()
             )
             Spacer(modifier = Modifier.height(15.dp))
             Button(
-                onClick = {  },
+                onClick = {
+                    onResetPasswordClick(email)
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xff616AE5)
                 ),
@@ -196,6 +199,8 @@ fun ForgetPasswordEmailEnterScreen() {
 @Composable
 fun ForgetPasswordEmailEnterScreenPreview() {
     SE121P11NewTheme {
-        ForgetPasswordEmailEnterScreen()
+        ForgetPasswordEmailEnterScreen(
+            onResetPasswordClick = { _ -> }
+        )
     }
 }

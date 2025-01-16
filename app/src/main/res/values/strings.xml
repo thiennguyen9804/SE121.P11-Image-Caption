@@ -47,4 +47,6 @@
     <string name="no_saved_image_text">Bạn chưa lưu hình ảnh nào cả :((</string>
     <string name="vocabulary_storing_text">Lưu trữ từ vựng</string>
     <string name="no_saved_vocabulary_text">Bạn chưa lưu từ vựng nào cả :((</string>
+    <string name="two_passwords_must_be_the_same">Xác nhận mật khẩu và mật khẩu không giống nhau</string>
+    <string name="all_fields_must_be_filled">Bạn phải nhập đầy đủ các trường!!!</string>
 </resources>
